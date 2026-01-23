@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="AdMarketplace.Database\AdMarketplace.Database.csproj" />
+  <Project Path="AdMarketplace.Domain\AdMarketplace.Domain.csproj" />
+  <Project Path="AdMarketplace.Infra\AdMarketplace.Infra.csproj" />
+  <Project Path="AdMarketplace\AdMarketplace.csproj" />
+</Solution>
