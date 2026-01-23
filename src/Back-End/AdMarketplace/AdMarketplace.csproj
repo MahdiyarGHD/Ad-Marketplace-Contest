@@ -17,8 +17,4 @@
       <ProjectReference Include="..\AdMarketplace.Infra\AdMarketplace.Infra.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Endpoints\General\" />
-    </ItemGroup>
-
 </Project>

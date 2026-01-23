@@ -1,9 +1,9 @@
-using ErrorOr;
+using EasyMicroservices.ServiceContracts;
 using FastEndpoints;
 
 namespace AdMarketplace.Endpoints.General.Ping;
 
-public class MyEndpoint : EndpointWithoutRequest<ErrorOr<bool>>
+public class MyEndpoint : EndpointWithoutRequest<MessageContract>
 {
     public override void Configure()
     {
