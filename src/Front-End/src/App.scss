@@ -1,0 +1,82 @@
+body {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+}
+
+.App {
+  height: 100%;
+  transition: all .3s ease;
+}
+
+.Main {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.SafeArea {
+  height: calc(100% - var(--tg-viewport-safe-area-inset-top, 0px));
+  padding-top: calc(var(--tg-viewport-safe-area-inset-top, 0px) + var(--tg-viewport-content-safe-area-inset-top, 0px));
+}
+
+.TopBar {
+  display: flex;
+  padding: 1rem;
+  justify-content: space-between;
+  align-items: center;
+
+  .AppName {
+    font-size: 24px;
+    font-weight: 500;
+    flex: 1;
+    margin-left: -12px;
+    padding-left: 12px;
+    overflow: hidden;
+  }
+
+  .AppName .title span {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+  }
+
+  .Buttons {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+
+    &>div {
+      display: flex;
+      cursor: pointer;
+    }
+  }
+}
+
+.BottomBar {
+  display: flex;
+  border-top: 1px solid var(--border-color);
+
+  .Item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    flex: 1;
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 1.2;
+    padding-block: 8px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all .2s ease;
+
+    &:active {
+      transform: scale(.95);
+      background-color: var(--active-bg);
+    }
+
+    .meta {
+      flex: 1;
+    }
+  }
+}

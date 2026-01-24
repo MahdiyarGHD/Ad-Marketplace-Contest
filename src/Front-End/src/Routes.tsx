@@ -1,0 +1,34 @@
+import { Suspense } from "react"
+import { createBrowserRouter, Outlet, RouterProvider, useLocation } from "react-router-dom"
+import Main from "./Components/Main"
+
+const Loading = () => {
+    return <div className="LoadingBar">
+        Loading...
+    </div>
+}
+
+const RootLayout = () => {
+    const location = useLocation()
+    return <div key={location.pathname} style={{ height: '100%' }}>
+        <Suspense fallback={<Loading />}>
+            <Outlet />
+        </Suspense>
+    </div>
+}
+
+const router = createBrowserRouter([{
+    path: '/',
+    element: <RootLayout />,
+    children: [{
+        element: <Main />,
+        children: [{
+            index: true,
+            // element: <Home />
+        }]
+    }]
+}])
+
+export default function Routes() {
+    return <RouterProvider router={router} />
+}
