@@ -13,12 +13,15 @@ bld.Services.ConfigureJsonSerializer();
 bld.Services.ConfigureServices();
 bld.Services.ConfigureHelpers();
 bld.Services.ConfigureOptions(bld.Configuration);
+bld.Services.ConfigureAuthentication(bld.Configuration);
 
 var app = bld.Build();
 
 app.UseCustomExceptionHandler();
-app.UseFastEndpoints();
+app.UseAuthentication();
+app.UseAuthorization();
 
+app.UseFastEndpoints();
 
 app.UseSwaggerGen();
 
