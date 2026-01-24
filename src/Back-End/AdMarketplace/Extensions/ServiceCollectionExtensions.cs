@@ -1,6 +1,7 @@
 using System.Text.Json;
 using AdMarketplace.Domain.Options;
 using AdMarketplace.Infra.Helpers;
+using FastEndpoints.Security;
 
 namespace AdMarketplace.Extensions;
 
@@ -34,6 +35,18 @@ public static class ServiceCollectionExtensions
             services.Configure<TelegramBotOptions>(
                 configuration.GetSection(TelegramBotOptions.KeyName));
         
+            services.Configure<JwtOptions>(
+                configuration.GetSection(JwtOptions.KeyName));
+        
+            return services;
+        }
+        
+        public IServiceCollection ConfigureAuthentication(IConfiguration configuration)
+        {
+            services.AddAuthenticationJwtBearer(s => 
+                    s.SigningKey = configuration.GetValue<string>($"{JwtOptions.KeyName}:SigningKey") ?? throw new ArgumentNullException()
+                );
+            services.AddAuthorization();
             return services;
         }
     }
