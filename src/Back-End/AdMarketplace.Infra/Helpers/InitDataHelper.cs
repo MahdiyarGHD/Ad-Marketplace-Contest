@@ -4,20 +4,20 @@ using System.Text.Json;
 using System.Web;
 using AdMarketplace.Domain.Contracts.Common;
 using AdMarketplace.Domain.Options;
-using EasyMicroservices.ServiceContracts;
+using ErrorOr;
 using Microsoft.Extensions.Options;
 
 namespace AdMarketplace.Infra.Helpers;
 
 public class InitDataHelper(IOptions<TelegramBotOptions> botOptions, JsonSerializerOptions serializerOptions)
 {
-    public async Task<MessageContract<InitDataUserContract>> ValidateInitDataAsync(string initData)
+    public async Task<ErrorOr<InitDataUserContract>> ValidateInitDataAsync(string initData)
     {
         var botToken = botOptions.Value.Token;
         var data = HttpUtility.ParseQueryString(initData);
         
         if(IsDataExpired(data["auth_date"]))
-            return FailedReasonType.Incorrect;
+            return Error.Forbidden();
         
         var hash = data["hash"];
 
@@ -33,13 +33,13 @@ public class InitDataHelper(IOptions<TelegramBotOptions> botOptions, JsonSeriali
         var computedHash = Convert.ToHexStringLower(hashBytes);
 
         if (!computedHash.Equals(hash))
-            return FailedReasonType.Incorrect;
+            return Error.Forbidden();
 
         using var inputStream = new MemoryStream(Encoding.UTF8.GetBytes(data["user"] ?? string.Empty));
         var initDataContract = await JsonSerializer.DeserializeAsync<InitDataUserContract>(inputStream, serializerOptions);
 
         if(initDataContract is null)
-            return FailedReasonType.Incorrect;
+            return Error.Forbidden();
         
         return initDataContract;
     }

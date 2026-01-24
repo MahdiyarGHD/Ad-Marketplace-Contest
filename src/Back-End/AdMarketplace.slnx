@@ -1,4 +1,8 @@
 <Solution>
+  <Folder Name="/Solution Items/">
+    <File Path="compose.yaml" />
+    <File Path="nuget.config" />
+  </Folder>
   <Project Path="AdMarketplace.Database\AdMarketplace.Database.csproj" />
   <Project Path="AdMarketplace.Domain\AdMarketplace.Domain.csproj" />
   <Project Path="AdMarketplace.Infra\AdMarketplace.Infra.csproj" />

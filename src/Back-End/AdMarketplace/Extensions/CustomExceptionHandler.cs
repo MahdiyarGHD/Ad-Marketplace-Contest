@@ -1,5 +1,5 @@
 using System.Net;
-using EasyMicroservices.ServiceContracts;
+using ErrorOr;
 using Microsoft.AspNetCore.Diagnostics;
 
 namespace AdMarketplace.Extensions;
@@ -24,11 +24,9 @@ public static class ExceptionHandlerExtensions
                             ctx.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
                             ctx.Response.ContentType = "application/problem+json";
                             
-                            MessageContract messageContract = FailedReasonType.InternalError;
-                            messageContract.Error.Message = exHandlerFeature.Error.Message;
-                            messageContract.Error.StackTrace = [];
+                            var result = Error.Unexpected(exHandlerFeature.Error.Message);
 
-                            await ctx.Response.WriteAsJsonAsync(messageContract);
+                            await ctx.Response.WriteAsJsonAsync(result);
                         }
                     });
             });
