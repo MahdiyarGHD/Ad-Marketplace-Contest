@@ -1,7 +1,9 @@
 using System.Text.Json;
+using AdMarketplace.Database;
 using AdMarketplace.Domain.Options;
 using AdMarketplace.Infra.Helpers;
 using FastEndpoints.Security;
+using Microsoft.EntityFrameworkCore;
 
 namespace AdMarketplace.Extensions;
 
@@ -30,6 +32,17 @@ public static class ServiceCollectionExtensions
             return services;
         }
 
+        public IServiceCollection ConfigureDbContexts(IConfiguration configuration)
+        {
+            services.AddDbContext<AdMarketDbContext>(options =>
+            {
+                options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
+                options.UseNpgsql(configuration.GetConnectionString(AdMarketDbContextSchema.DefaultConnectionStringName));
+            });
+
+            return services;
+        }
+        
         public IServiceCollection ConfigureOptions(IConfiguration configuration)
         {
             services.Configure<TelegramBotOptions>(
