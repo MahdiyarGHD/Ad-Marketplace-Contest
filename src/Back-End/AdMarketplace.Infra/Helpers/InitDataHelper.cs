@@ -17,14 +17,14 @@ public class InitDataHelper(IOptions<TelegramBotOptions> botOptions, JsonSeriali
         var data = HttpUtility.ParseQueryString(initData);
         
         if(IsDataExpired(data["auth_date"]))
-            return Error.Forbidden();
+            return Error.Forbidden("The init data is expired.");
         
         var hash = data["hash"];
 
         data.Remove("hash");
 
         var checkString = string.Join("\n", data.AllKeys.OrderBy(key => key)
-            .Select(key => $"{key}={data[key]?.Replace("/", "\\/")}")
+            .Select(key => $"{key}={data[key]}")
         );
         var hmacKey = new HMACSHA256("WebAppData"u8.ToArray());
         var secretKey = hmacKey.ComputeHash(Encoding.UTF8.GetBytes(botToken));
@@ -33,7 +33,7 @@ public class InitDataHelper(IOptions<TelegramBotOptions> botOptions, JsonSeriali
         var computedHash = Convert.ToHexStringLower(hashBytes);
 
         if (!computedHash.Equals(hash))
-            return Error.Forbidden();
+            return Error.Forbidden("The init data is invalid.");
 
         using var inputStream = new MemoryStream(Encoding.UTF8.GetBytes(data["user"] ?? string.Empty));
         var initDataContract = await JsonSerializer.DeserializeAsync<InitDataUserContract>(inputStream, serializerOptions);
@@ -50,6 +50,6 @@ public class InitDataHelper(IOptions<TelegramBotOptions> botOptions, JsonSeriali
             return true;
 
         var dateTime = DateTimeOffset.FromUnixTimeSeconds(dateUnix).UtcDateTime;
-        return (DateTimeOffset.UtcNow - dateTime).TotalSeconds > 60;
+        return (DateTimeOffset.UtcNow - dateTime).TotalSeconds > 3600; // ToDo: after implementing mini app, reduce this to something like 60s
     } 
 }

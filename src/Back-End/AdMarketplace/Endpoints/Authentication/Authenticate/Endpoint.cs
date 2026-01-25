@@ -22,7 +22,9 @@ public class Endpoint(InitDataHelper initDataHelper, IOptions<JwtOptions> jwtOpt
     {
         var validationResult = await initDataHelper.ValidateInitDataAsync(req.InitData);
         if (validationResult.IsError)
-            return Error.Forbidden();
+            return validationResult.Errors;
+        
+        // ToDo: persist user data if it isn't there
         
         var jwtSetting = jwtOptions.Value;
         var jwtToken = JwtBearer.CreateToken(options =>
