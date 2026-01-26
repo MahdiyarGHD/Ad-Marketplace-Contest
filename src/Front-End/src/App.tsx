@@ -1,83 +1,105 @@
-import { useEffect } from 'react'
-import './App.scss'
-import { backButton, init, isTMA, miniApp, on, retrieveLaunchParams, themeParams, viewport } from '@tma.js/sdk-react';
-import Routes from './Routes';
+import { useEffect } from "react";
+import "./App.scss";
+import {
+	backButton,
+	init,
+	initData,
+	isTMA,
+	miniApp,
+	on,
+	retrieveLaunchParams,
+	retrieveRawInitData,
+	themeParams,
+	viewport,
+} from "@tma.js/sdk-react";
+import Routes from "./Routes";
+import useAppStore from "./stores/useAppStore";
 
 function App() {
-  const handleTheme = (isDark: boolean) => {
-    document.body.setAttribute("data-theme", isDark ? "dark" : "light");
-  }
+	const { authenticate } = useAppStore();
 
-  const initializeTMA = async () => {
-    if (isTMA()) {
-      init()
+	const rawInitData = retrieveRawInitData();
 
-      const lp = retrieveLaunchParams()
+	const handleTheme = (isDark: boolean) => {
+		document.body.setAttribute("data-theme", isDark ? "dark" : "light");
+	};
 
-      const platform = lp.tgWebAppPlatform
+	const initializeTMA = async () => {
+		if (isTMA()) {
+			init();
 
-      if (
-        viewport.mount.isAvailable() &&
-        !viewport.isMounted()
-      ) {
-        await viewport.mount();
+			const lp = retrieveLaunchParams();
 
-        viewport.expand()
+			const platform = lp.tgWebAppPlatform;
 
-        if (viewport.requestFullscreen.isAvailable() &&
-          (platform === 'ios' || platform === 'android'))
-          await viewport.requestFullscreen();
+			if (viewport.mount.isAvailable() && !viewport.isMounted()) {
+				await viewport.mount();
 
-        viewport.bindCssVars()
-      }
+				viewport.expand();
 
-      if (!miniApp.isMounted()) {
-        miniApp.mount()
+				if (
+					viewport.requestFullscreen.isAvailable() &&
+					(platform === "ios" || platform === "android")
+				)
+					await viewport.requestFullscreen();
 
-        miniApp.ready()
+				viewport.bindCssVars();
+			}
 
-        handleTheme(miniApp.isDark())
-      }
+			if (!miniApp.isMounted()) {
+				miniApp.mount();
 
-      if (!themeParams.isMounted()) {
-        themeParams.mount()
-        themeParams.bindCssVars()
-      }
+				miniApp.ready();
 
-      if (backButton.mount.isAvailable())
-        backButton.mount()
-    }
-  }
+				handleTheme(miniApp.isDark());
+			}
 
-  useEffect(() => {
-    initializeTMA();
+			if (!themeParams.isMounted()) {
+				themeParams.mount();
+				themeParams.bindCssVars();
+			}
 
-    // document.addEventListener("contextmenu", (event) => {
-    //   event.preventDefault();
-    // });
+			if (backButton.mount.isAvailable()) backButton.mount();
+		}
+	};
 
-    // handleTheme(true)
+	const handleAuth = () => {
+		authenticate(rawInitData);
+	};
 
-    on('theme_changed', () => handleTheme(miniApp.isDark()))
+	useEffect(() => {
+		initializeTMA();
 
-    return () => {
-      if (viewport.isMounted()) {
-        // viewport.unmount();
-      }
+		handleAuth();
 
-      if (miniApp.isMounted()) {
-        miniApp.unmount();
-      }
+		// document.addEventListener("contextmenu", (event) => {
+		//   event.preventDefault();
+		// });
 
-      if (themeParams.isMounted()) {
-        themeParams.unmount();
-      }
-    };
-  }, []);
+		// handleTheme(true)
 
-  return <div className="App">
-      <Routes />
-    </div>
+		on("theme_changed", () => handleTheme(miniApp.isDark()));
+
+		return () => {
+			if (viewport.isMounted()) {
+				// viewport.unmount();
+			}
+
+			if (miniApp.isMounted()) {
+				miniApp.unmount();
+			}
+
+			if (themeParams.isMounted()) {
+				themeParams.unmount();
+			}
+		};
+	}, []);
+
+	return (
+		<div className="App">
+			<Routes />
+		</div>
+	);
 }
 
-export default App
+export default App;
