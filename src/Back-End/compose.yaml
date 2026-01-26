@@ -1,0 +1,10 @@
+﻿services:
+  admarketplace:
+    image: admarketplace
+    ports:
+      - "8080:8080"
+    environment:
+      - TelegramBot__Token=00ED8FD146C24D6DA9770F84A4508E0C
+    build:
+      context: .
+      dockerfile: AdMarketplace/Dockerfile
