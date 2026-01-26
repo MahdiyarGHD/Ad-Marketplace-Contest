@@ -1,25 +1,39 @@
-import { useLaunchParams } from "@tma.js/sdk-react";
-import { memo } from "react";
+import { retrieveRawInitData, useLaunchParams } from "@tma.js/sdk-react";
+import { HomeIcon } from "lucide-react";
+import { memo, useEffect } from "react";
 
-function BottomBar({ }) {
-    const launchParams = useLaunchParams()
+function BottomBar() {
+	const launchParams = useLaunchParams();
+	const rawInitData = retrieveRawInitData();
 
-    const firstName = launchParams.tgWebAppData?.user?.first_name;
+	const firstName = launchParams.tgWebAppData?.user?.first_name;
 
-    return <div className="BottomBar">
-        <div className="Item">
-            <div className="meta"></div>
-            <div className="title">Home</div>
-        </div>
-        <div className="Item">
-            <div className="meta">
-                <div className="Avatar">
-                    <div className="title">{firstName?.charAt(0).toUpperCase()}</div>
-                </div>
-            </div>
-            <div className="title">{firstName}</div>
-        </div>
-    </div>
+	useEffect(() => {
+		console.log(rawInitData);
+	}, []);
+
+	return (
+		<div className="BottomBar">
+			<div className="Item">
+				<div className="meta">
+					<HomeIcon />
+				</div>
+				<div className="title">Home</div>
+			</div>
+			<div className="Item">
+				<div className="meta"></div>
+				<div className="title">My Channels</div>
+			</div>
+			<div className="Item">
+				<div className="meta">
+					<div className="Avatar">
+						<div className="title">{firstName?.charAt(0).toUpperCase()}</div>
+					</div>
+				</div>
+				<div className="title">{firstName}</div>
+			</div>
+		</div>
+	);
 }
 
-export default memo(BottomBar)
+export default memo(BottomBar);
