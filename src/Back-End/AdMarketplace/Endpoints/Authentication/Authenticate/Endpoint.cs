@@ -2,6 +2,7 @@ using System.Security.Claims;
 using AdMarketplace.Domain.Contracts.Common;
 using AdMarketplace.Domain.Options;
 using AdMarketplace.Infra.Helpers;
+using AdMarketplace.Infra.Interfaces;
 using ErrorOr;
 using FastEndpoints;
 using FastEndpoints.Security;
@@ -9,7 +10,11 @@ using Microsoft.Extensions.Options;
 
 namespace AdMarketplace.Endpoints.Authentication.Authenticate;
 
-public class Endpoint(InitDataHelper initDataHelper, IOptions<JwtOptions> jwtOptions, ILogger<Endpoint> logger)
+public class Endpoint(
+    InitDataHelper initDataHelper,
+    IOptions<JwtOptions> jwtOptions, 
+    IUserService userService,
+    ILogger<Endpoint> logger)
     : Endpoint<Request, ErrorOr<Response>>
 {
     public override void Configure()
@@ -23,8 +28,8 @@ public class Endpoint(InitDataHelper initDataHelper, IOptions<JwtOptions> jwtOpt
         var validationResult = await initDataHelper.ValidateInitDataAsync(req.InitData);
         if (validationResult.IsError)
             return validationResult.Errors;
-        
-        // ToDo: persist user data if it isn't there
+
+        await userService.EnsureExistsAsync(validationResult.Value);
         
         var jwtSetting = jwtOptions.Value;
         var jwtToken = JwtBearer.CreateToken(options =>
