@@ -4,7 +4,30 @@
     ports:
       - "8080:8080"
     environment:
-      - TelegramBot__Token=00ED8FD146C24D6DA9770F84A4508E0C
+      - TelegramBot__Token=8570922135:AAGdFaRa62TrYK9vpr5zvvvCKUQWFDBug1k
+      - ConnectionStrings__Main=Host=postgres;Port=5432;Database=AdMarketplace;Username=postgres;Password=postgres;Include Error Detail=true;
+    depends_on:
+      postgres:
+        condition: service_healthy
     build:
       context: .
       dockerfile: AdMarketplace/Dockerfile
+
+  postgres:
+    image: postgres:16-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=AdMarketplace
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:

@@ -2,6 +2,8 @@ using System.Text.Json;
 using AdMarketplace.Database;
 using AdMarketplace.Domain.Options;
 using AdMarketplace.Infra.Helpers;
+using AdMarketplace.Infra.Interfaces;
+using AdMarketplace.Infra.Services;
 using FastEndpoints.Security;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,6 +15,8 @@ public static class ServiceCollectionExtensions
     {
         public IServiceCollection ConfigureServices()
         {
+            services.AddScoped<IUserService, UserService>();
+            
             return services;
         }
         
@@ -50,7 +54,32 @@ public static class ServiceCollectionExtensions
         
             services.Configure<JwtOptions>(
                 configuration.GetSection(JwtOptions.KeyName));
+
+            services.Configure<CorsOptions>(
+                configuration.GetSection(CorsOptions.KeyName));
         
+            return services;
+        }
+
+        public IServiceCollection ConfigureCors(IConfiguration configuration)
+        {
+            var corsOptions = configuration.GetSection(CorsOptions.KeyName).Get<CorsOptions>() ?? new CorsOptions();
+            var allowAnyOrigin = corsOptions.Origins.Count == 0 || corsOptions.Origins.Contains("*");
+
+            services.AddCors(options =>
+            {
+                options.AddPolicy(CorsOptions.PolicyName, policy =>
+                {
+                    if (allowAnyOrigin)
+                        policy.AllowAnyOrigin();
+                    else
+                        policy.WithOrigins(corsOptions.Origins.ToArray());
+
+                    policy.AllowAnyMethod();
+                    policy.AllowAnyHeader();
+                });
+            });
+
             return services;
         }
         
