@@ -8,9 +8,13 @@ type AppState = {
 
 const useAppStore = create<AppState>((set) => ({
 	async authenticate(initData) {
-		const response = await requestAPI("/authenticate", { initData });
+		const response = await requestAPI("/api/authentication/authenticate", {
+			initData,
+		});
 
 		set({ token: response.value.accessToken });
+
+		console.log("token", this.token);
 	},
 }));
 

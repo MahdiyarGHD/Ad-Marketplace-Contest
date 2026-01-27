@@ -1,114 +1,116 @@
 @font-face {
-  font-family: Roboto;
-  src: url(./assets/fonts/Roboto/Roboto-Regular.ttf);
+	font-family: Roboto;
+	src: url(./assets/fonts/Roboto/Roboto-Regular.ttf);
 }
 
 @font-face {
-  font-family: Roboto;
-  font-weight: 500;
-  src: url(./assets/fonts/Roboto/Roboto-Medium.ttf);
+	font-family: Roboto;
+	font-weight: 500;
+	src: url(./assets/fonts/Roboto/Roboto-Medium.ttf);
 }
 
 @font-face {
-  font-family: Roboto;
-  font-weight: bold;
-  src: url(./assets/fonts/Roboto/Roboto-Bold.ttf);
+	font-family: Roboto;
+	font-weight: bold;
+	src: url(./assets/fonts/Roboto/Roboto-Bold.ttf);
 }
 
 @font-face {
-  font-family: "SF Pro Text";
-  font-style: normal;
-  font-weight: 300;
-  src: url("https://raw.githubusercontent.com/blaisck/sfwin/master/SFPro/TrueType/SFProText-Light.ttf");
+	font-family: "SF Pro Text";
+	font-style: normal;
+	font-weight: 300;
+	src: url("https://raw.githubusercontent.com/blaisck/sfwin/master/SFPro/TrueType/SFProText-Light.ttf");
 }
 
 @font-face {
-  font-family: "SF Pro Text";
-  font-style: normal;
-  font-weight: 400;
-  src: url("https://raw.githubusercontent.com/blaisck/sfwin/master/SFPro/TrueType/SFProText-Regular.ttf");
+	font-family: "SF Pro Text";
+	font-style: normal;
+	font-weight: 400;
+	src: url("https://raw.githubusercontent.com/blaisck/sfwin/master/SFPro/TrueType/SFProText-Regular.ttf");
 }
 
 @font-face {
-  font-family: "SF Pro Text";
-  font-style: normal;
-  font-weight: 500;
-  src: url("https://raw.githubusercontent.com/blaisck/sfwin/master/SFPro/TrueType/SFProText-Medium.ttf");
+	font-family: "SF Pro Text";
+	font-style: normal;
+	font-weight: 500;
+	src: url("https://raw.githubusercontent.com/blaisck/sfwin/master/SFPro/TrueType/SFProText-Medium.ttf");
 }
 
 @font-face {
-  font-family: "SF Pro Text";
-  font-style: normal;
-  font-weight: 600;
-  src: url("https://raw.githubusercontent.com/blaisck/sfwin/master/SFPro/TrueType/SFProText-SemiBold.ttf");
+	font-family: "SF Pro Text";
+	font-style: normal;
+	font-weight: 600;
+	src: url("https://raw.githubusercontent.com/blaisck/sfwin/master/SFPro/TrueType/SFProText-SemiBold.ttf");
 }
 
 * {
-  padding: 0;
-  margin: 0;
-  box-sizing: border-box;
-  user-select: none;
-  -webkit-tap-highlight-color: rgba(255, 255, 255, 0)
+	padding: 0;
+	margin: 0;
+	box-sizing: border-box;
+	user-select: none;
+	-webkit-tap-highlight-color: rgba(255, 255, 255, 0);
 }
 
 html {
-  overscroll-behavior: none;
-  overflow: hidden;
+	overscroll-behavior: none;
+	overflow: hidden;
 }
 
 html,
 body {
-  margin: 0;
-  font-family: "SF Pro Text", -apple-system, BlinkMacSystemFont, Roboto, Vazirmatn, OpenSans, 'Segoe UI', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  height: 100%;
+	margin: 0;
+	font-family:
+		"SF Pro Text", -apple-system, BlinkMacSystemFont, Roboto, Vazirmatn, OpenSans, "Segoe UI", "Oxygen",
+		"Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+		sans-serif;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	height: 100%;
 }
 
 body {
-  background-color: #000;
+	background-color: #000;
 }
 
 #root {
-  height: 100%;
+	height: 100%;
 }
 
 :root {
-  background-color: #fff;
-  color: #000;
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+	background-color: #fff;
+	color: #000;
+	font-synthesis: none;
+	text-rendering: optimizeLegibility;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
 }
 
 :root {
-  --bg-color: #fff;
-  --bg-color-rgb: 255, 255, 255;
-  --active-bg: #0001;
-  --border-color: #0001;
-  --text-color: #000;
-  --secondary-text: #0007;
-  --primary-background: #000;
-  --primary-text: #fff;
-  --secondary-background: #0001;
+	--bg-color: #fff;
+	--bg-color-rgb: 255, 255, 255;
+	--active-bg: #0001;
+	--border-color: #0001;
+	--text-color: #000;
+	--secondary-text: #0007;
+	--primary-background: #000;
+	--primary-text: #fff;
+	--secondary-background: #0001;
 
-  --topbar-height: 60px;
+	--topbar-height: 60px;
 
-  /* --tg-viewport-safe-area-inset-top: 20px;
+	/* --tg-viewport-safe-area-inset-top: 20px;
   --tg-viewport-content-safe-area-inset-top: 20px; */
 }
 
 body[data-theme="dark"] {
-  --bg-color: #000;
-  --bg-color-rgb: 0, 0, 0;
-  --active-bg: #fff2;
-  --border-color: #fff1;
-  --text-color: #fff;
-  --secondary-text: #fff7;
-  --primary-background: #fff;
-  --primary-text: #000;
-  --secondary-background: #fff1;
+	--bg-color: #000;
+	--bg-color-rgb: 0, 0, 0;
+	--hover-bg: #fff1;
+	--active-bg: #fff2;
+	--border-color: #fff1;
+	--text-color: #fff;
+	--secondary-text: #fff7;
+	--primary-background: #fff;
+	--primary-text: #000;
+	--secondary-background: #fff1;
 }
