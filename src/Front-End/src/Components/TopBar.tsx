@@ -1,16 +1,21 @@
 import { memo, useState } from "react";
 import TextTransition from "./TextTransition";
 import { SearchIcon } from "lucide-react";
+import useUIStore from "../stores/useUIStore";
 
 function TopBar() {
 	const [fetched, setFetched] = useState(false);
+
+	const { topBarTitle } = useUIStore();
 
 	return (
 		<div className="TopBar">
 			<div className="AppName">
 				<div className="title">
 					<TextTransition
-						text={fetched ? "Ad Marketplace" : "Fetching Data..."}
+						text={
+							topBarTitle ?? (fetched ? "Ad Marketplace" : "Fetching Data...")
+						}
 					/>
 				</div>
 			</div>
