@@ -7,6 +7,7 @@ import {
 } from "react-router-dom";
 import Main from "./components/Main";
 import Home from "./pages/Home";
+import MyChannels from "./pages/MyChannels";
 
 const Loading = () => {
 	return <div className="LoadingBar">Loading...</div>;
@@ -34,6 +35,10 @@ const router = createBrowserRouter([
 					{
 						index: true,
 						element: <Home />,
+					},
+					{
+						path: "my-channels",
+						element: <MyChannels />,
 					},
 				],
 			},

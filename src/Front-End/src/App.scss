@@ -55,6 +55,7 @@ body {
 .BottomBar {
   display: flex;
   border-top: 1px solid var(--border-color);
+  // padding-inline: 2px;
 
   .Item {
     display: flex;
@@ -68,12 +69,19 @@ body {
     line-height: 1.2;
     padding-block: 4px;
     border-radius: 8px;
+    color: #aaa;
     cursor: pointer;
     transition: all 0.2s ease;
 
     &:active {
       transform: scale(.95);
+      color: #fff;
       background-color: var(--active-bg);
+    }
+    
+    &.active {
+      color: #fff;
+      // background-color: var(--active-bg);
     }
 
     .meta {
@@ -94,4 +102,67 @@ body {
   justify-content: center;
   background-color: var(--active-bg);
   border-radius: 50%;
+}
+
+@keyframes ItemLoading {
+  from {
+    background-position-x: 200%;
+  }
+
+  to {
+    background-position-x: 0%;
+  }
+}
+
+.Transition {
+  display: contents;
+
+  &.hidden {
+    visibility: hidden;
+  }
+}
+
+.TextTransition {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  min-width: 12rem;
+  /* min-height: 1.2rem; */
+}
+
+.TextTransition span {
+  position: relative;
+  left: 0px;
+  opacity: 1;
+  transition: all .3s ease;
+}
+
+.TextTransition span.showAnim {
+  left: 12px;
+  opacity: 0;
+}
+
+.TextTransition .prev {
+  position: absolute;
+  width: 100%;
+  left: -12px;
+  opacity: 0;
+}
+
+.TextTransition .prev.showAnim {
+  left: 0px;
+  opacity: 1;
+}
+
+.TextTransition .Transition.hidden {
+  visibility: visible;
+}
+
+.TextTransition .Transition.hidden span {
+  visibility: hidden;
+}
+
+.TextTransition .Transition.hidden .prev {
+  visibility: visible !important;
 }

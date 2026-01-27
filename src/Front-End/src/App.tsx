@@ -5,6 +5,7 @@ import {
 	init,
 	initData,
 	isTMA,
+	mainButton,
 	miniApp,
 	on,
 	retrieveLaunchParams,
@@ -51,12 +52,16 @@ function App() {
 
 				miniApp.ready();
 
-				handleTheme(miniApp.isDark());
+				handleTheme(!miniApp.isDark());
 			}
 
 			if (!themeParams.isMounted()) {
 				themeParams.mount();
 				themeParams.bindCssVars();
+			}
+
+			if (!mainButton.isMounted()) {
+				mainButton.mount();
 			}
 
 			if (backButton.mount.isAvailable()) backButton.mount();
@@ -78,7 +83,7 @@ function App() {
 
 		// handleTheme(true)
 
-		on("theme_changed", () => handleTheme(miniApp.isDark()));
+		on("theme_changed", () => handleTheme(!miniApp.isDark()));
 
 		return () => {
 			if (viewport.isMounted()) {
