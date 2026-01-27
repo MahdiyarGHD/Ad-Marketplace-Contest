@@ -8,6 +8,7 @@ import {
 import Main from "./components/Main";
 import Home from "./pages/Home";
 import MyChannels from "./pages/MyChannels";
+import AddChannel from "./pages/AddChannel";
 
 const Loading = () => {
 	return <div className="LoadingBar">Loading...</div>;
@@ -41,6 +42,10 @@ const router = createBrowserRouter([
 						element: <MyChannels />,
 					},
 				],
+			},
+			{
+				path: "add-channel",
+				element: <AddChannel />,
 			},
 		],
 	},

@@ -166,3 +166,73 @@ body {
 .TextTransition .Transition.hidden .prev {
   visibility: visible !important;
 }
+
+.primary {
+  color: var(--tg-theme-accent-text-color);
+
+  &:hover {
+    background-color: color-mix(in srgb, var(--tg-theme-accent-text-color) 10%, transparent) !important;
+  }
+}
+
+.Items, .ChatList {
+  .Item, .ChatItem {
+      display: flex;
+      align-items: center;
+      gap: .25rem;
+      min-height: 3rem;
+      padding: .5rem;
+      padding-right: 1rem;
+      cursor: pointer;
+      position: relative;
+      transition: background-color .2s ease;
+
+      &:hover {
+        background-color: var(--hover-bg);
+      }
+
+      .icon {
+        width: 3rem;
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .body {
+        display: flex;
+        flex-direction: column;
+        gap: 0.33rem;
+        flex: 1 auto;
+
+        .subtitle {
+          font-size: .75rem;
+          color: #888;
+        }
+      }
+
+      .meta {
+        color: var(--tg-theme-subtitle-text-color);
+        font-size: .9rem;
+      }
+  }
+}
+
+.ChatList {
+  flex: 1;
+  overflow-y: auto;
+  background-color: var(--tg-theme-bg-color);
+  margin: .5rem;
+  border-radius: 1rem;
+
+  .ChatItem {
+    gap: 1rem;
+  }
+}
+
+.Placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 4rem 2rem;
+  gap: 1rem;
+}
