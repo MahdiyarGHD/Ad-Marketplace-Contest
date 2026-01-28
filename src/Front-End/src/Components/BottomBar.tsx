@@ -1,5 +1,10 @@
 import { retrieveRawInitData, useLaunchParams } from "@tma.js/sdk-react";
-import { HomeIcon, MessageCircle } from "lucide-react";
+import {
+	HandshakeIcon,
+	HomeIcon,
+	MessageCircle,
+	StoreIcon,
+} from "lucide-react";
 import { memo, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { buildClassName } from "../utils/common";
@@ -27,9 +32,9 @@ function BottomBar() {
 				onClick={() => navigate("/")}
 			>
 				<div className="meta">
-					<HomeIcon />
+					<StoreIcon />
 				</div>
-				<div className="title">Home</div>
+				<div className="title">Market</div>
 			</div>
 			<div
 				className={buildClassName(
@@ -39,9 +44,9 @@ function BottomBar() {
 				onClick={() => navigate("/my-channels")}
 			>
 				<div className="meta">
-					<MessageCircle />
+					<HandshakeIcon />
 				</div>
-				<div className="title">My Channels</div>
+				<div className="title">Deals</div>
 			</div>
 			<div className="Item">
 				<div className="meta">
