@@ -12,6 +12,17 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+
+  >.Transition {
+    >div {
+      transition: transform .3s ease, opacity .3s ease;
+  
+      &.animate {
+        opacity: 0;
+        transform: translateX(10px);
+      }
+    }
+  }
 }
 
 .SafeArea {
@@ -176,6 +187,12 @@ body {
 }
 
 .Items, .ChatList {
+  flex: 1;
+  overflow-y: auto;
+  
+  margin: .5rem;
+  border-radius: 1rem;
+
   .Item, .ChatItem {
       display: flex;
       align-items: center;
@@ -184,11 +201,30 @@ body {
       padding: .5rem;
       padding-right: 1rem;
       cursor: pointer;
+      background-color: var(--tg-theme-bg-color);
       position: relative;
-      transition: background-color .2s ease;
+      transition: background-color .2s ease, opacity .3s ease;
 
       &:hover {
         background-color: var(--hover-bg);
+      }
+
+      &::after {
+        content: "";
+        background-color: #fff1;
+        position: absolute;
+        left: 3.75rem;
+        bottom: 0px;
+        width: calc(100% - 3.75rem);
+        height: 1px;
+      }
+
+      &:last-child::after {
+        display: none;
+      }
+
+      &.animate {
+        opacity: 0;
       }
 
       .icon {
@@ -206,23 +242,18 @@ body {
 
         .subtitle {
           font-size: .75rem;
-          color: #888;
+          color: var(--secondary-text);
         }
       }
 
       .meta {
-        color: var(--tg-theme-subtitle-text-color);
+        color: var(--secondary-text);
         font-size: .9rem;
       }
   }
 }
 
 .ChatList {
-  flex: 1;
-  overflow-y: auto;
-  background-color: var(--tg-theme-bg-color);
-  margin: .5rem;
-  border-radius: 1rem;
 
   .ChatItem {
     gap: 1rem;
@@ -235,4 +266,15 @@ body {
   align-items: center;
   margin: 4rem 2rem;
   gap: 1rem;
+}
+
+.Section {
+  display: flex;
+  flex-direction: column;
+
+  >.title {
+    color: var(--secondary-text);
+    font-size: .9rem;
+    margin: 0 1.5rem;
+  }
 }
