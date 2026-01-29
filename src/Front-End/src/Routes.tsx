@@ -27,39 +27,44 @@ const RootLayout = () => {
 	);
 };
 
-const router = createBrowserRouter([
+const router = createBrowserRouter(
+	[
+		{
+			path: "/",
+			element: <RootLayout />,
+			children: [
+				{
+					element: <Main />,
+					children: [
+						{
+							index: true,
+							element: <Home />,
+						},
+						{
+							path: "deals",
+							element: <Deals />,
+						},
+						{
+							path: "profile",
+							element: <Profile />,
+						},
+						{
+							path: "my-channels",
+							element: <MyChannels />,
+						},
+					],
+				},
+				{
+					path: "add-channel",
+					element: <AddChannel />,
+				},
+			],
+		},
+	],
 	{
-		path: "/",
-		element: <RootLayout />,
-		children: [
-			{
-				element: <Main />,
-				children: [
-					{
-						index: true,
-						element: <Home />,
-					},
-					{
-						path: "deals",
-						element: <Deals />,
-					},
-					{
-						path: "profile",
-						element: <Profile />,
-					},
-					{
-						path: "my-channels",
-						element: <MyChannels />,
-					},
-				],
-			},
-			{
-				path: "add-channel",
-				element: <AddChannel />,
-			},
-		],
+		basename: "/Ad-Marketplace-Contest",
 	},
-]);
+);
 
 export default function Routes() {
 	return <RouterProvider router={router} />;
