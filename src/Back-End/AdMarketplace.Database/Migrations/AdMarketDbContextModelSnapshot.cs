@@ -74,6 +74,100 @@ namespace AdMarketplace.Database.Migrations
                     b.ToTable("Agents", "AdMarketplace");
                 });
 
+            modelBuilder.Entity("AdMarketplace.Database.Models.Category", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<int>("DisplayOrder")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Icon")
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.ToTable("Categories", "AdMarketplace");
+                });
+
+            modelBuilder.Entity("AdMarketplace.Database.Models.Channel", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("AverageViews")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid?>("CategoryId")
+                        .HasColumnType("uuid");
+
+                    b.Property<long>("ChatId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(1024)
+                        .HasColumnType("character varying(1024)");
+
+                    b.Property<Guid>("OwnerId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("PremiumCount")
+                        .HasColumnType("integer");
+
+                    b.Property<byte>("Status")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("smallint")
+                        .HasDefaultValue((byte)0);
+
+                    b.Property<int>("SubscriberCount")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Username")
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CategoryId");
+
+                    b.HasIndex("ChatId")
+                        .IsUnique();
+
+                    b.HasIndex("OwnerId");
+
+                    b.ToTable("Channels", "AdMarketplace");
+                });
+
             modelBuilder.Entity("AdMarketplace.Database.Models.User", b =>
                 {
                     b.Property<Guid>("Id")
@@ -108,6 +202,91 @@ namespace AdMarketplace.Database.Migrations
                         .IsUnique();
 
                     b.ToTable("Users", "AdMarketplace");
+                });
+
+            modelBuilder.Entity("AdMarketplace.Database.Models.UserChannelConnection", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<long>("ChatId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId", "ChatId")
+                        .IsUnique();
+
+                    b.ToTable("UserChannelConnections", "AdMarketplace");
+                });
+
+            modelBuilder.Entity("AdMarketplace.Database.Models.Channel", b =>
+                {
+                    b.HasOne("AdMarketplace.Database.Models.Category", "Category")
+                        .WithMany()
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("AdMarketplace.Database.Models.User", "Owner")
+                        .WithMany()
+                        .HasForeignKey("OwnerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.OwnsMany("AdMarketplace.Domain.Contracts.Common.LanguageDistributionContract", "LanguageDistributionJson", b1 =>
+                        {
+                            b1.Property<Guid>("ChannelId");
+
+                            b1.Property<int>("__synthesizedOrdinal")
+                                .ValueGeneratedOnAdd();
+
+                            b1.Property<string>("Language")
+                                .IsRequired()
+                                .HasMaxLength(16);
+
+                            b1.Property<double>("Percentage");
+
+                            b1.HasKey("ChannelId", "__synthesizedOrdinal");
+
+                            b1.ToTable("Channels", "AdMarketplace");
+
+                            b1
+                                .ToJson("LanguageDistributionJson")
+                                .HasColumnType("jsonb");
+
+                            b1.WithOwner()
+                                .HasForeignKey("ChannelId");
+                        });
+
+                    b.Navigation("Category");
+
+                    b.Navigation("LanguageDistributionJson");
+
+                    b.Navigation("Owner");
+                });
+
+            modelBuilder.Entity("AdMarketplace.Database.Models.UserChannelConnection", b =>
+                {
+                    b.HasOne("AdMarketplace.Database.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 #pragma warning restore 612, 618
         }

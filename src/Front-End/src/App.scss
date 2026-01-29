@@ -278,3 +278,66 @@ body {
     margin: 0 1.5rem;
   }
 }
+
+.Tabs {
+  display: flex;
+  gap: 8px;
+  padding: 8px;
+  position: sticky;
+  top: 0px;
+  background-color: var(--secondary);
+  z-index: 1;
+}
+
+.Tab {
+  background-color: transparent;
+  padding: 6px;
+  border-radius: 8px;
+  font-weight: 500;
+  transition: all .3s ease;
+  cursor: pointer;
+  user-select: none;
+}
+
+.Tab:hover {
+  background-color: var(--hover-bg);
+}
+
+.Tab.active {
+  background-color: var(--active-bg);
+}
+
+.Tab .icon {
+  display: none;
+}
+
+.TabContainer,
+.TabContent {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.TabContent {
+  left: 0;
+  width: 100%;
+  overflow: hidden;
+  scroll-snap-align: center;
+  transition: left .3s ease;
+}
+
+.next .TabContent.hideAnim,
+.prev .TabContent.showAnim {
+  position: absolute;
+  left: -100%;
+  top: 51px;
+}
+
+.next .TabContent.showAnim,
+.prev .TabContent.hideAnim {
+  position: absolute;
+  left: 100%;
+  top: 51px;
+}
