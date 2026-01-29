@@ -1,0 +1,134 @@
+using System.Text.Json;
+using AdMarketplace.Bot;
+using AdMarketplace.Database;
+using AdMarketplace.Domain.Options;
+using AdMarketplace.Infra.Helpers;
+using AdMarketplace.Infra.Interfaces;
+using AdMarketplace.Infra.Services;
+using FastEndpoints.Security;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Protocols.Configuration;
+using Telegram.Bot;
+using Telegram.Bot.AspNetCore;
+
+namespace AdMarketplace.Extensions;
+
+public static class ServiceCollectionExtensions
+{
+    extension(IServiceCollection services)
+    {
+        public IServiceCollection ConfigureServices()
+        {
+            services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IChannelService, ChannelService>();
+            services.AddScoped<ICategoryService, CategoryService>();
+            services.AddScoped<IUserChannelConnectionService, UserChannelConnectionService>();
+            
+            
+            return services;
+        }
+
+        public IServiceCollection ConfigureBotHandler()
+        {
+            services.Scan(scan => scan
+                .FromAssemblyOf<UpdateHandler>()
+                .AddClasses(classes => classes.AssignableToAny(typeof(IHandler), typeof(IHandlerWithResult<>))));
+            
+            services.AddScoped<UpdateHandler>();
+            return services;
+        }
+        
+        public IServiceCollection ConfigureHelpers()
+        {
+            services.AddSingleton<InitDataHelper>();
+            return services;
+        }
+
+        public IServiceCollection ConfigureJsonSerializer()
+        {
+            services.AddSingleton(new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower
+            });
+        
+            return services;
+        }
+
+        public IServiceCollection ConfigureDbContexts(IConfiguration configuration)
+        {
+            services.AddDbContext<AdMarketDbContext>(options =>
+            {
+                options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
+                options.UseNpgsql(configuration.GetConnectionString(AdMarketDbContextSchema.DefaultConnectionStringName));
+            });
+
+            return services;
+        }
+        
+        public IServiceCollection ConfigureTelegramBot(IConfiguration configuration)
+        {
+            var botConfigSection = configuration.GetSection(TelegramBotOptions.KeyName).Get<TelegramBotOptions>();
+
+            if (botConfigSection is null)
+                throw new InvalidConfigurationException();
+            
+            var telegramBotClientOptions = new TelegramBotClientOptions(token: botConfigSection.Token, baseUrl: botConfigSection.BotApiServer);
+            
+            services.AddHttpClient("TgWebhook")
+                .RemoveAllLoggers()
+                .ConfigureHttpClient(_ => { })
+                .AddTypedClient<ITelegramBotClient>(
+                    httpClient => new TelegramBotClient(telegramBotClientOptions, httpClient));
+            
+            services.ConfigureTelegramBotMvc();
+            services.ConfigureTelegramBot<Microsoft.AspNetCore.Http.Json.JsonOptions>(opt => opt.SerializerOptions);
+            
+            return services;
+        }
+        
+        public IServiceCollection ConfigureOptions(IConfiguration configuration)
+        {
+            services.Configure<TelegramBotOptions>(
+                configuration.GetSection(TelegramBotOptions.KeyName));
+        
+            services.Configure<JwtOptions>(
+                configuration.GetSection(JwtOptions.KeyName));
+
+            services.Configure<CorsOptions>(
+                configuration.GetSection(CorsOptions.KeyName));
+        
+            return services;
+        }
+
+        public IServiceCollection ConfigureCors(IConfiguration configuration)
+        {
+            var corsOptions = configuration.GetSection(CorsOptions.KeyName).Get<CorsOptions>() ?? new CorsOptions();
+            var allowAnyOrigin = corsOptions.Origins.Count == 0 || corsOptions.Origins.Contains("*");
+
+            services.AddCors(options =>
+            {
+                options.AddPolicy(CorsOptions.PolicyName, policy =>
+                {
+                    if (allowAnyOrigin)
+                        policy.AllowAnyOrigin();
+                    else
+                        policy.WithOrigins(corsOptions.Origins.ToArray());
+
+                    policy.AllowAnyMethod();
+                    policy.AllowAnyHeader();
+                });
+            });
+
+            return services;
+        }
+        
+        public IServiceCollection ConfigureAuthentication(IConfiguration configuration)
+        {
+            services.AddAuthenticationJwtBearer(s => 
+                    s.SigningKey = configuration.GetValue<string>($"{JwtOptions.KeyName}:SigningKey") ?? throw new ArgumentNullException()
+                );
+            services.AddAuthorization();
+            return services;
+        }
+    }
+}

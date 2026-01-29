@@ -1,0 +1,46 @@
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - closed
+
+jobs:
+  deploy:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Setup Node
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20
+
+    - name: Create .env
+      run: |
+        cd src/Front-End
+        touch .env
+        echo "VITE_BACKEND_BASE_URL=${{secrets.BACKEND_BASE_URL}}" >> .env
+        echo "VITE_BOT_USERNAME=${{secrets.VITE_BOT_USERNAME}}" >> .env
+
+    - name: Install and Build
+      run: |
+        cd src/Front-End
+        npm ci
+        npm run build
+
+    - name: Upload Pages Artifact
+      uses: actions/upload-pages-artifact@v3
+      with:
+        path: src/Front-End/dist
+
+    - name: Deploy to GitHub Pages
+      uses: actions/deploy-pages@v4
