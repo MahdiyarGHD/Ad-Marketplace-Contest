@@ -10,6 +10,7 @@ import Home from "./pages/Home";
 import MyChannels from "./pages/MyChannels";
 import AddChannel from "./pages/AddChannel";
 import Profile from "./pages/Profile";
+import Deals from "./pages/Deals";
 
 const Loading = () => {
 	return <div className="LoadingBar">Loading...</div>;
@@ -39,12 +40,16 @@ const router = createBrowserRouter([
 						element: <Home />,
 					},
 					{
-						path: "my-channels",
-						element: <MyChannels />,
+						path: "deals",
+						element: <Deals />,
 					},
 					{
 						path: "profile",
 						element: <Profile />,
+					},
+					{
+						path: "my-channels",
+						element: <MyChannels />,
 					},
 				],
 			},

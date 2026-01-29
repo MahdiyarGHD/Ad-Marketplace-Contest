@@ -1,5 +1,4 @@
 import { useEffect } from "react";
-import Lottie from "../components/Lottie";
 import { backButton, mainButton, openTelegramLink } from "@tma.js/sdk-react";
 import "./AddChannel.scss";
 import { invokeHapticFeedbackImpact } from "../utils/common";
@@ -48,9 +47,7 @@ function AddChannel() {
 			</PageHeader>
 
 			<div className="Placeholder">
-				<div className="Emoji">
-					<Lottie file="bubble" size={120} />
-				</div>
+				<div className="Emoji">{/* <Lottie file="bubble" size={120} /> */}</div>
 				<h2 className="Title">Add Your Channel</h2>
 				<div className="Instructions">
 					<p className="InstructionText">
