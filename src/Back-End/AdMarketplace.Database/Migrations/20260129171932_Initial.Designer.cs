@@ -3,6 +3,7 @@ using System;
 using AdMarketplace.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AdMarketplace.Database.Migrations
 {
     [DbContext(typeof(AdMarketDbContext))]
-    partial class AdMarketDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260129171932_Initial")]
+    partial class Initial
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -230,7 +233,7 @@ namespace AdMarketplace.Database.Migrations
                     b.HasIndex("UserId", "ChatId")
                         .IsUnique();
 
-                    b.ToTable("UserChannelConnections", "AdMarketplace");
+                    b.ToTable("UserChannelLinks", "AdMarketplace");
                 });
 
             modelBuilder.Entity("AdMarketplace.Database.Models.Channel", b =>

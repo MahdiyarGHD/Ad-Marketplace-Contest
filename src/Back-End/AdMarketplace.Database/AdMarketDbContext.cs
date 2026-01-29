@@ -7,6 +7,9 @@ public class AdMarketDbContext(DbContextOptions<AdMarketDbContext> dbContextOpti
 {
     public DbSet<User> Users => Set<User>();
     public DbSet<Agent> Agents => Set<Agent>();
+    public DbSet<Channel> Channels => Set<Channel>();
+    public DbSet<Category> Categories => Set<Category>();
+    public DbSet<UserChannelConnection> UserChannelConnection => Set<UserChannelConnection>();
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
