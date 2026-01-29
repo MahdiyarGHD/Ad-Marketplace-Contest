@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <RootNamespace>AdMarketplace.Bot</RootNamespace>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+    <ItemGroup>
+      <PackageReference Include="Telegram.Bot.AspNetCore" Version="22.5.0" />
+    </ItemGroup>
+    <ItemGroup>
+      <ProjectReference Include="..\AdMarketplace.Infra\AdMarketplace.Infra.csproj" />
+    </ItemGroup>
+</Project>

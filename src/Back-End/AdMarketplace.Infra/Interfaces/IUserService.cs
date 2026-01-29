@@ -7,4 +7,5 @@ namespace AdMarketplace.Infra.Interfaces;
 public interface IUserService
 {
     Task<ErrorOr<User>> EnsureExistsAsync(InitDataUserContract initData);
+    Task<ErrorOr<User>> GetByUserIdAsync(long userId);
 }

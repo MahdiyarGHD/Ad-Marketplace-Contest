@@ -28,4 +28,13 @@ public class UserService(AdMarketDbContext dbContext) : IUserService
 
          return userToCreate;
      }
+
+     public async Task<ErrorOr<User>> GetByUserIdAsync(long userId)
+     {
+         var user = await dbContext.Users.FirstOrDefaultAsync(u => u.UserId.Equals(userId));
+         if (user is null)
+             return Error.NotFound("User.NotFound", "User not found");
+
+         return user;
+     }
 }
