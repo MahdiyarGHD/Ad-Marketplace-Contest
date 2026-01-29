@@ -5,13 +5,28 @@ import { PlusIcon } from "lucide-react";
 import "./MyChannels.scss";
 import { useNavigate } from "react-router-dom";
 import Transition from "../components/Transition";
+import { backButton } from "@tma.js/sdk-react";
+import { invokeHapticFeedbackImpact } from "../utils/common";
 
 function MyChannels() {
 	const navigate = useNavigate();
 
+	const onBackButton = () => {
+		navigate("/profile");
+	};
+
 	useEffect(() => {
-		// mainButton.setText("Add Your Channel");
-		// mainButton.show();
+		backButton.show();
+
+		backButton.onClick(onBackButton);
+
+		invokeHapticFeedbackImpact("medium");
+
+		return () => {
+			backButton.hide();
+
+			backButton.offClick(onBackButton);
+		};
 	}, []);
 
 	return (
