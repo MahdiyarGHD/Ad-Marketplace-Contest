@@ -19,14 +19,15 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v4
 
-    #- name: Create .env
-      #run: |
-        #touch .env
-        #echo "BaseUrl=Test" >> .env
-
+    - name: Create .env
+      run: |
+        cd src/Front-End
+        touch .env
+        echo "VITE_BACKEND_BASE_URL=${{secrets.BACKEND_BASE_URL}}" >> .env
+        echo "VITE_BOT_USERNAME=${{secrets.VITE_BOT_USERNAME}}" >> .env
+        
     - id: build-publish
       uses: bitovi/github-actions-react-to-github-pages@v1.2.4
       with:
-        path: build
-      #env:
-        #BaseUrl: ${{ secrets.BaseUrl }}
+        directory: src/Front-End
+        path: src/Front-End/build
