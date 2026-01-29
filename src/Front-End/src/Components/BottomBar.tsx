@@ -48,7 +48,7 @@ function BottomBar() {
 				</div>
 				<div className="title">Deals</div>
 			</div>
-			<div className="Item">
+			<div className="Item" onClick={() => navigate("/profile")}>
 				<div className="meta">
 					<div className="Avatar">
 						<div className="title">{firstName?.charAt(0).toUpperCase()}</div>
