@@ -1,0 +1,104 @@
+import { Children, isValidElement, memo, useEffect, useRef } from "react";
+import Transition from "./Transition";
+
+function Tabs({
+	tabs,
+	children,
+	index,
+	setIndex,
+	showOneTab = false,
+	bottom = false,
+}: {
+	tabs: React.ReactElement;
+	children: React.ReactNode;
+	index: number;
+	setIndex: (index: number) => void;
+	showOneTab?: boolean;
+	bottom?: boolean;
+}) {
+	const containerRef = useRef<HTMLDivElement>(null);
+	const prevIndex = useRef<number>(0);
+	const scrollDiv = useRef<HTMLDivElement>(null);
+
+	const tabCount = isValidElement(tabs)
+		? Children.count((tabs as any).props.children)
+		: 0;
+
+	useEffect(() => {
+		prevIndex.current = index;
+	}, []);
+
+	useEffect(() => {
+		// if (prevIndex.current > index) {
+		//     containerRef.current.classList.remove('next')
+		//     containerRef.current.classList.add('prev')
+		// } else if (prevIndex.current < index) {
+		//     containerRef.current.classList.remove('prev')
+		//     containerRef.current.classList.add('next')
+		// }
+		const widthPerTab = scrollDiv.current!.scrollWidth / tabCount;
+
+		if (scrollDiv.current && prevIndex.current !== index)
+			scrollDiv.current.scrollLeft = widthPerTab * index;
+
+		prevIndex.current = index;
+	}, [index]);
+
+	const onScroll = () => {
+		if (!scrollDiv.current) return;
+
+		const widthPerTab = scrollDiv.current?.scrollWidth / tabCount;
+		const currentIndex = Math.round(scrollDiv.current.scrollLeft / widthPerTab);
+
+		if (currentIndex !== index) {
+			prevIndex.current = currentIndex;
+			setIndex(currentIndex);
+		}
+	};
+
+	const TabsButtons = ((showOneTab && tabCount > 0) || tabCount > 1) && (
+		<Transition state={true}>
+			<div className="Tabs">{tabs}</div>
+		</Transition>
+	);
+
+	return (
+		<div className="TabContainer" ref={containerRef}>
+			{!bottom && TabsButtons}
+			<div
+				style={{
+					overflowX: "auto",
+					scrollSnapType: "x mandatory",
+					scrollBehavior: "smooth",
+					scrollbarWidth: "none",
+					flex: 1,
+				}}
+				ref={scrollDiv}
+				onScroll={onScroll}
+			>
+				<div
+					style={{
+						display: "flex",
+						width: `${(tabCount || 1) * 100}%`,
+						height: "100%",
+					}}
+				>
+					{children}
+				</div>
+			</div>
+			{bottom && TabsButtons}
+		</div>
+	);
+}
+
+export const TabContent = memo(
+	({ state, children }: { state: boolean; children: React.ReactNode }) => {
+		return (
+			<div className="TabContent">
+				<Transition state={state}>{children}</Transition>
+			</div>
+		);
+	},
+);
+
+export default memo(Tabs);

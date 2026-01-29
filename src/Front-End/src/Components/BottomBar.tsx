@@ -1,10 +1,5 @@
 import { retrieveRawInitData, useLaunchParams } from "@tma.js/sdk-react";
-import {
-	HandshakeIcon,
-	HomeIcon,
-	MessageCircle,
-	StoreIcon,
-} from "lucide-react";
+import { HandshakeIcon, StoreIcon } from "lucide-react";
 import { memo, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { buildClassName } from "../utils/common";
@@ -39,16 +34,22 @@ function BottomBar() {
 			<div
 				className={buildClassName(
 					"Item",
-					location.pathname === "/my-channels" && "active",
+					location.pathname === "/deals" && "active",
 				)}
-				onClick={() => navigate("/my-channels")}
+				onClick={() => navigate("/deals")}
 			>
 				<div className="meta">
 					<HandshakeIcon />
 				</div>
 				<div className="title">Deals</div>
 			</div>
-			<div className="Item" onClick={() => navigate("/profile")}>
+			<div
+				className={buildClassName(
+					"Item",
+					location.pathname === "/profile" && "active",
+				)}
+				onClick={() => navigate("/profile")}
+			>
 				<div className="meta">
 					<div className="Avatar">
 						<div className="title">{firstName?.charAt(0).toUpperCase()}</div>

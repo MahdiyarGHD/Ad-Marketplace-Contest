@@ -1,4 +1,4 @@
-import { memo, useState } from "react";
+import { memo, useEffect, useState } from "react";
 import TextTransition from "./TextTransition";
 import { SearchIcon } from "lucide-react";
 import useUIStore from "../stores/useUIStore";
@@ -7,6 +7,10 @@ function TopBar() {
 	const [fetched, setFetched] = useState(false);
 
 	const { topBarTitle } = useUIStore();
+
+	useEffect(() => {
+		setFetched(true);
+	}, []);
 
 	return (
 		<div className="TopBar">

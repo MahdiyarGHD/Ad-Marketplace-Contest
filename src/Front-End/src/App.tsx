@@ -3,7 +3,6 @@ import "./App.scss";
 import {
 	backButton,
 	init,
-	initData,
 	isTMA,
 	mainButton,
 	miniApp,
