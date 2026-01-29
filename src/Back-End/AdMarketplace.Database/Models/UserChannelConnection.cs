@@ -29,6 +29,11 @@ public class UserChannelConnection : IDateTimeSchema
         };
     }
 
+    public static IQueryable<UserChannelConnection> ByChannel(IQueryable<UserChannelConnection> query, long chatId)
+    {
+        return query.Where(x => x.ChatId == chatId);
+    }
+
     public void Touch()
     {
         UpdatedAt = DateTimeOffset.UtcNow;

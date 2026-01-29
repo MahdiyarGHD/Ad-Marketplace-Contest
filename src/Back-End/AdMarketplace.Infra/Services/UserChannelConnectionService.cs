@@ -4,7 +4,6 @@ using AdMarketplace.Infra.Interfaces;
 using ErrorOr;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Serilog;
 
 namespace AdMarketplace.Infra.Services;
 
@@ -34,6 +33,16 @@ public class UserChannelConnectionService(AdMarketDbContext dbContext, IUserServ
         logger.LogInformation("User {UserId} connected bot to channel {ChatId} - {Title} successfully.", userId, chatId, title);
         
         return link;
+    }
+
+    public async Task<ErrorOr<int>> RemoveChannelConnectionsAsync(long chatId)
+    {
+        var query = UserChannelConnection.ByChannel(dbContext.UserChannelConnection, chatId);
+        var deletedCount = await query.ExecuteDeleteAsync();
+        
+        logger.LogInformation("Removed {Count} connection(s) for channel {ChatId}", deletedCount, chatId);
+        
+        return deletedCount;
     }
 
     public async Task<ErrorOr<List<UserChannelConnection>>> GetRecentByUserIdAsync(Guid userId, DateTimeOffset sinceUtc)
