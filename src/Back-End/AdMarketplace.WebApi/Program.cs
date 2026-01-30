@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using AdMarketplace.Bot;
 using AdMarketplace.Domain.Options;
 using AdMarketplace.Extensions;
@@ -44,7 +45,10 @@ app.UseAuthorization();
 
 app.UseCors(CorsOptions.PolicyName);
 
-app.UseFastEndpoints();
+app.UseFastEndpoints(c =>
+{
+    c.Serializer.Options.DefaultIgnoreCondition = JsonIgnoreCondition.Never;
+});
 app.UseSwaggerGen();
 app.ConfigureAppStart();
 app.Run();
