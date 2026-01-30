@@ -53,10 +53,6 @@ public class ChannelEfConfiguration : IEntityTypeConfiguration<Channel>
                 .IsRequired();
         });
 
-        // builder.Property(x => x.PricePerPost)
-        //     .IsRequired(false)
-        //     .HasPrecision(18, 8);
-
         builder.Property(x => x.Status)
             .IsRequired()
             .HasDefaultValue(ChannelStatusType.UnReady);

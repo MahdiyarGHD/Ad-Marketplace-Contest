@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using AdMarketplace.Bot;
 using AdMarketplace.Database;
 using AdMarketplace.Domain.Options;
@@ -48,7 +49,7 @@ public static class ServiceCollectionExtensions
         {
             services.AddSingleton(new JsonSerializerOptions
             {
-                PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower
+                PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower,
             });
         
             return services;
