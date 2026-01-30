@@ -55,5 +55,16 @@ public class UserChannelConnectionService(AdMarketDbContext dbContext, IUserServ
 
         return links;
     }
+
+    public async Task<ErrorOr<UserChannelConnection>> GetByUserAndChatIdAsync(Guid userId, long chatId)
+    {
+        var connection = await dbContext.UserChannelConnection
+            .FirstOrDefaultAsync(x => x.UserId == userId && x.ChatId == chatId);
+
+        if (connection is null)
+            return Error.NotFound("UserChannelConnection.NotFound", "No connection found between user and channel");
+
+        return connection;
+    }
 }
 

@@ -29,26 +29,24 @@ public class Channel : IDateTimeSchema
     public Category? Category { get; private set; }
     
     public static Channel Create(
-        long telegramChannelId,
+        long chatId,
         string title,
         string? username,
         string? description,
-        int subscriberCount,
-        int averageViews,
-        List<LanguageDistributionContract>? languageDistributionJson,
         Guid ownerId,
         Guid? categoryId)
     {
         return new Channel
         {
             Id = Guid.CreateVersion7(),
-            ChatId = telegramChannelId,
+            ChatId = chatId,
             Title = title,
             Username = username,
+            PremiumCount = 0,
+            SubscriberCount = 0,
+            AverageViews = 0,
+            LanguageDistributionJson = [],
             Description = description,
-            SubscriberCount = subscriberCount,
-            AverageViews = averageViews,
-            LanguageDistributionJson = languageDistributionJson,
             OwnerId = ownerId,
             CategoryId = categoryId,
             CreatedAt = DateTimeOffset.UtcNow

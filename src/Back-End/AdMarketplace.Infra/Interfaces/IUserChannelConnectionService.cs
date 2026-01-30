@@ -8,5 +8,6 @@ public interface IUserChannelConnectionService
     Task<ErrorOr<UserChannelConnection>> CreateOrTouchAsync(string title, long userId, long chatId);
     Task<ErrorOr<int>> RemoveChannelConnectionsAsync(long chatId);
     Task<ErrorOr<List<UserChannelConnection>>> GetRecentByUserIdAsync(Guid userId, DateTimeOffset sinceUtc);
+    Task<ErrorOr<UserChannelConnection>> GetByUserAndChatIdAsync(Guid userId, long chatId);
 }
 
