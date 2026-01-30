@@ -4,6 +4,7 @@ import "./AddChannel.scss";
 import { invokeHapticFeedbackImpact } from "../utils/common";
 import { useNavigate } from "react-router-dom";
 import PageHeader, { PageHeaderTitle } from "../components/PageHeader";
+import RLottie from "../components/RLottie";
 
 function AddChannel() {
 	const navigate = useNavigate();
@@ -47,7 +48,9 @@ function AddChannel() {
 			</PageHeader>
 
 			<div className="Placeholder">
-				<div className="Emoji">{/* <Lottie file="bubble" size={120} /> */}</div>
+				<div className="Emoji">
+					<RLottie sticker="bubble" autoplay width={120} height={120} />
+				</div>
 				<h2 className="Title">Add Your Channel</h2>
 				<div className="Instructions">
 					<p className="InstructionText">
