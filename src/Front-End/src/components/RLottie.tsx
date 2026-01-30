@@ -79,7 +79,7 @@ const RLottie = forwardRef(
 
 		useEffect(() => {
 			(async () => {
-				if (!data.current) {
+				if (!data.current || !fromFrame) {
 					const res = await fetch(
 						`${PUBLIC_URL}/Ad-Marketplace-Contest/tgs/${sticker}.json`,
 					);
@@ -119,10 +119,11 @@ const RLottie = forwardRef(
 							`${height}px`;
 					}
 				});
-				return () => {
-					window.RLottie.destroy(anim.current);
-				};
 			})();
+
+			return () => {
+				window.RLottie.destroy(anim.current);
+			};
 		}, [sticker, fromFrame]);
 
 		return <div className="RLottie" ref={player}></div>;

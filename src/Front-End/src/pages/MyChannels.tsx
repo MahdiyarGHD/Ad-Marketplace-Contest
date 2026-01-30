@@ -7,8 +7,11 @@ import { useNavigate } from "react-router-dom";
 import Transition from "../components/Transition";
 import { backButton } from "@tma.js/sdk-react";
 import { invokeHapticFeedbackImpact } from "../utils/common";
+import useChannelStore from "../stores/useChannelStore";
 
 function MyChannels() {
+	const { getMyChannels } = useChannelStore();
+
 	const navigate = useNavigate();
 
 	const onBackButton = () => {
@@ -21,6 +24,8 @@ function MyChannels() {
 		backButton.onClick(onBackButton);
 
 		invokeHapticFeedbackImpact("medium");
+
+		getMyChannels();
 
 		return () => {
 			backButton.hide();
