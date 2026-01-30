@@ -17,14 +17,17 @@ public class Channel : IDateTimeSchema
     public List<LanguageDistributionContract>? LanguageDistributionJson { get; private set; }
     public ChannelStatusType Status { get; private set; }
     
+    public Guid OwnerId { get; private set; }
+    public Guid? CategoryId { get; private set; }
+    
     public DateTimeOffset CreatedAt { get; private init; }
     public DateTimeOffset? UpdatedAt { get; private set; }
     
     
-    public Guid OwnerId { get; private set; }
+    // Navigation properties
     public User Owner { get; private set; }
-    public Guid? CategoryId { get; private set; }
     public Category? Category { get; private set; }
+    
     public static Channel Create(
         long telegramChannelId,
         string title,
