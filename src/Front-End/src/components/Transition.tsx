@@ -72,9 +72,9 @@ export default function Transition({
 				if (eachElement) {
 					if (!element.current) return;
 
-					const items = element.current.querySelectorAll("&>*");
+					const items = element.current.children;
 
-					items.forEach((item, index) => {
+					Array.from(items).forEach((item, index) => {
 						setTimeout(() => {
 							item.classList.add("animate", "showAnim");
 							requestAnimationFrame(() => {
