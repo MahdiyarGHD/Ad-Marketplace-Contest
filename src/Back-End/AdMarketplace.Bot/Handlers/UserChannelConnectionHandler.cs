@@ -13,13 +13,13 @@ public class UserChannelConnectionHandler(IUserChannelConnectionService userChan
             return;
 
         var chatMemberUpdate = update.MyChatMember;
-        var newStatus = chatMemberUpdate.NewChatMember;
         
-        switch (newStatus)
+        switch (chatMemberUpdate.NewChatMember)
         {
-            case ChatMemberLeft:
+            case ChatMemberLeft or not ChatMemberAdministrator { CanInviteUsers: true, CanPromoteMembers: true }:
                 await HandleChannelDisconnectAsync(chatMemberUpdate.Chat.Id);
                 return;
+            
             case ChatMemberAdministrator { CanInviteUsers: true, CanPromoteMembers: true }:
                 await HandleChannelConnectAsync(
                     chatMemberUpdate.Chat.Title ?? string.Empty,
