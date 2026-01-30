@@ -8,15 +8,12 @@ namespace AdMarketplace.Infra.Interfaces;
 public interface IChannelService
 {
     Task<ErrorOr<Channel>> CreateAsync(
-        long telegramChannelId,
+        long chatId,
         string title,
         string? username,
         string? description,
-        int subscriberCount,
-        int averageViews,
-        List<LanguageDistributionContract>? languageDistributionJson,
         Guid ownerId,
-        Guid? categoryId);
+        Guid categoryId);
 
     Task<ErrorOr<Channel>> GetByIdAsync(Guid id);
     Task<ErrorOr<Channel>> GetByTelegramIdAsync(long telegramChannelId);
@@ -31,7 +28,7 @@ public interface IChannelService
         int subscriberCount,
         int averageViews,
         List<LanguageDistributionContract>? languageDistributionJson,
-        Guid? categoryId,
+        Guid categoryId,
         Guid ownerId);
 
     Task<ErrorOr<bool>> SetStatusAsync(Guid id, Guid ownerId, ChannelStatusType status);

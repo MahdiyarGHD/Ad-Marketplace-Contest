@@ -1,12 +1,18 @@
 using AdMarketplace.Extensions;
-using AdMarketplace.Infra;
 using AdMarketplace.Infra.Interfaces;
 using ErrorOr;
 using FastEndpoints;
+using Telegram.Bot;
+using Telegram.Bot.Types;
+using Telegram.Bot.Types.Enums;
 
 namespace AdMarketplace.Endpoints.Channel.Create;
 
-public class Endpoint(IChannelService channelService, IUserService userService)
+public class Endpoint(
+    IChannelService channelService,
+    IUserService userService,
+    IUserChannelConnectionService userChannelConnectionService,
+    ITelegramBotClient botClient)
     : Endpoint<Request, ErrorOr<Response>>
 {
     public override void Configure()
@@ -20,33 +26,46 @@ public class Endpoint(IChannelService channelService, IUserService userService)
         if (userResult.IsError)
             return userResult.Errors;
 
-        var result = await channelService.CreateAsync(
-            telegramChannelId: req.TelegramChannelId,
-            title: req.Title,
-            username: req.Username,
-            description: req.Description,
-            subscriberCount: req.SubscriberCount,
-            averageViews: req.AverageViews,
-            languageDistributionJson: req.LanguageDistributionJson,
-            ownerId: userResult.Value.Id,
-            categoryId: req.CategoryId);
+        var connectionResult = await userChannelConnectionService.GetByUserAndChatIdAsync(
+            userResult.Value.Id,
+            req.ChatId);
 
-        if (result.IsError)
-            return result.Errors;
+        if (connectionResult.IsError)
+            return connectionResult.Errors;
 
-        return new Response
+        try
         {
-            Id = result.Value.Id,
-            TelegramChannelId = result.Value.ChatId,
-            Title = result.Value.Title,
-            Username = result.Value.Username,
-            Description = result.Value.Description,
-            SubscriberCount = result.Value.SubscriberCount,
-            AverageViews = result.Value.AverageViews,
-            LanguageDistributionJson = result.Value.LanguageDistributionJson,
-            CategoryId = result.Value.CategoryId,
-            CategoryName = result.Value.Category?.Name,
-            CreatedAt = result.Value.CreatedAt
-        };
+            var chat = await botClient.GetChat(req.ChatId, ct);
+            var me = await botClient.GetMe(ct);
+            var botMember = await botClient.GetChatMember(req.ChatId, me.Id, ct);
+            
+            if (botMember is not ChatMemberAdministrator { CanPromoteMembers: true, CanInviteUsers: true })
+            {
+                return Error.Forbidden("Channel.BotNotAdmin", "The bot must be an administrator in the channel");
+            }
+
+            var result = await channelService.CreateAsync(
+                chatId: req.ChatId,
+                title: chat.Title ?? connectionResult.Value.Title,
+                username: chat.Username,
+                description: chat.Description,
+                ownerId: userResult.Value.Id,
+                categoryId: req.CategoryId);
+
+            if (result.IsError)
+                return result.Errors;
+
+            return new Response
+            {
+                Id = result.Value.Id,
+                ChatId = result.Value.ChatId,
+                Title = result.Value.Title,
+                CreatedAt = result.Value.CreatedAt
+            };
+        }
+        catch (Telegram.Bot.Exceptions.ApiRequestException ex)
+        {
+            return Error.Failure("Telegram.ApiError", $"Failed to verify channel: {ex.Message}");
+        }
     }
 }

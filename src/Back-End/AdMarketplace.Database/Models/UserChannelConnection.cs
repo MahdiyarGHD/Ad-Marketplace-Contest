@@ -9,9 +9,10 @@ public class UserChannelConnection : IDateTimeSchema
     public string Title { get; set; }
     public DateTimeOffset CreatedAt { get; private init; }
     public DateTimeOffset? UpdatedAt { get; private set; }
-    
-    
     public Guid UserId { get; private set; }
+    
+    
+    // Navigation properties
     public User User { get; private set; }
 
     public static UserChannelConnection Create(

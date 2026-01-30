@@ -8,33 +8,31 @@ using Microsoft.EntityFrameworkCore;
 
 namespace AdMarketplace.Infra.Services;
 
-public class ChannelService(AdMarketDbContext dbContext) : IChannelService
+public class ChannelService(AdMarketDbContext dbContext, ICategoryService categoryService) : IChannelService
 {
     public async Task<ErrorOr<Channel>> CreateAsync(
-        long telegramChannelId,
+        long chatId,
         string title,
         string? username,
         string? description,
-        int subscriberCount,
-        int averageViews,
-        List<LanguageDistributionContract>? languageDistributionJson,
         Guid ownerId,
-        Guid? categoryId)
+        Guid categoryId)
     {
         var existingChannel = await dbContext.Channels
-            .FirstOrDefaultAsync(c => c.ChatId == telegramChannelId);
+            .FirstOrDefaultAsync(c => c.ChatId == chatId);
 
         if (existingChannel is not null)
             return Error.Conflict("Channel.AlreadyExists", "Channel with this Telegram ID already exists");
 
+        var categoryResult = await categoryService.GetByIdAsync(categoryId);
+        if (categoryResult.IsError)
+            return categoryResult.Errors;
+
         var channel = Channel.Create(
-            telegramChannelId: telegramChannelId,
+            chatId: chatId,
             title: title,
             username: username,
             description: description,
-            subscriberCount: subscriberCount,
-            averageViews: averageViews,
-            languageDistributionJson: languageDistributionJson,
             ownerId: ownerId,
             categoryId: categoryId);
 
@@ -115,7 +113,7 @@ public class ChannelService(AdMarketDbContext dbContext) : IChannelService
         int subscriberCount,
         int averageViews,
         List<LanguageDistributionContract>? languageDistributionJson,
-        Guid? categoryId,
+        Guid categoryId,
         Guid ownerId)
     {
         var channel = await dbContext.Channels.FirstOrDefaultAsync(c => c.Id == id);
@@ -125,6 +123,10 @@ public class ChannelService(AdMarketDbContext dbContext) : IChannelService
 
         if (channel.OwnerId != ownerId)
             return Error.Forbidden("Channel.NotOwner", "You are not the owner of this channel");
+
+        var categoryResult = await categoryService.GetByIdAsync(categoryId);
+        if (categoryResult.IsError)
+            return categoryResult.Errors;
 
         channel.Update(
             title: title,

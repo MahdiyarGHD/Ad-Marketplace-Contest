@@ -17,35 +17,36 @@ public class Channel : IDateTimeSchema
     public List<LanguageDistributionContract>? LanguageDistributionJson { get; private set; }
     public ChannelStatusType Status { get; private set; }
     
+    public Guid OwnerId { get; private set; }
+    public Guid? CategoryId { get; private set; }
+    
     public DateTimeOffset CreatedAt { get; private init; }
     public DateTimeOffset? UpdatedAt { get; private set; }
     
     
-    public Guid OwnerId { get; private set; }
+    // Navigation properties
     public User Owner { get; private set; }
-    public Guid? CategoryId { get; private set; }
     public Category? Category { get; private set; }
+    
     public static Channel Create(
-        long telegramChannelId,
+        long chatId,
         string title,
         string? username,
         string? description,
-        int subscriberCount,
-        int averageViews,
-        List<LanguageDistributionContract>? languageDistributionJson,
         Guid ownerId,
         Guid? categoryId)
     {
         return new Channel
         {
             Id = Guid.CreateVersion7(),
-            ChatId = telegramChannelId,
+            ChatId = chatId,
             Title = title,
             Username = username,
+            PremiumCount = 0,
+            SubscriberCount = 0,
+            AverageViews = 0,
+            LanguageDistributionJson = [],
             Description = description,
-            SubscriberCount = subscriberCount,
-            AverageViews = averageViews,
-            LanguageDistributionJson = languageDistributionJson,
             OwnerId = ownerId,
             CategoryId = categoryId,
             CreatedAt = DateTimeOffset.UtcNow

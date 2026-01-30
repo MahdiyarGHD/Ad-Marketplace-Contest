@@ -9,14 +9,14 @@ ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 
 COPY nuget.config .
-COPY ["AdMarketplace/AdMarketplace.Bot.csproj", "AdMarketplace/"]
-COPY ["AdMarketplace/AdMarketplace.WebApi.csproj", "AdMarketplace/"]
+COPY ["AdMarketplace.WebApi/AdMarketplace.WebApi.csproj", "AdMarketplace.WebApi/"]
+COPY ["AdMarketplace.Bot/AdMarketplace.Bot.csproj", "AdMarketplace.Bot/"]
 COPY ["AdMarketplace.Infra/AdMarketplace.Infra.csproj", "AdMarketplace.Infra/"]
 COPY ["AdMarketplace.Database/AdMarketplace.Database.csproj", "AdMarketplace.Database/"]
 COPY ["AdMarketplace.Domain/AdMarketplace.Domain.csproj", "AdMarketplace.Domain/"]
 RUN dotnet restore "AdMarketplace.WebApi/AdMarketplace.WebApi.csproj"
 COPY . .
-WORKDIR "/src/AdMarketplace"
+WORKDIR "/src/AdMarketplace.WebApi"
 RUN dotnet build "./AdMarketplace.WebApi.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish
