@@ -6,7 +6,6 @@ import {
 	isTMA,
 	mainButton,
 	miniApp,
-	on,
 	retrieveLaunchParams,
 	retrieveRawInitData,
 	themeParams,
