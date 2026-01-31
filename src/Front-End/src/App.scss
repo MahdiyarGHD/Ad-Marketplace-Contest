@@ -1,6 +1,6 @@
 body {
   background-color: var(--bg-color);
-  color: var(--text-color);
+  color: var(--tg-theme-text-color);
 }
 
 .App {
@@ -86,12 +86,12 @@ body {
 
     &:active {
       transform: scale(.95);
-      color: #fff;
+      color: var(--text-color);
       background-color: var(--active-bg);
     }
     
     &.active {
-      color: #fff;
+      color: var(--text-color);
       // background-color: var(--active-bg);
     }
 
@@ -201,7 +201,7 @@ body {
       padding: .5rem;
       padding-right: 1rem;
       cursor: pointer;
-      background-color: var(--tg-theme-bg-color);
+      background-color: var(--secondary-bg-color);
       position: relative;
       transition: background-color .2s ease, opacity .3s ease;
 
