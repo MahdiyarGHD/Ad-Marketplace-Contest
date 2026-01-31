@@ -46,20 +46,22 @@ function App() {
 				viewport.bindCssVars();
 			}
 
-			if (!miniApp.isMounted()) {
+			if (!miniApp.isMounted() && miniApp.mount.isAvailable()) {
 				miniApp.mount();
 
+				handleTheme(miniApp.isDark());
+				miniApp.isDark.sub(handleTheme);
+
 				miniApp.ready();
-
-				handleTheme(!miniApp.isDark());
 			}
 
-			if (!themeParams.isMounted()) {
+			if (!themeParams.isMounted() && themeParams.mount.isAvailable()) {
 				themeParams.mount();
-				themeParams.bindCssVars();
+
+				if (!themeParams.isCssVarsBound()) themeParams.bindCssVars();
 			}
 
-			if (!mainButton.isMounted()) {
+			if (!mainButton.isMounted() && mainButton.mount.isAvailable()) {
 				mainButton.mount();
 			}
 
@@ -82,7 +84,7 @@ function App() {
 
 		// handleTheme(true)
 
-		on("theme_changed", () => handleTheme(!miniApp.isDark()));
+		// on("theme_changed", () => handleTheme(miniApp.isDark()));
 
 		return () => {
 			if (viewport.isMounted()) {
