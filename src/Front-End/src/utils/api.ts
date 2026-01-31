@@ -4,7 +4,7 @@ type HTTPMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 
 export async function requestAPI<TResponse = any>(
 	path: string = "/",
-	body: { [key: string]: string | Blob | undefined } = {},
+	body: { [key: string]: string | number | Blob | undefined } = {},
 	method: HTTPMethod = "POST",
 ): Promise<TResponse> {
 	const { token } = useAppStore.getState();
@@ -21,7 +21,7 @@ export async function requestAPI<TResponse = any>(
 			"Content-Type": "application/json",
 			...headers,
 		},
-		body: body ? JSON.stringify(body) : undefined,
+		body: method === "POST" && body ? JSON.stringify(body) : undefined,
 	});
 
 	if (!res.ok) {
