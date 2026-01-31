@@ -33,6 +33,13 @@ public class Endpoint(IChannelService channelService)
                 SubscriberCount = c.SubscriberCount,
                 AverageViews = c.AverageViews,
                 LanguageDistributionJson = c.LanguageDistributionJson,
+                Pricings = c.Pricings.Select(p => new ChannelPricingResponseContract
+                {
+                    Id = p.Id,
+                    AdFormat = p.AdFormat,
+                    PriceType = p.PriceType,
+                    PriceTon = p.PriceTon
+                }).ToList()
             }).ToList()
         };
     }

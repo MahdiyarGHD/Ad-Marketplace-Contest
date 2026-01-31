@@ -1,11 +1,6 @@
-namespace AdMarketplace.Endpoints.Category.List;
+namespace AdMarketplace.Domain.Contracts.Responses;
 
-public class Response
-{
-    public required List<CategoryItem> Categories { get; set; }
-}
-
-public class CategoryItem
+public class CategoryResponseDto
 {
     public required Guid Id { get; set; }
     public required string Name { get; set; }
@@ -13,4 +8,3 @@ public class CategoryItem
     public string? Icon { get; set; }
     public int DisplayOrder { get; set; }
 }
-

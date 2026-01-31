@@ -10,6 +10,7 @@ public class AdMarketDbContext(DbContextOptions<AdMarketDbContext> dbContextOpti
     public DbSet<Channel> Channels => Set<Channel>();
     public DbSet<Category> Categories => Set<Category>();
     public DbSet<UserChannelConnection> UserChannelConnection => Set<UserChannelConnection>();
+    public DbSet<ChannelPricing> ChannelPricings => Set<ChannelPricing>();
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

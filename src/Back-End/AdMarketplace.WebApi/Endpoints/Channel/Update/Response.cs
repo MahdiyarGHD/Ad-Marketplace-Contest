@@ -1,4 +1,5 @@
 using AdMarketplace.Domain.Contracts.Common;
+using AdMarketplace.Domain.Contracts.Responses;
 
 namespace AdMarketplace.Endpoints.Channel.Update;
 
@@ -16,4 +17,5 @@ public class Response
     public Guid? CategoryId { get; set; }
     public string? CategoryName { get; set; }
     public DateTimeOffset UpdatedAt { get; set; }
+    public List<ChannelPricingResponseContract> Pricings { get; set; } = [];
 }
