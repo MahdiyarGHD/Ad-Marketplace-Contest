@@ -10,5 +10,5 @@ public class Request
     public int SubscriberCount { get; set; }
     public int AverageViews { get; set; }
     public List<LanguageDistributionContract>? LanguageDistributionJson { get; set; }
-    public Guid? CategoryId { get; set; }
+    public required Guid CategoryId { get; set; }
 }

@@ -1,3 +1,4 @@
+using AdMarketplace.Domain.Contracts.Responses;
 using AdMarketplace.Infra.Interfaces;
 using ErrorOr;
 using FastEndpoints;
@@ -22,19 +23,16 @@ public class Endpoint(IChannelService channelService)
 
         return new Response
         {
-            Channels = result.Value.Select(c => new ChannelItem
+            Channels = result.Value.Select(c => new ChannelResponseContract
             {
                 Id = c.Id,
-                TelegramChannelId = c.ChatId,
+                ChatId = c.ChatId,
                 Title = c.Title,
                 Username = c.Username,
                 Description = c.Description,
                 SubscriberCount = c.SubscriberCount,
                 AverageViews = c.AverageViews,
                 LanguageDistributionJson = c.LanguageDistributionJson,
-                CategoryId = c.CategoryId,
-                CategoryName = c.Category?.Name,
-                CreatedAt = c.CreatedAt
             }).ToList()
         };
     }
