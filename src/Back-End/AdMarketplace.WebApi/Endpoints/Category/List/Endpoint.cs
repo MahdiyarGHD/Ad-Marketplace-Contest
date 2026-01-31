@@ -1,3 +1,4 @@
+using AdMarketplace.Domain.Contracts.Responses;
 using AdMarketplace.Infra.Interfaces;
 using ErrorOr;
 using FastEndpoints;
@@ -5,7 +6,7 @@ using FastEndpoints;
 namespace AdMarketplace.Endpoints.Category.List;
 
 public class Endpoint(ICategoryService categoryService)
-    : EndpointWithoutRequest<ErrorOr<Response>>
+    : EndpointWithoutRequest<ErrorOr<List<CategoryResponseDto>>>
 {
     public override void Configure()
     {
@@ -13,24 +14,21 @@ public class Endpoint(ICategoryService categoryService)
         AllowAnonymous();
     }
 
-    public override async Task<ErrorOr<Response>> ExecuteAsync(CancellationToken ct)
+    public override async Task<ErrorOr<List<CategoryResponseDto>>> ExecuteAsync(CancellationToken ct)
     {
         var result = await categoryService.GetAllAsync();
 
         if (result.IsError)
             return result.Errors;
 
-        return new Response
+        return result.Value.Select(c => new CategoryResponseDto
         {
-            Categories = result.Value.Select(c => new CategoryItem
-            {
-                Id = c.Id,
-                Name = c.Name,
-                Description = c.Description,
-                Icon = c.Icon,
-                DisplayOrder = c.DisplayOrder
-            }).ToList()
-        };
+            Id = c.Id,
+            Name = c.Name,
+            Description = c.Description,
+            Icon = c.Icon,
+            DisplayOrder = c.DisplayOrder
+        }).ToList();
     }
 }
 

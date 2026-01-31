@@ -29,4 +29,9 @@ public static class AdMarketDbContextSchema
     {
         public const string TableName = "UserChannelConnections";
     }
+
+    public static class ChannelPricing
+    {
+        public const string TableName = "ChannelPricings";
+    }
 }

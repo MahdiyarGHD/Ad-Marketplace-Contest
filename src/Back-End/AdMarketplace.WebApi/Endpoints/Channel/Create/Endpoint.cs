@@ -4,7 +4,6 @@ using ErrorOr;
 using FastEndpoints;
 using Telegram.Bot;
 using Telegram.Bot.Types;
-using Telegram.Bot.Types.Enums;
 
 namespace AdMarketplace.Endpoints.Channel.Create;
 
@@ -12,6 +11,7 @@ public class Endpoint(
     IChannelService channelService,
     IUserService userService,
     IUserChannelConnectionService userChannelConnectionService,
+    IChannelPricingService channelPricingService,
     ITelegramBotClient botClient)
     : Endpoint<Request, ErrorOr<Response>>
 {
@@ -32,6 +32,23 @@ public class Endpoint(
 
         if (connectionResult.IsError)
             return connectionResult.Errors;
+
+        var pricings = req.Pricings
+            .Select(p => (p.AdFormat, p.PriceType, p.PriceTon))
+            .ToList();
+
+        if (pricings.Count == 0)
+            return Error.Validation("ChannelPricing.EmptyList", "At least one pricing must be provided");
+
+        if (pricings.Any(p => p.PriceTon <= 0))
+            return Error.Validation("ChannelPricing.InvalidPrice", "All prices must be greater than zero");
+
+        var hasDuplicates = pricings
+            .GroupBy(p => (p.AdFormat, p.PriceType))
+            .Any(g => g.Count() > 1);
+
+        if (hasDuplicates)
+            return Error.Validation("ChannelPricing.DuplicatePricing", "Duplicate pricing entries found");
 
         try
         {
@@ -55,12 +72,24 @@ public class Endpoint(
             if (result.IsError)
                 return result.Errors;
 
+            var pricingResult = await channelPricingService.CreateBulkAsync(result.Value.Id, pricings);
+
+            if (pricingResult.IsError)
+                return pricingResult.Errors;
+
             return new Response
             {
                 Id = result.Value.Id,
                 ChatId = result.Value.ChatId,
                 Title = result.Value.Title,
-                CreatedAt = result.Value.CreatedAt
+                CreatedAt = result.Value.CreatedAt,
+                Pricings = pricingResult.Value.Select(p => new PricingResponse
+                {
+                    Id = p.Id,
+                    AdFormat = p.AdFormat,
+                    PriceType = p.PriceType,
+                    PriceTon = p.PriceTon
+                }).ToList()
             };
         }
         catch (Telegram.Bot.Exceptions.ApiRequestException ex)

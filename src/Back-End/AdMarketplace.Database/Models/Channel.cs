@@ -27,6 +27,7 @@ public class Channel : IDateTimeSchema
     // Navigation properties
     public User Owner { get; private set; }
     public Category? Category { get; private set; }
+    public ICollection<ChannelPricing> Pricings { get; private set; } = [];
     
     public static Channel Create(
         long chatId,
@@ -66,6 +67,12 @@ public class Channel : IDateTimeSchema
         SubscriberCount = subscriberCount;
         AverageViews = averageViews;
         LanguageDistributionJson = languageDistributionJson;
+        CategoryId = categoryId;
+        UpdatedAt = DateTimeOffset.UtcNow;
+    }
+
+    public void UpdateCategory(Guid? categoryId)
+    {
         CategoryId = categoryId;
         UpdatedAt = DateTimeOffset.UtcNow;
     }

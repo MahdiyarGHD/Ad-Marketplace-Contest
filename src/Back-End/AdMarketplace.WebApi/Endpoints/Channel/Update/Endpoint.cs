@@ -1,5 +1,5 @@
+using AdMarketplace.Domain.Contracts.Responses;
 using AdMarketplace.Extensions;
-using AdMarketplace.Infra;
 using AdMarketplace.Infra.Interfaces;
 using ErrorOr;
 using FastEndpoints;
@@ -22,13 +22,9 @@ public class Endpoint(IChannelService channelService, IUserService userService)
 
         var result = await channelService.UpdateAsync(
             id: req.Id,
-            title: req.Title,
-            description: req.Description,
-            subscriberCount: req.SubscriberCount,
-            averageViews: req.AverageViews,
-            languageDistributionJson: req.LanguageDistributionJson,
+            ownerId: userResult.Value.Id,
             categoryId: req.CategoryId,
-            ownerId: userResult.Value.Id);
+            pricings: req.Pricings.Select(p => (p.AdFormat, p.PriceType, p.PriceTon)).ToList());
 
         if (result.IsError)
             return result.Errors;
@@ -45,7 +41,14 @@ public class Endpoint(IChannelService channelService, IUserService userService)
             LanguageDistributionJson = result.Value.LanguageDistributionJson,
             CategoryId = result.Value.CategoryId,
             CategoryName = result.Value.Category?.Name,
-            UpdatedAt = result.Value.UpdatedAt ?? DateTimeOffset.UtcNow
+            UpdatedAt = result.Value.UpdatedAt ?? DateTimeOffset.UtcNow,
+            Pricings = result.Value.Pricings.Select(p => new ChannelPricingResponseContract
+            {
+                Id = p.Id,
+                AdFormat = p.AdFormat,
+                PriceType = p.PriceType,
+                PriceTon = p.PriceTon
+            }).ToList()
         };
     }
 }

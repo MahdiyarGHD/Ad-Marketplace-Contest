@@ -23,13 +23,9 @@ public interface IChannelService
 
     Task<ErrorOr<Channel>> UpdateAsync(
         Guid id,
-        string title,
-        string? description,
-        int subscriberCount,
-        int averageViews,
-        List<LanguageDistributionContract>? languageDistributionJson,
+        Guid ownerId,
         Guid categoryId,
-        Guid ownerId);
+        List<(AdFormatType AdFormat, PriceType PriceType, decimal PriceTon)> pricings);
 
     Task<ErrorOr<bool>> SetStatusAsync(Guid id, Guid ownerId, ChannelStatusType status);
 }

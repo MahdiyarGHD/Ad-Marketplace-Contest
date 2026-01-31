@@ -15,4 +15,5 @@ public class ChannelResponseContract
     public int AverageViews { get; set; }
     public List<LanguageDistributionContract>? LanguageDistributionJson { get; set; }
     public ChannelStatusType Status { get; set; }
+    public List<ChannelPricingResponseContract> Pricings { get; set; } = [];
 }

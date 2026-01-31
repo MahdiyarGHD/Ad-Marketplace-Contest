@@ -24,6 +24,7 @@ public static class ServiceCollectionExtensions
             services.AddScoped<IChannelService, ChannelService>();
             services.AddScoped<ICategoryService, CategoryService>();
             services.AddScoped<IUserChannelConnectionService, UserChannelConnectionService>();
+            services.AddScoped<IChannelPricingService, ChannelPricingService>();
             
             
             return services;
