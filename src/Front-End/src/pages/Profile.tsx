@@ -1,5 +1,8 @@
 import { memo } from "react";
-import PageHeader, { PageHeaderTitle } from "../components/PageHeader";
+import PageHeader, {
+	PageHeaderButtons,
+	PageHeaderTitle,
+} from "../components/PageHeader";
 import Avatar from "../components/Avatar";
 import "./Profile.scss";
 import { useLaunchParams } from "@tma.js/sdk-react";
@@ -21,6 +24,7 @@ function Profile() {
 		<div className="Profile">
 			<PageHeader>
 				<PageHeaderTitle>Profile</PageHeaderTitle>
+				<PageHeaderButtons />
 			</PageHeader>
 
 			<div className="User">
