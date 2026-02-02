@@ -1,8 +1,23 @@
-import { Children, memo, useEffect, type ReactNode } from "react";
+import {
+	Children,
+	isValidElement,
+	memo,
+	useEffect,
+	type ReactNode,
+} from "react";
 import useUIStore from "../stores/useUIStore";
 
 function PageHeader({ children }: { children: ReactNode }) {
-	return children;
+	const hasButtons = Children.toArray(children).some(
+		(child) => isValidElement(child) && child.type === PageHeaderButtons,
+	);
+
+	return (
+		<>
+			{children}
+			{!hasButtons && <PageHeaderButtons />}
+		</>
+	);
 }
 
 export function PageHeaderTitle({ children }: { children: ReactNode }) {
@@ -14,6 +29,16 @@ export function PageHeaderTitle({ children }: { children: ReactNode }) {
 		if (typeof first === "string") {
 			setTopBarTitle(first);
 		}
+	}, [children]);
+
+	return <></>;
+}
+
+export function PageHeaderButtons({ children }: { children?: ReactNode }) {
+	const { setTopBarButtons } = useUIStore();
+
+	useEffect(() => {
+		setTopBarButtons(children);
 	}, [children]);
 
 	return <></>;

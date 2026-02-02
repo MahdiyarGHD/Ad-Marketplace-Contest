@@ -1,12 +1,12 @@
 import { memo, useEffect, useState } from "react";
 import TextTransition from "./TextTransition";
-import { SearchIcon } from "lucide-react";
 import useUIStore from "../stores/useUIStore";
+import Transition from "./Transition";
 
 function TopBar() {
 	const [fetched, setFetched] = useState(false);
 
-	const { topBarTitle } = useUIStore();
+	const { topBarTitle, topBarButtons } = useUIStore();
 
 	useEffect(() => {
 		setFetched(true);
@@ -24,9 +24,7 @@ function TopBar() {
 				</div>
 			</div>
 			<div className="Buttons">
-				<div className="Search">
-					<SearchIcon />
-				</div>
+				<Transition state={!!topBarButtons}>{topBarButtons}</Transition>
 			</div>
 		</div>
 	);

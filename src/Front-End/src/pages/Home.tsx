@@ -1,6 +1,9 @@
 import { memo, useState } from "react";
-import PageHeader, { PageHeaderTitle } from "../components/PageHeader";
-import { ChevronRight } from "lucide-react";
+import PageHeader, {
+	PageHeaderButtons,
+	PageHeaderTitle,
+} from "../components/PageHeader";
+import { ChevronRight, SearchIcon } from "lucide-react";
 import "./Home.scss";
 import Transition from "../components/Transition";
 import Tabs, { TabContent } from "../components/Tabs";
@@ -13,6 +16,11 @@ function Home() {
 		<div className="Home">
 			<PageHeader>
 				<PageHeaderTitle>Ad Marketplace</PageHeaderTitle>
+				<PageHeaderButtons>
+					<div className="Search">
+						<SearchIcon />
+					</div>
+				</PageHeaderButtons>
 			</PageHeader>
 
 			<Tabs
