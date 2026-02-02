@@ -4,7 +4,7 @@ import BottomBar from "./BottomBar";
 import TopBar from "./TopBar";
 import Transition from "./Transition";
 
-function Main() {
+function Main({ bottomBarVisible = true }: { bottomBarVisible?: boolean }) {
 	return (
 		<div className="Main SafeArea">
 			<TopBar />
@@ -13,7 +13,7 @@ function Main() {
 				<Outlet />
 			</Transition>
 
-			<BottomBar />
+			{bottomBarVisible && <BottomBar />}
 		</div>
 	);
 }

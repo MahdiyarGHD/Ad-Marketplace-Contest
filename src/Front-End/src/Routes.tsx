@@ -56,7 +56,7 @@ const router = createBrowserRouter(
 					],
 				},
 				{
-					element: <Main />,
+					element: <Main bottomBarVisible={false} />,
 					children: [
 						{
 							path: "add-channel",
