@@ -56,12 +56,17 @@ const router = createBrowserRouter(
 					],
 				},
 				{
-					path: "add-channel",
-					element: <AddChannel />,
-				},
-				{
-					path: "set-channel-data",
-					element: <SetChannelData />,
+					element: <Main />,
+					children: [
+						{
+							path: "add-channel",
+							element: <AddChannel />,
+						},
+						{
+							path: "set-channel-data",
+							element: <SetChannelData />,
+						},
+					],
 				},
 			],
 		},
