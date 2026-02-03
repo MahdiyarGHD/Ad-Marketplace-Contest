@@ -91,7 +91,7 @@ body {
 	--secondary-bg-color: var(--tg-theme-bg-color, #ffffff);
 	--hover-bg: #0001;
 	--active-bg: #0001;
-	--border-color: #0001;
+	--border-color: #00000008;
 	--text-color: #000;
 	--secondary-text: #0007;
 	--primary-background: #000;
@@ -116,4 +116,9 @@ body[data-theme="dark"] {
 	--primary-background: #fff;
 	--primary-text: #000;
 	--secondary-background: #fff1;
+}
+
+.Mobile[data-theme="dark"] {
+	--bg-color: var(--tg-theme--secondary-bg-color, #000000);
+	--secondary-bg-color: var(--tg-theme-bg-color, #111);
 }

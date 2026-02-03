@@ -1,14 +1,19 @@
-using AdMarketplace.Domain.Contracts.Common;
+using AdMarketplace.Domain.Types;
+using Microsoft.AspNetCore.Mvc;
 
 namespace AdMarketplace.Endpoints.Channel.Update;
 
 public class Request
 {
-    public required Guid Id { get; set; }
-    public required string Title { get; set; }
-    public string? Description { get; set; }
-    public int SubscriberCount { get; set; }
-    public int AverageViews { get; set; }
-    public List<LanguageDistributionContract>? LanguageDistributionJson { get; set; }
-    public required Guid CategoryId { get; set; }
+    [FromRoute]
+    public Guid Id { get; set; }
+    public Guid CategoryId { get; set; }
+    public List<PricingUpdateRequest> Pricings { get; set; }
+}
+
+public class PricingUpdateRequest
+{
+    public required AdFormatType AdFormat { get; set; }
+    public required PriceType PriceType { get; set; }
+    public required decimal PriceTon { get; set; }
 }

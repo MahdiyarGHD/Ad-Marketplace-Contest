@@ -47,6 +47,7 @@ public class ChannelService(AdMarketDbContext dbContext, ICategoryService catego
         var channel = await dbContext.Channels
             .Include(c => c.Owner)
             .Include(c => c.Category)
+            .Include(c => c.Pricings)
             .FirstOrDefaultAsync(c => c.Id == id);
 
         if (channel is null)
@@ -60,6 +61,7 @@ public class ChannelService(AdMarketDbContext dbContext, ICategoryService catego
         var channel = await dbContext.Channels
             .Include(c => c.Owner)
             .Include(c => c.Category)
+            .Include(c => c.Pricings)
             .FirstOrDefaultAsync(c => c.ChatId == telegramChannelId);
 
         if (channel is null)
@@ -73,6 +75,7 @@ public class ChannelService(AdMarketDbContext dbContext, ICategoryService catego
         var channels = await dbContext.Channels
             .Include(c => c.Owner)
             .Include(c => c.Category)
+            .Include(c => c.Pricings)
             .Where(c => c.OwnerId == ownerId)
             .ToListAsync();
 
@@ -84,6 +87,7 @@ public class ChannelService(AdMarketDbContext dbContext, ICategoryService catego
         var channels = await dbContext.Channels
             .Include(c => c.Owner)
             .Include(c => c.Category)
+            .Include(c => c.Pricings)
             .OrderByDescending(c => c.CreatedAt)
             .Skip(skip)
             .Take(take)
@@ -97,6 +101,7 @@ public class ChannelService(AdMarketDbContext dbContext, ICategoryService catego
         var channels = await dbContext.Channels
             .Include(c => c.Owner)
             .Include(c => c.Category)
+            .Include(c => c.Pricings)
             .Where(c => c.CategoryId == categoryId)
             .OrderByDescending(c => c.CreatedAt)
             .Skip(skip)
@@ -108,15 +113,14 @@ public class ChannelService(AdMarketDbContext dbContext, ICategoryService catego
 
     public async Task<ErrorOr<Channel>> UpdateAsync(
         Guid id,
-        string title,
-        string? description,
-        int subscriberCount,
-        int averageViews,
-        List<LanguageDistributionContract>? languageDistributionJson,
+        Guid ownerId,
         Guid categoryId,
-        Guid ownerId)
+        List<(AdFormatType AdFormat, PriceType PriceType, decimal PriceTon)> pricings)
     {
-        var channel = await dbContext.Channels.FirstOrDefaultAsync(c => c.Id == id);
+        var channel = await dbContext.Channels
+            .Include(c => c.Category)
+            .Include(c => c.Pricings)
+            .FirstOrDefaultAsync(c => c.Id == id);
 
         if (channel is null)
             return Error.NotFound("Channel.NotFound", "Channel not found");
@@ -128,13 +132,27 @@ public class ChannelService(AdMarketDbContext dbContext, ICategoryService catego
         if (categoryResult.IsError)
             return categoryResult.Errors;
 
-        channel.Update(
-            title: title,
-            description: description,
-            subscriberCount: subscriberCount,
-            averageViews: averageViews,
-            languageDistributionJson: languageDistributionJson,
-            categoryId: categoryId);
+        if (pricings.Count == 0)
+            return Error.Validation("Channel.NoPricings", "Channel must have at least one pricing");
+
+        if (pricings.Any(p => p.PriceTon <= 0))
+            return Error.Validation("ChannelPricing.InvalidPrice", "All prices must be greater than zero");
+
+        var hasDuplicates = pricings
+            .GroupBy(p => (p.AdFormat, p.PriceType))
+            .Any(g => g.Count() > 1);
+
+        if (hasDuplicates)
+            return Error.Validation("ChannelPricing.DuplicatePricing", "Duplicate pricing entries found");
+
+        channel.UpdateCategory(categoryId);
+
+        dbContext.ChannelPricings.RemoveRange(channel.Pricings);
+
+        foreach (var p in pricings)
+        {
+            channel.Pricings.Add(ChannelPricing.Create(channel.Id, p.AdFormat, p.PriceType, p.PriceTon));
+        }
 
         await dbContext.SaveChangesAsync();
 

@@ -1,3 +1,4 @@
+using AdMarketplace.Domain.Contracts.Responses;
 using AdMarketplace.Infra.Interfaces;
 using ErrorOr;
 using FastEndpoints;
@@ -23,7 +24,7 @@ public class Endpoint(IChannelService channelService)
         return new Response
         {
             Id = result.Value.Id,
-            TelegramChannelId = result.Value.ChatId,
+            ChatId = result.Value.ChatId,
             Title = result.Value.Title,
             Username = result.Value.Username,
             Description = result.Value.Description,
@@ -33,7 +34,14 @@ public class Endpoint(IChannelService channelService)
             OwnerId = result.Value.OwnerId,
             CategoryId = result.Value.CategoryId,
             CategoryName = result.Value.Category?.Name,
-            CreatedAt = result.Value.CreatedAt
+            CreatedAt = result.Value.CreatedAt,
+            Pricings = result.Value.Pricings.Select(p => new ChannelPricingResponseContract
+            {
+                Id = p.Id,
+                AdFormat = p.AdFormat,
+                PriceType = p.PriceType,
+                PriceTon = p.PriceTon
+            }).ToList()
         };
     }
 }

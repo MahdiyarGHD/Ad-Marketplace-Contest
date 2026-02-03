@@ -4,17 +4,46 @@ import { backButton, mainButton } from "@tma.js/sdk-react";
 import { invokeHapticFeedbackImpact } from "../utils/common";
 import { useNavigate } from "react-router";
 import "./SetChannelData.scss";
+import PageHeader, { PageHeaderTitle } from "../components/PageHeader";
+import Avatar from "../components/Avatar";
+import {
+	ChevronDown,
+	ChevronRight,
+	ClockIcon,
+	DollarSignIcon,
+	PlusIcon,
+	SendHorizontalIcon,
+	TagIcon,
+} from "lucide-react";
+import useChannelStore from "../stores/useChannelStore";
+import Menu, { DropdownMenu, MenuItem } from "../components/Menu";
+import TextTransition from "../components/TextTransition";
+
+const PriceTypes = ["Per hour", "Per day", "Per 1000 views"];
+const AdFormats = ["Post"];
 
 function SetChannelData() {
+	const { draftChannel, setDraftChannelPriceType, setDraftChannelAdFormat } =
+		useChannelStore();
+
 	const navigate = useNavigate();
 
 	const onBackButton = () => {
 		navigate("/my-channels");
 	};
 
+	const onSelectCategory = () => {
+		navigate("/select-category");
+	};
+
+	const handleSave = () => {
+		// Implement save logic here
+		console.log("Save button clicked");
+	};
+
 	useEffect(() => {
-		mainButton.setText("Back to Channels");
-		mainButton.onClick(onBackButton);
+		mainButton.setText("Save");
+		mainButton.onClick(handleSave);
 		mainButton.show();
 
 		backButton.show();
@@ -26,7 +55,7 @@ function SetChannelData() {
 		return () => {
 			mainButton.hide();
 
-			mainButton.offClick(onBackButton);
+			mainButton.offClick(handleSave);
 
 			backButton.hide();
 
@@ -46,7 +75,118 @@ function SetChannelData() {
 		);
 	};
 
-	return <div className="SetChannelData">{renderSuccess()}</div>;
+	return (
+		<div className="SetChannelData">
+			<PageHeader>
+				<PageHeaderTitle>Create your influence channel</PageHeaderTitle>
+			</PageHeader>
+
+			<div className="Section">
+				<div className="Items">
+					<div className="ChatItem">
+						<Avatar id="1" title="Channel 1" photo="" />
+						<div className="body">
+							<div className="title">Channel 1</div>
+							<div className="subtitle">Subtitle 1</div>
+						</div>
+						<div className="meta">
+							<ChevronRight />
+						</div>
+					</div>
+					<div className="Item" onClick={onSelectCategory}>
+						<div className="icon">
+							<TagIcon />
+						</div>
+						<div className="body">
+							<div className="title">
+								{draftChannel?.category?.name || "Select Category..."}
+							</div>
+						</div>
+						<div className="meta">
+							<ChevronRight />
+						</div>
+					</div>
+				</div>
+			</div>
+			<div className="Section Pricing">
+				<div className="title">Pricing</div>
+				<div className="Items">
+					<div className="Item">
+						<div className="icon">
+							<DollarSignIcon />
+						</div>
+						<div className="body">
+							<div className="price">
+								<input type="text" placeholder="Price" />
+							</div>
+						</div>
+						<div className="meta">TON</div>
+					</div>
+					<Menu
+						custom={
+							<div className="Item">
+								<div className="icon">
+									<ClockIcon />
+								</div>
+								<div className="body">Price type</div>
+								<div className="meta">
+									<TextTransition
+										text={PriceTypes[draftChannel?.priceType] || "Per hour"}
+									/>
+									<ChevronDown />
+								</div>
+							</div>
+						}
+					>
+						<DropdownMenu className="right">
+							{PriceTypes.map((type, index) => (
+								<MenuItem
+									key={type}
+									title={type}
+									onClick={() => setDraftChannelPriceType(index)}
+								/>
+							))}
+						</DropdownMenu>
+					</Menu>
+					<Menu
+						custom={
+							<div className="Item">
+								<div className="icon">
+									<SendHorizontalIcon />
+								</div>
+								<div className="body">Ad format</div>
+								<div className="meta">
+									<TextTransition
+										text={AdFormats[draftChannel?.adFormat] || "Post"}
+									/>
+									<ChevronDown />
+								</div>
+							</div>
+						}
+					>
+						<DropdownMenu className="right">
+							{AdFormats.map((format, index) => (
+								<MenuItem
+									key={format}
+									title={format}
+									onClick={() => setDraftChannelAdFormat(index)}
+								/>
+							))}
+						</DropdownMenu>
+					</Menu>
+					<div className="Item primary">
+						<div className="icon">
+							<PlusIcon />
+						</div>
+						<div className="body">
+							<div className="title">Add Price...</div>
+						</div>
+					</div>
+				</div>
+				<div className="description">Set your price for sponsored content</div>
+			</div>
+		</div>
+	);
 }
 
 export default memo(SetChannelData);

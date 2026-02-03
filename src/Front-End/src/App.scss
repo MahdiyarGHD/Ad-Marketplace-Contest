@@ -1,347 +1,583 @@
 body {
-  background-color: var(--bg-color);
-  color: var(--tg-theme-text-color);
+    background-color: var(--bg-color);
+    color: var(--tg-theme-text-color);
 }
 
 .App {
-  height: 100%;
-  transition: all .3s ease;
+    height: 100%;
+    transition: all 0.3s ease;
 }
 
 .Main {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 
-  >.Transition {
-    >div {
-      transition: transform .3s ease, opacity .3s ease;
-  
-      &.animate {
-        opacity: 0;
-        transform: translateX(10px);
-      }
+    > .Transition {
+        > div {
+            transition:
+                transform 0.3s ease,
+                opacity 0.3s ease;
+
+            &.animate {
+                opacity: 0;
+                transform: translateX(10px);
+            }
+        }
     }
-  }
 }
 
 .SafeArea {
-  height: calc(100% - var(--tg-viewport-safe-area-inset-top, 0px));
-  padding-top: calc(var(--tg-viewport-safe-area-inset-top, 0px) + var(--tg-viewport-content-safe-area-inset-top, 0px));
+    height: calc(100% - var(--tg-viewport-safe-area-inset-top, 0px));
+    padding-top: calc(
+        var(--tg-viewport-safe-area-inset-top, 0px) +
+            var(--tg-viewport-content-safe-area-inset-top, 0px)
+    );
 }
 
 .TopBar {
-  display: flex;
-  padding: 1rem;
-  justify-content: space-between;
-  align-items: center;
-
-  .AppName {
-    font-size: 24px;
-    font-weight: 500;
-    flex: 1;
-    margin-left: -12px;
-    padding-left: 12px;
-    overflow: hidden;
-  }
-
-  .AppName .title span {
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    overflow: hidden;
-  }
-
-  .Buttons {
     display: flex;
+    padding: 1rem;
+    justify-content: space-between;
     align-items: center;
-    gap: 16px;
 
-    &>div {
-      display: flex;
-      cursor: pointer;
+    .AppName {
+        font-size: 24px;
+        font-weight: 500;
+        flex: 1;
+        margin-left: -12px;
+        padding-left: 12px;
+        overflow: hidden;
     }
-  }
+
+    .AppName .title span {
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+    }
+
+    .Buttons {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+
+        & > div {
+            display: flex;
+            cursor: pointer;
+        }
+    }
 }
 
 .BottomBar {
-  display: flex;
-  border-top: 1px solid var(--border-color);
-  // padding-inline: 2px;
-
-  .Item {
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    flex: 1;
-    font-weight: 500;
-    gap: .25rem;
-    font-size: 12px;
-    line-height: 1.2;
-    padding-block: 4px;
-    border-radius: 8px;
-    color: #aaa;
-    cursor: pointer;
-    transition: all 0.2s ease;
+    border-top: 1px solid var(--border-color);
+    // padding-inline: 2px;
 
-    &:active {
-      transform: scale(.95);
-      color: var(--text-color);
-      background-color: var(--active-bg);
-    }
-    
-    &.active {
-      color: var(--text-color);
-      // background-color: var(--active-bg);
-    }
+    .Item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        flex: 1;
+        font-weight: 500;
+        gap: 0.25rem;
+        font-size: 12px;
+        line-height: 1.2;
+        padding-block: 4px;
+        border-radius: 8px;
+        color: #aaa;
+        cursor: pointer;
+        transition: all 0.2s ease;
 
-    .meta {
-      flex: 1;
-      display: inline-flex;
-      align-items: center;
+        &:active {
+            transform: scale(0.95);
+            color: var(--text-color);
+            background-color: var(--active-bg);
+        }
+
+        &.active {
+            color: var(--text-color);
+            // background-color: var(--active-bg);
+        }
+
+        .meta {
+            flex: 1;
+            display: inline-flex;
+            align-items: center;
+        }
     }
-  }
 }
 
 .Avatar {
-  width: 32px;
-  height: 32px;
-  font-size: 16px;
-  text-align: center;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: var(--active-bg);
-  border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    font-size: 16px;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--active-bg);
+    border-radius: 50%;
 }
 
 @keyframes ItemLoading {
-  from {
-    background-position-x: 200%;
-  }
+    from {
+        background-position-x: 200%;
+    }
 
-  to {
-    background-position-x: 0%;
-  }
+    to {
+        background-position-x: 0%;
+    }
 }
 
 .Transition {
-  display: contents;
+    display: contents;
 
-  &.hidden {
-    visibility: hidden;
-  }
+    &.hidden {
+        visibility: hidden;
+    }
 }
 
 .TextTransition {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  text-align: left;
-  min-width: 12rem;
-  /* min-height: 1.2rem; */
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    min-width: 12rem;
+    /* min-height: 1.2rem; */
 }
 
 .TextTransition span {
-  position: relative;
-  left: 0px;
-  opacity: 1;
-  transition: all .3s ease;
+    position: relative;
+    left: 0px;
+    opacity: 1;
+    transition: all 0.3s ease;
 }
 
 .TextTransition span.showAnim {
-  left: 12px;
-  opacity: 0;
+    left: 12px;
+    opacity: 0;
 }
 
 .TextTransition .prev {
-  position: absolute;
-  width: 100%;
-  left: -12px;
-  opacity: 0;
+    position: absolute;
+    width: 100%;
+    left: -12px;
+    opacity: 0;
 }
 
 .TextTransition .prev.showAnim {
-  left: 0px;
-  opacity: 1;
+    left: 0px;
+    opacity: 1;
 }
 
 .TextTransition .Transition.hidden {
-  visibility: visible;
+    visibility: visible;
 }
 
 .TextTransition .Transition.hidden span {
-  visibility: hidden;
+    visibility: hidden;
 }
 
 .TextTransition .Transition.hidden .prev {
-  visibility: visible !important;
+    visibility: visible !important;
 }
 
 .primary {
-  color: var(--tg-theme-accent-text-color);
+    color: var(--tg-theme-accent-text-color);
 
-  &:hover {
-    background-color: color-mix(in srgb, var(--tg-theme-accent-text-color) 10%, transparent) !important;
-  }
+    &:hover {
+        background-color: color-mix(
+            in srgb,
+            var(--tg-theme-accent-text-color) 10%,
+            transparent
+        ) !important;
+    }
 }
 
-.Items, .ChatList {
-  flex: 1;
-  overflow-y: auto;
-  
-  margin: .5rem;
-  border-radius: 1rem;
+.Items,
+.ChatList {
+    flex: 1;
+    overflow-y: auto;
 
-  .Item, .ChatItem {
-      display: flex;
-      align-items: center;
-      gap: .25rem;
-      min-height: 3rem;
-      padding: .5rem;
-      padding-right: 1rem;
-      cursor: pointer;
-      background-color: var(--secondary-bg-color);
-      position: relative;
-      transition: background-color .2s ease, opacity .3s ease;
+    margin: 0.5rem;
+    border-radius: 1rem;
 
-      &:hover {
-        background-color: var(--hover-bg);
-      }
-
-      &::after {
-        content: "";
-        background-color: #fff1;
-        position: absolute;
-        left: 3.75rem;
-        bottom: 0px;
-        width: calc(100% - 3.75rem);
-        height: 1px;
-      }
-
-      &:last-child::after {
-        display: none;
-      }
-
-      &.animate {
-        opacity: 0;
-      }
-
-      .icon {
-        width: 3rem;
-        display: inline-flex;
-        justify-content: center;
-        align-items: center;
-      }
-
-      .body {
+    .Item,
+    .ChatItem {
         display: flex;
-        flex-direction: column;
-        gap: 0.33rem;
-        flex: 1 auto;
+        align-items: center;
+        gap: 0.25rem;
+        min-height: 3rem;
+        padding: 0.5rem;
+        padding-right: 1rem;
+        cursor: pointer;
+        background-color: var(--secondary-bg-color);
+        position: relative;
+        transition:
+            background-color 0.2s ease,
+            opacity 0.3s ease;
 
-        .subtitle {
-          font-size: .75rem;
-          color: var(--secondary-text);
+        &:hover {
+            background-color: var(--hover-bg);
         }
-      }
 
-      .meta {
-        color: var(--secondary-text);
-        font-size: .9rem;
-      }
-  }
+        &::after {
+            content: "";
+            background-color: var(--border-color);
+            position: absolute;
+            left: 3.75rem;
+            bottom: 0px;
+            width: calc(100% - 3.75rem);
+            height: 1px;
+        }
+
+        &:last-child::after {
+            display: none;
+        }
+
+        &.animate {
+            opacity: 0;
+        }
+
+        .icon {
+            width: 3rem;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .body {
+            display: flex;
+            flex-direction: column;
+            gap: 0.33rem;
+            flex: 1 auto;
+
+            .subtitle {
+                font-size: 0.75rem;
+                color: var(--secondary-text);
+            }
+        }
+
+        .meta {
+            color: var(--secondary-text);
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+
+            .TextTransition {
+                min-width: 7rem;
+                text-align: right;
+            }
+        }
+    }
+
+    .ChatItem {
+        gap: 1rem;
+    }
 }
 
 .ChatList {
-
-  .ChatItem {
-    gap: 1rem;
-  }
+    .ChatItem {
+        gap: 1rem;
+    }
 }
 
 .Placeholder {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin: 4rem 2rem;
-  gap: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 4rem 2rem;
+    gap: 1rem;
 
-  .Title {
-    text-align: center;
-  }
+    .Title {
+        text-align: center;
+    }
 }
 
 .Section {
-  display: flex;
-  flex-direction: column;
+    display: flex;
+    flex-direction: column;
 
-  >.title {
-    color: var(--secondary-text);
-    font-size: .9rem;
-    margin: 0 1.5rem;
-  }
+    > .title {
+        color: var(--secondary-text);
+        font-size: 0.9rem;
+        margin: 0 1.5rem;
+    }
+
+    > .description {
+        color: var(--secondary-text);
+        font-size: 0.9rem;
+        margin: 0 1.5rem 0.5rem 1.5rem;
+    }
 }
 
 .Tabs {
-  display: flex;
-  gap: 8px;
-  padding: 8px;
-  position: sticky;
-  top: 0px;
-  background-color: var(--secondary);
-  z-index: 1;
+    display: flex;
+    gap: 8px;
+    padding: 8px;
+    position: sticky;
+    top: 0px;
+    background-color: var(--secondary);
+    z-index: 1;
 }
 
 .Tab {
-  background-color: transparent;
-  padding: 6px;
-  border-radius: 8px;
-  font-weight: 500;
-  transition: all .3s ease;
-  cursor: pointer;
-  user-select: none;
+    background-color: transparent;
+    padding: 6px;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    user-select: none;
 }
 
 .Tab:hover {
-  background-color: var(--hover-bg);
+    background-color: var(--hover-bg);
 }
 
 .Tab.active {
-  background-color: var(--active-bg);
+    background-color: var(--active-bg);
 }
 
 .Tab .icon {
-  display: none;
+    display: none;
 }
 
 .TabContainer,
 .TabContent {
-  position: relative;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  height: 100%;
+    position: relative;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
 }
 
 .TabContent {
-  left: 0;
-  width: 100%;
-  overflow: hidden;
-  scroll-snap-align: center;
-  transition: left .3s ease;
+    left: 0;
+    width: 100%;
+    overflow: hidden;
+    scroll-snap-align: center;
+    transition: left 0.3s ease;
 }
 
 .next .TabContent.hideAnim,
 .prev .TabContent.showAnim {
-  position: absolute;
-  left: -100%;
-  top: 51px;
+    position: absolute;
+    left: -100%;
+    top: 51px;
 }
 
 .next .TabContent.showAnim,
 .prev .TabContent.hideAnim {
-  position: absolute;
-  left: 100%;
-  top: 51px;
+    position: absolute;
+    left: 100%;
+    top: 51px;
+}
+
+input {
+    appearance: none;
+    outline: none;
+    border: none;
+    font-size: 1rem;
+    // border: 1px solid var(--border-color);
+    // border-radius: 8px;
+    background-color: transparent;
+    color: var(--text-color);
+}
+
+.flex {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.scrollable {
+    overflow-y: auto;
+}
+
+.Menu {
+    position: relative;
+    transition: transform .3s ease;
+
+    &>::after {
+        display: block !important;
+    }
+
+    .active {
+        background-color: var(--hover-bg);
+    }
+
+    >.icon {
+        position: relative;
+    }
+}
+
+.DropdownMenu {
+    --blur-filter: blur(10px);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    background-color: #0002;
+    position: fixed;
+    min-width: 13.5rem;
+    border-radius: 10px;
+    z-index: 30;
+    margin: 4px 12px;
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: var(--blur-filter);
+    user-select: none;
+    transform-origin: top left !important;
+    transform-origin: var(--origin, top left) !important;
+    overflow: hidden;
+    box-shadow: 0px 0px 10px -4px #000000aa;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+
+    .icon {
+      background: none;
+    }
+
+    &.animate {
+        /* transform: scale(0.95); */
+        transform: scale(.5) rotateX(45deg) translateY(-18px);
+        opacity: 0;
+    }
+
+    &.hideAnim {
+        transform: scale(.95) translateY(-18px);
+        transform-origin: top !important;
+        opacity: 0;
+    }
+
+    &.showAnim {
+        transition: none;
+    }
+
+    &.top {
+        top: 0;
+    }
+
+    &.left {
+        left: 0;
+        transform-origin: top left !important;
+    }
+
+    &.right {
+        right: 0;
+        transform-origin: top right !important;
+    }
+
+    &.bottom {
+        bottom: 0;
+    }
+
+    &.withoutTitle {
+        top: 36px !important;
+    }
+}
+
+.MenuItem {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    min-height: 34px;
+    padding: .75rem 0.5rem;
+    white-space: pre;
+    border-bottom: 1px solid var(--border-color);
+    cursor: pointer;
+    transition: all 0.15s ease;
+
+    &:last-child {
+        border-bottom: none;
+    }
+
+    &.withSubtitle {
+     min-height: 44px;
+    }
+
+    &>div {
+        margin-left: 8px;
+    }
+
+    &>div~div {
+        margin: 0;
+        overflow: hidden;
+    }
+
+    &:hover {
+     background-color: var(--hover-bg);
+    }
+
+    // &:active {
+    //  transform: scale(.95);
+    // }
+
+    .icon {
+     font-size: 22px;
+    }
+
+    .title {
+        //   font-weight: bold;
+        text-overflow: ellipsis;
+        overflow: hidden;
+    }
+
+    .subtitle {
+      font-size: 12px;
+    }
+}
+
+.MenuItem.Loading,
+.Shimmer {
+    background-image: linear-gradient(90deg, #ffffff10, #ffffff30, #ffffff10);
+    background-size: 200%;
+    animation: ItemLoading 1s linear infinite;
+}
+
+.Shimmer {
+    /* background-image: linear-gradient(90deg, #ffffff10, #ffffff20, #ffffff10); */
+    /* background-image: none; */
+    /* background: linear-gradient(#fff1) padding-box,
+        linear-gradient(90deg, #fff1, #fff4, #fff1) border-box; */
+    background: linear-gradient(rgba(var(--primary-rgb), .9)) padding-box,
+        linear-gradient(90deg, #fff0, #fff, #fff0) border-box;
+    opacity: .25;
+    border: 1px solid transparent;
+    background-size: 400%;
+    /* border: 1px solid #fff1; */
+    animation: Shimmer 1.5s ease infinite;
+}
+
+@keyframes Shimmer {
+    0% {
+        background-position-x: 100%;
+    }
+
+    70% {
+        background-position-x: -0%;
+    }
+
+    100% {
+        background-position-x: -0%;
+    }
+}
+
+@keyframes ItemLoading {
+    from {
+        background-position-x: 200%;
+    }
+
+    to {
+        background-position-x: 0%;
+    }
+}
+
+.bg {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 9;
 }
