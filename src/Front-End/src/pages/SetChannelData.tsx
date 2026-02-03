@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import useChannelStore from "../stores/useChannelStore";
 import Menu, { DropdownMenu, MenuItem } from "../components/Menu";
+import TextTransition from "../components/TextTransition";
 
 const PriceTypes = ["Per hour", "Per day", "Per 1000 views"];
 const AdFormats = ["Post"];
@@ -129,7 +130,9 @@ function SetChannelData() {
 								</div>
 								<div className="body">Price type</div>
 								<div className="meta">
-									{PriceTypes[draftChannel?.priceType] || "Per hour"}
+									<TextTransition
+										text={PriceTypes[draftChannel?.priceType] || "Per hour"}
+									/>
 									<ChevronDown />
 								</div>
 							</div>
@@ -153,7 +156,9 @@ function SetChannelData() {
 								</div>
 								<div className="body">Ad format</div>
 								<div className="meta">
-									{AdFormats[draftChannel?.adFormat] || "Post"}
+									<TextTransition
+										text={AdFormats[draftChannel?.adFormat] || "Post"}
+									/>
 									<ChevronDown />
 								</div>
 							</div>

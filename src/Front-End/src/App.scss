@@ -224,12 +224,16 @@ body {
 
         &::after {
             content: "";
-            background-color: #fff1;
+            background-color: var(--border-color);
             position: absolute;
             left: 3.75rem;
             bottom: 0px;
             width: calc(100% - 3.75rem);
             height: 1px;
+        }
+
+        &:last-child::after {
+            display: none;
         }
 
         &.animate {
@@ -261,11 +265,12 @@ body {
             display: flex;
             align-items: center;
             gap: 0.5rem;
-        }
-    }
 
-    >:last-child::after {
-        display: none;
+            .TextTransition {
+                min-width: 7rem;
+                text-align: right;
+            }
+        }
     }
 
     .ChatItem {
@@ -395,14 +400,18 @@ input {
 .Menu {
     position: relative;
     transition: transform .3s ease;
-}
 
-.Menu.active {
-    background-color: var(--hover-bg);
-}
+    &>::after {
+        display: block !important;
+    }
 
-.Menu>.icon {
-    position: relative;
+    .active {
+        background-color: var(--hover-bg);
+    }
+
+    >.icon {
+        position: relative;
+    }
 }
 
 .DropdownMenu {
@@ -475,7 +484,7 @@ input {
     min-height: 34px;
     padding: .75rem 0.5rem;
     white-space: pre;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.062745098);
+    border-bottom: 1px solid var(--border-color);
     cursor: pointer;
     transition: all 0.15s ease;
 
