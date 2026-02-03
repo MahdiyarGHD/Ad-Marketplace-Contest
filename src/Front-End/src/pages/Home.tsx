@@ -1,4 +1,4 @@
-import { memo, useState } from "react";
+import { memo, useEffect, useState } from "react";
 import PageHeader, {
 	PageHeaderButtons,
 	PageHeaderTitle,
@@ -8,9 +8,16 @@ import "./Home.scss";
 import Transition from "../components/Transition";
 import Tabs, { TabContent } from "../components/Tabs";
 import { buildClassName } from "../utils/common";
+import useCategoryStore from "../stores/useCategoryStore";
 
 function Home() {
 	const [tabIndex, setTabIndex] = useState(0);
+
+	const { getCategories } = useCategoryStore();
+
+	useEffect(() => {
+		getCategories();
+	}, []);
 
 	return (
 		<div className="Home">
