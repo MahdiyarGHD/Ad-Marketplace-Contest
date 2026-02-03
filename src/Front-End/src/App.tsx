@@ -31,6 +31,10 @@ function App() {
 
 			const platform = lp.tgWebAppPlatform;
 
+			if (platform === "ios" || platform === "android") {
+				document.body.classList.add("Mobile");
+			}
+
 			if (viewport.mount.isAvailable() && !viewport.isMounted()) {
 				await viewport.mount();
 
