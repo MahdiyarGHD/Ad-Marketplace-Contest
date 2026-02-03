@@ -232,10 +232,6 @@ body {
             height: 1px;
         }
 
-        &:last-child::after {
-            display: none;
-        }
-
         &.animate {
             opacity: 0;
         }
@@ -266,6 +262,10 @@ body {
             align-items: center;
             gap: 0.5rem;
         }
+    }
+
+    >:last-child::after {
+        display: none;
     }
 
     .ChatItem {
@@ -386,4 +386,189 @@ input {
     display: flex;
     align-items: center;
     gap: 0.5rem;
+}
+
+.scrollable {
+    overflow-y: auto;
+}
+
+.Menu {
+    position: relative;
+    transition: transform .3s ease;
+}
+
+.Menu.active {
+    background-color: var(--hover-bg);
+}
+
+.Menu>.icon {
+    position: relative;
+}
+
+.DropdownMenu {
+    --blur-filter: blur(10px);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    background-color: #0002;
+    position: fixed;
+    min-width: 13.5rem;
+    border-radius: 10px;
+    z-index: 30;
+    margin: 4px 12px;
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: var(--blur-filter);
+    user-select: none;
+    transform-origin: top left !important;
+    transform-origin: var(--origin, top left) !important;
+    overflow: hidden;
+    box-shadow: 0px 0px 10px -4px #000000aa;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+
+    .icon {
+      background: none;
+    }
+
+    &.animate {
+        /* transform: scale(0.95); */
+        transform: scale(.5) rotateX(45deg) translateY(-18px);
+        opacity: 0;
+    }
+
+    &.hideAnim {
+        transform: scale(.95) translateY(-18px);
+        transform-origin: top !important;
+        opacity: 0;
+    }
+
+    &.showAnim {
+        transition: none;
+    }
+
+    &.top {
+        top: 0;
+    }
+
+    &.left {
+        left: 0;
+        transform-origin: top left !important;
+    }
+
+    &.right {
+        right: 0;
+        transform-origin: top right !important;
+    }
+
+    &.bottom {
+        bottom: 0;
+    }
+
+    &.withoutTitle {
+        top: 36px !important;
+    }
+}
+
+.MenuItem {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    min-height: 34px;
+    padding: .75rem 0.5rem;
+    white-space: pre;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.062745098);
+    cursor: pointer;
+    transition: all 0.15s ease;
+
+    &:last-child {
+        border-bottom: none;
+    }
+
+    &.withSubtitle {
+     min-height: 44px;
+    }
+
+    &>div {
+        margin-left: 8px;
+    }
+
+    &>div~div {
+        margin: 0;
+        overflow: hidden;
+    }
+
+    &:hover {
+     background-color: var(--hover-bg);
+    }
+
+    // &:active {
+    //  transform: scale(.95);
+    // }
+
+    .icon {
+     font-size: 22px;
+    }
+
+    .title {
+        //   font-weight: bold;
+        text-overflow: ellipsis;
+        overflow: hidden;
+    }
+
+    .subtitle {
+      font-size: 12px;
+    }
+}
+
+.MenuItem.Loading,
+.Shimmer {
+    background-image: linear-gradient(90deg, #ffffff10, #ffffff30, #ffffff10);
+    background-size: 200%;
+    animation: ItemLoading 1s linear infinite;
+}
+
+.Shimmer {
+    /* background-image: linear-gradient(90deg, #ffffff10, #ffffff20, #ffffff10); */
+    /* background-image: none; */
+    /* background: linear-gradient(#fff1) padding-box,
+        linear-gradient(90deg, #fff1, #fff4, #fff1) border-box; */
+    background: linear-gradient(rgba(var(--primary-rgb), .9)) padding-box,
+        linear-gradient(90deg, #fff0, #fff, #fff0) border-box;
+    opacity: .25;
+    border: 1px solid transparent;
+    background-size: 400%;
+    /* border: 1px solid #fff1; */
+    animation: Shimmer 1.5s ease infinite;
+}
+
+@keyframes Shimmer {
+    0% {
+        background-position-x: 100%;
+    }
+
+    70% {
+        background-position-x: -0%;
+    }
+
+    100% {
+        background-position-x: -0%;
+    }
+}
+
+@keyframes ItemLoading {
+    from {
+        background-position-x: 200%;
+    }
+
+    to {
+        background-position-x: 0%;
+    }
+}
+
+.bg {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 9;
 }

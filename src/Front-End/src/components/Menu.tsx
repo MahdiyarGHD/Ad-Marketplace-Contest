@@ -1,0 +1,173 @@
+import {
+	forwardRef,
+	useEffect,
+	useImperativeHandle,
+	useRef,
+	useState,
+	type ReactNode,
+} from "react";
+import Transition from "./Transition";
+
+const Menu = forwardRef(
+	(
+		{
+			// icon,
+			animateWidth = false,
+			animateHeight = false,
+			minHeight = 36,
+			closeManually = false,
+			custom,
+			children,
+		}: {
+			// icon?: ReactNode;
+			animateWidth?: boolean;
+			animateHeight?: boolean;
+			minHeight?: number;
+			closeManually?: boolean;
+			custom?: React.ReactNode;
+			children?: React.ReactNode;
+		},
+		ref,
+	) => {
+		const menu = useRef<HTMLDivElement>(null);
+		const [isActive, setIsActive] = useState<boolean>(false);
+
+		const bg = useRef(null);
+
+		useEffect(() => {
+			(menu.current!.querySelector(".icon") as HTMLElement)!.style.zIndex =
+				isActive ? "32" : "";
+			menu.current!.style.zIndex = isActive ? "32" : "";
+			if (!isActive) return;
+			// setTimeout(() => {
+			//     bg.current.classList.remove('animate')
+			// }, 0);
+		}, [isActive]);
+
+		useEffect(() => {
+			if (custom) {
+				(menu.current!.querySelector(".Item") as HTMLElement)!.onclick =
+					handleOpenMenu;
+			}
+		}, [custom]);
+
+		const activeAction = () => {
+			const dropdownMenu = menu.current!.querySelector(
+				".DropdownMenu",
+			) as HTMLElement;
+			let w = dropdownMenu.clientWidth;
+			let h = dropdownMenu.clientHeight;
+
+			if (!closeManually) {
+				(
+					menu.current!.querySelectorAll(".MenuItem") as NodeListOf<HTMLElement>
+				).forEach((item) => {
+					item.onclick = handleCloseMenu;
+				});
+			}
+
+			dropdownMenu.classList.add("animate");
+			requestAnimationFrame(() => {
+				dropdownMenu.classList.remove("animate");
+			});
+			if (animateWidth) {
+				dropdownMenu.style.minWidth = 36 + "px";
+				dropdownMenu.style.width = 36 + "px";
+			}
+			if (animateHeight) dropdownMenu.style.height = minHeight + "px";
+
+			requestAnimationFrame(() => {
+				setTimeout(() => {
+					if (animateWidth) dropdownMenu.style.width = w + "px";
+					if (animateHeight) dropdownMenu.style.height = h + "px";
+				}, 40);
+				setTimeout(() => {
+					if (animateHeight) dropdownMenu.style.height = "";
+				}, 200);
+			});
+		};
+
+		useImperativeHandle(ref, () => ({
+			handleOpenMenu() {
+				handleOpenMenu();
+			},
+			handleCloseMenu() {
+				handleCloseMenu();
+			},
+		}));
+
+		const handleOpenMenu = () => {
+			setIsActive(!isActive);
+		};
+
+		const handleCloseMenu = () => {
+			setIsActive(false);
+		};
+
+		return (
+			<>
+				<Transition state={isActive}>
+					<div ref={bg} className="bg animate" onClick={handleOpenMenu}></div>
+				</Transition>
+				<div className="Menu" ref={menu}>
+					{/* {icon && <Icon iconNode={icon} onClick={handleOpenMenu} />} */}
+					{custom}
+					{/* {isActive ? children : null} */}
+					<Transition state={isActive} activeAction={activeAction}>
+						{children}
+					</Transition>
+				</div>
+			</>
+		);
+	},
+);
+
+export function DropdownMenu({
+	className,
+	children,
+}: {
+	className?: string;
+	children?: React.ReactNode;
+}) {
+	return (
+		<div className={`DropdownMenu${className ? ` ${className}` : ""}`}>
+			{children}
+		</div>
+	);
+}
+
+export function MenuItem({
+	icon,
+	title,
+	subtitle,
+	onClick,
+	style,
+	className,
+}: {
+	icon?: ReactNode;
+	title: string;
+	subtitle?: string;
+	onClick?: () => void;
+	style?: React.CSSProperties;
+	className?: string;
+}) {
+	return (
+		<div
+			className={
+				"MenuItem" +
+				(className ? ` ${className}` : "") +
+				(subtitle ? " withSubtitle" : "")
+			}
+			style={style}
+			onClick={onClick}
+		>
+			{icon}
+			<div>
+				<div className="title">{title}</div>
+				{subtitle && <div className="subtitle">{subtitle}</div>}
+			</div>
+		</div>
+	);
+}
+
+export default Menu;

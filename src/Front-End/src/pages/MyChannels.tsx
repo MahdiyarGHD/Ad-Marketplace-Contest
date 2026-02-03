@@ -51,7 +51,10 @@ function MyChannels() {
 						</div>
 						<div className="title">Add Your Channel</div>
 					</div>
-					<div className="ChatItem">
+					<div
+						className="ChatItem"
+						onClick={() => navigate("/set-channel-data")}
+					>
 						<Avatar id="1" title="Channel 1" photo="" />
 						<div className="body">
 							<div className="title">Channel 1</div>

@@ -12,6 +12,7 @@ import AddChannel from "./pages/AddChannel";
 import Profile from "./pages/Profile";
 import Deals from "./pages/Deals";
 import SetChannelData from "./pages/SetChannelData";
+import SelectCategory from "./pages/Channel/SelectCategory";
 
 const Loading = () => {
 	return <div className="LoadingBar">Loading...</div>;
@@ -65,6 +66,10 @@ const router = createBrowserRouter(
 						{
 							path: "set-channel-data",
 							element: <SetChannelData />,
+						},
+						{
+							path: "select-category",
+							element: <SelectCategory />,
 						},
 					],
 				},
