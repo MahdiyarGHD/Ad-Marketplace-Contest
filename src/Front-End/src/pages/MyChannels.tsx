@@ -9,6 +9,13 @@ import { backButton } from "@tma.js/sdk-react";
 import { invokeHapticFeedbackImpact } from "../utils/common";
 import useChannelStore from "../stores/useChannelStore";
 
+const ChannelStatus: { [key: number]: string } = {
+	0: "Pending",
+	1: "Pending",
+	2: "Active",
+	3: "Inactive",
+};
+
 function MyChannels() {
 	const { myChannels, getMyChannels } = useChannelStore();
 
@@ -62,7 +69,7 @@ function MyChannels() {
 								<div className="title">{channel.title}</div>
 								<div className="subtitle">{channel.chat_id}</div>
 							</div>
-							<div className="meta">Pending</div>
+							<div className="meta">{ChannelStatus[channel.status]}</div>
 						</div>
 					))}
 				</Transition>
