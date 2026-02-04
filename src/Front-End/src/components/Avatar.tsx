@@ -10,14 +10,14 @@ function Avatar({
 }: {
 	id: string | number;
 	title: string;
-	photo: string;
+	photo?: string;
 	size?: number;
 }) {
 	return (
 		<div
 			className={buildClassName(
 				"Avatar",
-				`peer-color-${getPeerColorIndexById(id)}`,
+				`peer-color-${getPeerColorIndexById(getPeerIdFromChatId(id))}`,
 			)}
 			style={{
 				width: size,
@@ -38,8 +38,12 @@ function Avatar({
 	);
 }
 
+export function getPeerIdFromChatId(chatId: string | number): string | number {
+	return Number(chatId) < 0 ? Number(String(chatId).slice(4)) : chatId;
+}
+
 export function getPeerColorIndexById(peerId: string | number): number {
-	return Math.abs(Number(peerId)) % 7;
+	return peerId ? Math.abs(Number(peerId)) % 7 : -1;
 }
 
 export default memo(Avatar);

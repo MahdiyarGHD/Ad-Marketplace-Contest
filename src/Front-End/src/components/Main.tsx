@@ -9,7 +9,7 @@ function Main({ bottomBarVisible = true }: { bottomBarVisible?: boolean }) {
 		<div className="Main SafeArea">
 			<TopBar />
 
-			<Transition state>
+			<Transition state className="Content">
 				<Outlet />
 			</Transition>
 
