@@ -2,36 +2,39 @@ import type { ReactNode } from "react";
 import { create } from "zustand";
 
 type Toast = {
-  id: number;
-  icon: ReactNode;
-  title: string;
-}
+	id?: number;
+	icon?: ReactNode;
+	title: string;
+};
 
 type UIState = {
 	topBarTitle?: string;
-  topBarButtons?: ReactNode;
-  toasts: Toast[];
+	topBarButtons?: ReactNode;
+	toasts: Toast[];
 	setTopBarTitle: (value: string) => void;
 	setTopBarButtons: (value: ReactNode) => void;
 	showToast: (toast: Toast) => void;
+	removeToast: (id: number) => void;
 };
 
 const useUIStore = create<UIState>((set) => ({
-  toasts: [],
+	toasts: [],
 	setTopBarTitle(value) {
 		set({ topBarTitle: value });
 	},
 	setTopBarButtons(value) {
 		set({ topBarButtons: value });
-  },
-  showToast(toast) {
-    toast.id = Date.now();
+	},
+	showToast(toast) {
+		toast.id = Date.now();
 
-    set((state) => ({
-			toasts: [
-        ...state.toasts,
-        toast
-			],
+		set((state) => ({
+			toasts: [...state.toasts, toast],
+		}));
+	},
+	removeToast(id) {
+		set((state) => ({
+			toasts: state.toasts.filter((t) => t.id !== id),
 		}));
 	},
 }));

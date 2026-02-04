@@ -126,17 +126,9 @@ const RLottie = forwardRef(
 			};
 		}, [sticker, fromFrame]);
 
-		return <div className="RLottie" ref={player}></div>;
-		// return <div className="RLottie">
-		//     {data && <lottie-player
-		//         autoPlay
-		//         loop
-		//         mode="normal"
-		//         src={data}
-		//         style={{ width: 128, height: 128 }}
-		//     >
-		//     </lottie-player>}
-		// </div>
+		return (
+			<div className="RLottie" style={{ width, height }} ref={player}></div>
+		);
 	},
 );
 
