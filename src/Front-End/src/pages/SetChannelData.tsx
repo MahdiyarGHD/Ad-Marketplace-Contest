@@ -8,7 +8,6 @@ import Avatar from "../components/Avatar";
 import {
 	ChevronDown,
 	ChevronRight,
-	CircleAlertIcon,
 	ClockIcon,
 	DollarSignIcon,
 	PlusIcon,
