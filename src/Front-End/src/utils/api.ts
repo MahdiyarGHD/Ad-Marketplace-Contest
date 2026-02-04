@@ -1,4 +1,3 @@
-import { CircleAlertIcon } from "lucide-react";
 import useAppStore from "../stores/useAppStore";
 import useUIStore from "../stores/useUIStore";
 
