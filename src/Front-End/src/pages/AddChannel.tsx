@@ -66,7 +66,7 @@ function AddChannel() {
 	}, [currentStatus]);
 
 	useEffect(() => {
-		if (unVerifiedChannels.length > 0) {
+		if (unVerifiedChannels.length > 0 && currentStatus === "waiting") {
 			setDraftChannel(unVerifiedChannels[0]);
 			handleChannelVerified();
 		}
@@ -77,7 +77,6 @@ function AddChannel() {
 		navigate("/set-channel-data");
 		invokeHapticFeedbackImpact("medium");
 		setTimeout(() => invokeHapticFeedbackImpact("soft"), 200);
-		setTimeout(() => invokeHapticFeedbackImpact("soft"), 400);
 	};
 
 	const renderInstructions = () => {

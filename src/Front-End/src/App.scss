@@ -604,44 +604,57 @@ input {
 }
 
 .Toasts {
-  display: flex;
-  width: fit-content;
-  flex-direction: column;
-  gap: 8px;
-  margin: 0 auto;
-  position: fixed;
-  bottom: 120px;
-  left: 0;
-  right: 0;
-  z-index: 9;
+    display: flex;
+    width: fit-content;
+    flex-direction: column;
+    gap: 8px;
+    margin: 0 auto;
+    position: fixed;
+    bottom: 120px;
+    left: 0;
+    right: 0;
+    z-index: 9;
 }
 
 .Toast {
-  background-color: #000d;
-  color: var(--text-color);
-  backdrop-filter: blur(10px);
-  width: fit-content;
-  padding: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  border-radius: 16px;
-  gap: 12px;
-  height: auto;
-  overflow: hidden;
-  user-select: none;
-  interpolate-size: allow-keywords;
-  transition: transform .3s ease, opacity .1s ease;
+    background-color: #000d;
+    color: var(--text-color);
+    backdrop-filter: blur(10px);
+    width: fit-content;
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    border-radius: 16px;
+    gap: 12px;
+    height: auto;
+    overflow: hidden;
+    user-select: none;
+    interpolate-size: allow-keywords;
+    transition: transform .3s ease, opacity .1s ease;
+}
+
+
+.Toasts {
+    width: calc(100% - 16px);
+    margin: 8px;
+    bottom: 48px;
+}
+
+.Toast {
+    width: auto;
+    padding: 12px;
+    background-color: #121212f8;
 }
 
 .Toast.animate {
-  opacity: 0;
-  transform: scale(0.95) translateY(48px);
+    opacity: 0;
+    transform: scale(0.95) translateY(48px);
 }
 
 .Toast .icon {
-  padding: 0;
-  margin: 0;
+    padding: 0;
+    margin: 0;
 }
 
 :root {

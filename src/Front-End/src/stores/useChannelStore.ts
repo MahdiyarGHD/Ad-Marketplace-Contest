@@ -14,6 +14,7 @@ export type Channel = {
 		display_order: number;
 	};
 	title: string;
+	status: number;
 	pricing: {
 		ad_format: number;
 		price_type: number;
@@ -51,7 +52,7 @@ const useChannelStore = create<ChannelState>((set, get) => ({
 	async getMyChannels() {
 		const response = await requestAPI("/api/channels/my", {}, "GET");
 
-		set({ myChannels: response.value });
+		if (response.value) set({ myChannels: response.value });
 	},
 	async verifyChannel() {
 		const response = await requestAPI("/api/channels/verify-add", {
