@@ -8,6 +8,7 @@ import Avatar from "../components/Avatar";
 import {
 	ChevronDown,
 	ChevronRight,
+	CircleAlertIcon,
 	ClockIcon,
 	DollarSignIcon,
 	PlusIcon,
@@ -21,6 +22,7 @@ import useChannelStore, {
 import Menu, { DropdownMenu, MenuItem } from "../components/Menu";
 import TextTransition from "../components/TextTransition";
 import { requestAPI } from "../utils/api";
+import useUIStore from "../stores/useUIStore";
 
 const AdFormats = ["Post"];
 
@@ -32,6 +34,8 @@ function SetChannelData() {
 		setDraftChannelPriceType,
 		setDraftChannelAdFormat,
 	} = useChannelStore();
+
+	const { showToast } = useUIStore();
 
 	const navigate = useNavigate();
 
@@ -50,6 +54,18 @@ function SetChannelData() {
 	const handleSave = async () => {
 		if (!draftChannel.pricing) return;
 
+		try {
+			if (!draftChannel.chat_id) {
+				throw new Error("Please select a channel");
+			}
+			if (!draftChannel.category_id) {
+				throw new Error("Please select a category");
+			}
+		} catch (error) {
+			showToast({ title: (error as Error).message });
+			return;
+		}
+
 		const response = await requestAPI(
 			"/api/channels/",
 			{
@@ -64,13 +80,12 @@ function SetChannelData() {
 			"POST",
 		);
 
-		if (!response.isError) {
+		if (!response.isError && response.value) {
 			navigate("/add-channel/success");
 			invokeHapticFeedbackImpact("medium");
 			setTimeout(() => invokeHapticFeedbackImpact("soft"), 200);
-			setTimeout(() => invokeHapticFeedbackImpact("soft"), 400);
+			setTimeout(() => invokeHapticFeedbackImpact("soft"), 300);
 		}
-		// TODO: Handle error with toast
 	};
 
 	useEffect(() => {
