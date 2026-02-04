@@ -2,9 +2,12 @@ import useAppStore from "../stores/useAppStore";
 
 type HTTPMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 
-export async function requestAPI<TResponse = any>(
+export async function requestAPI<
+	TResponse = any,
+	TBody = { [key: string]: string | number | Blob | undefined },
+>(
 	path: string = "/",
-	body: { [key: string]: string | number | Blob | undefined } = {},
+	body: TBody = {} as TBody,
 	method: HTTPMethod = "POST",
 ): Promise<TResponse> {
 	const { token } = useAppStore.getState();
