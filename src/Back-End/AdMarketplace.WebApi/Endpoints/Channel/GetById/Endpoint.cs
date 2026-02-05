@@ -35,13 +35,13 @@ public class Endpoint(IChannelService channelService)
             CategoryId = result.Value.CategoryId,
             CategoryName = result.Value.Category?.Name,
             CreatedAt = result.Value.CreatedAt,
-            Pricings = result.Value.Pricings.Select(p => new ChannelPricingResponseContract
+            Pricings = [.. result.Value.Pricings.Select(p => new ChannelPricingResponseContract
             {
                 Id = p.Id,
                 AdFormat = p.AdFormat,
                 PriceType = p.PriceType,
                 PriceTon = p.PriceTon
-            }).ToList()
+            })]
         };
     }
 }

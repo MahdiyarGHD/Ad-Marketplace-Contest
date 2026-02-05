@@ -19,6 +19,7 @@ public class Channel : IDateTimeSchema
     
     public Guid OwnerId { get; private set; }
     public Guid? CategoryId { get; private set; }
+    public Guid? AgentId { get; private set; }
     
     public DateTimeOffset CreatedAt { get; private init; }
     public DateTimeOffset? UpdatedAt { get; private set; }
@@ -27,6 +28,7 @@ public class Channel : IDateTimeSchema
     // Navigation properties
     public User Owner { get; private set; }
     public Category? Category { get; private set; }
+    public Agent? Agent { get; private set; }
     public ICollection<ChannelPricing> Pricings { get; private set; } = [];
     
     public static Channel Create(
@@ -44,6 +46,7 @@ public class Channel : IDateTimeSchema
             Title = title,
             Username = username,
             PremiumCount = 0,
+            Status = ChannelStatusType.PartiallyReady,
             SubscriberCount = 0,
             AverageViews = 0,
             LanguageDistributionJson = [],
@@ -77,9 +80,41 @@ public class Channel : IDateTimeSchema
         UpdatedAt = DateTimeOffset.UtcNow;
     }
 
+    public void UpdateSubscriberCount(int subscriberCount)
+    {
+        SubscriberCount = subscriberCount;
+        UpdatedAt = DateTimeOffset.UtcNow;
+    }
+
+    public void UpdateAnalytics(int subscriberCount, int premiumCount, int averageViews)
+    {
+        SubscriberCount = subscriberCount;
+        PremiumCount = premiumCount;
+        AverageViews = averageViews;
+        UpdatedAt = DateTimeOffset.UtcNow;
+    }
+
+    public void UpdateLanguageDistribution(List<LanguageDistributionContract> languageDistribution)
+    {
+        LanguageDistributionJson = languageDistribution;
+        UpdatedAt = DateTimeOffset.UtcNow;
+    }
+
     public void SetStatus(ChannelStatusType type)
     {
         Status = type;
+        UpdatedAt = DateTimeOffset.UtcNow;
+    }
+
+    public void AttachAgent(Guid agentId)
+    {
+        AgentId = agentId;
+        UpdatedAt = DateTimeOffset.UtcNow;
+    }
+
+    public void DetachAgent()
+    {
+        AgentId = null;
         UpdatedAt = DateTimeOffset.UtcNow;
     }
 }

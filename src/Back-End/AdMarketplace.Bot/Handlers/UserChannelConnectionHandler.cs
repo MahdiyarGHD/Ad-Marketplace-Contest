@@ -5,7 +5,9 @@ using Telegram.Bot.Types.Enums;
 
 namespace AdMarketplace.Bot.Handlers;
 
-public class UserChannelConnectionHandler(IUserChannelConnectionService userChannelConnectionService, ILogger<UserChannelConnectionHandler> logger) : IHandler
+public class UserChannelConnectionHandler(
+    IUserChannelConnectionService userChannelConnectionService,
+    ILogger<UserChannelConnectionHandler> logger) : IHandler
 {
     public async Task HandleUpdateAsync(Update update, CancellationToken cancellationToken)
     {
@@ -13,14 +15,28 @@ public class UserChannelConnectionHandler(IUserChannelConnectionService userChan
             return;
 
         var chatMemberUpdate = update.MyChatMember;
-        
+
         switch (chatMemberUpdate.NewChatMember)
         {
-            case ChatMemberLeft or not ChatMemberAdministrator { CanInviteUsers: true, CanPromoteMembers: true }:
+            case ChatMemberLeft or not ChatMemberAdministrator
+            {
+                CanPromoteMembers: true,
+                CanInviteUsers: true,
+                CanDeleteMessages: true,
+                CanPostMessages: true,
+                CanEditMessages: true,
+            }:
                 await HandleChannelDisconnectAsync(chatMemberUpdate.Chat.Id);
                 return;
-            
-            case ChatMemberAdministrator { CanInviteUsers: true, CanPromoteMembers: true }:
+
+            case ChatMemberAdministrator
+            {
+                CanPromoteMembers: true, 
+                CanInviteUsers: true, 
+                CanDeleteMessages: true, 
+                CanPostMessages: true,
+                CanEditMessages: true,
+            }:
                 await HandleChannelConnectAsync(
                     chatMemberUpdate.Chat.Title ?? string.Empty,
                     chatMemberUpdate.Chat.Id,
@@ -32,7 +48,7 @@ public class UserChannelConnectionHandler(IUserChannelConnectionService userChan
     private async Task HandleChannelConnectAsync(string title, long chatId, long userId)
     {
         var result = await userChannelConnectionService.CreateOrTouchAsync(title, userId, chatId);
-        
+
         if (result.IsError)
             logger.LogError("Failed to connect channel {ChatId} for user {UserId}", chatId, userId);
     }

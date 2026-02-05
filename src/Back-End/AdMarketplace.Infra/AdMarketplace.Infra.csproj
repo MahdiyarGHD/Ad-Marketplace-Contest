@@ -8,9 +8,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-    </ItemGroup>
-
-    <ItemGroup>
       <ProjectReference Include="..\AdMarketplace.Database\AdMarketplace.Database.csproj" />
     </ItemGroup>
 
@@ -24,6 +21,7 @@
       <PackageReference Include="Microsoft.Extensions.Options" Version="10.0.1" />
     <PackageReference Include="FastEndpoints" Version="7.2.0" />
     <PackageReference Include="Telegram.Bot" Version="22.8.1" />
+    <PackageReference Include="WTelegramClient" Version="4.4.0" />
     </ItemGroup>
 
     <ItemGroup>

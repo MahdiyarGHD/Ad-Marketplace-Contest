@@ -4,7 +4,7 @@ using AdMarketplace.Infra.Interfaces;
 using ErrorOr;
 using Microsoft.EntityFrameworkCore;
 
-namespace AdMarketplace.Infra.Services;
+namespace AdMarketplace.Infra.Services.CategoryServices;
 
 public class CategoryService(AdMarketDbContext dbContext) : ICategoryService
 {

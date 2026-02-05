@@ -5,7 +5,7 @@ using AdMarketplace.Infra.Interfaces;
 using ErrorOr;
 using Microsoft.EntityFrameworkCore;
 
-namespace AdMarketplace.Infra.Services;
+namespace AdMarketplace.Infra.Services.ChannelServices;
 
 public class ChannelPricingService(AdMarketDbContext dbContext) : IChannelPricingService
 {

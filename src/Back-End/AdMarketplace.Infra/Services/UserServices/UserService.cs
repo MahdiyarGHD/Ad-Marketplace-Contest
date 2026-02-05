@@ -5,7 +5,7 @@ using AdMarketplace.Infra.Interfaces;
 using ErrorOr;
 using Microsoft.EntityFrameworkCore;
 
-namespace AdMarketplace.Infra.Services;
+namespace AdMarketplace.Infra.Services.UserServices;
 
 public class UserService(AdMarketDbContext dbContext) : IUserService
 {

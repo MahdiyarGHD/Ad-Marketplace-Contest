@@ -11,9 +11,9 @@
     <ItemGroup>
         <PackageReference Include="FastEndpoints.Core" Version="7.2.0" />
         <PackageReference Include="FastEndpoints.Security" Version="7.2.0" />
-        <PackageReference Include="FastEndpoints.Swagger" Version="7.2.0" />    
+        <PackageReference Include="FastEndpoints.Swagger" Version="7.2.0" />
         <PackageReference Include="Scrutor" Version="6.1.0" />
-        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.0"/>
+        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.0" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.2">
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -25,13 +25,21 @@
     </ItemGroup>
 
     <ItemGroup>
+      <Folder Include="Endpoints/Channel/Home/" />
       <Folder Include="Endpoints\Authentication\" />
+      <Folder Include="Sessions/" />
     </ItemGroup>
 
     <ItemGroup>
       <Content Include="..\.dockerignore">
         <Link>.dockerignore</Link>
       </Content>
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Update="Sessions\**">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
 
 </Project>

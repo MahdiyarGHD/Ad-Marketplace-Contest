@@ -72,5 +72,13 @@ public class ChannelEfConfiguration : IEntityTypeConfiguration<Channel>
             .WithMany()
             .HasForeignKey(x => x.CategoryId)
             .OnDelete(DeleteBehavior.SetNull);
+        
+        builder.Property(x => x.AgentId)
+            .IsRequired(false);
+
+        builder.HasOne(x => x.Agent)
+            .WithMany()
+            .HasForeignKey(x => x.AgentId)
+            .OnDelete(DeleteBehavior.SetNull);
     }
 }

@@ -6,7 +6,7 @@ using AdMarketplace.Infra.Interfaces;
 using ErrorOr;
 using Microsoft.EntityFrameworkCore;
 
-namespace AdMarketplace.Infra.Services;
+namespace AdMarketplace.Infra.Services.ChannelServices;
 
 public class ChannelService(AdMarketDbContext dbContext, ICategoryService categoryService) : IChannelService
 {
@@ -120,6 +120,7 @@ public class ChannelService(AdMarketDbContext dbContext, ICategoryService catego
         var channel = await dbContext.Channels
             .Include(c => c.Category)
             .Include(c => c.Pricings)
+            .AsTracking()
             .FirstOrDefaultAsync(c => c.Id == id);
 
         if (channel is null)
@@ -161,7 +162,9 @@ public class ChannelService(AdMarketDbContext dbContext, ICategoryService catego
 
     public async Task<ErrorOr<bool>> SetStatusAsync(Guid id, Guid ownerId, ChannelStatusType status)
     {
-        var channel = await dbContext.Channels.FirstOrDefaultAsync(c => c.Id == id);
+        var channel = await dbContext.Channels
+            .AsTracking()
+            .FirstOrDefaultAsync(c => c.Id == id);
 
         if (channel is null)
             return Error.NotFound("Channel.NotFound", "Channel not found");

@@ -5,7 +5,7 @@ using ErrorOr;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
-namespace AdMarketplace.Infra.Services;
+namespace AdMarketplace.Infra.Services.UserServices;
 
 public class UserChannelConnectionService(AdMarketDbContext dbContext, IUserService userService, ILogger<UserChannelConnectionService> logger) : IUserChannelConnectionService
 {

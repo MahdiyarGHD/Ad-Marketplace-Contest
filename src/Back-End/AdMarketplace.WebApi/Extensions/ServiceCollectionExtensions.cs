@@ -5,7 +5,13 @@ using AdMarketplace.Database;
 using AdMarketplace.Domain.Options;
 using AdMarketplace.Infra.Helpers;
 using AdMarketplace.Infra.Interfaces;
-using AdMarketplace.Infra.Services;
+using AdMarketplace.Infra.Queues;
+using AdMarketplace.Infra.Services.AgentServices;
+using AdMarketplace.Infra.Services.CategoryServices;
+using AdMarketplace.Infra.Services.ChannelServices;
+using AdMarketplace.Infra.Services.TelegramServices;
+using AdMarketplace.Infra.Services.UserServices;
+using AdMarketplace.Workers.ChannelAnalytics;
 using FastEndpoints.Security;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Protocols.Configuration;
@@ -25,8 +31,13 @@ public static class ServiceCollectionExtensions
             services.AddScoped<ICategoryService, CategoryService>();
             services.AddScoped<IUserChannelConnectionService, UserChannelConnectionService>();
             services.AddScoped<IChannelPricingService, ChannelPricingService>();
+            services.AddScoped<IAgentService, AgentService>();
+            services.AddScoped<IClientFactory, ClientFactory>();
+            services.AddScoped<IAnalyticsUpdateService, AnalyticsUpdateService>();
             
-            
+            services.AddSingleton<IAnalyticsUpdateQueue, AnalyticsUpdateQueue>();
+            services.AddHostedService<AnalyticsConsumerWorker>();
+
             return services;
         }
 
@@ -35,11 +46,11 @@ public static class ServiceCollectionExtensions
             services.Scan(scan => scan
                 .FromAssemblyOf<UpdateHandler>()
                 .AddClasses(classes => classes.AssignableToAny(typeof(IHandler), typeof(IHandlerWithResult<>))));
-            
+
             services.AddScoped<UpdateHandler>();
             return services;
         }
-        
+
         public IServiceCollection ConfigureHelpers()
         {
             services.AddSingleton<InitDataHelper>();
@@ -51,8 +62,9 @@ public static class ServiceCollectionExtensions
             services.AddSingleton(new JsonSerializerOptions
             {
                 PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower,
+                DefaultIgnoreCondition = JsonIgnoreCondition.Never,
             });
-        
+
             return services;
         }
 
@@ -66,39 +78,42 @@ public static class ServiceCollectionExtensions
 
             return services;
         }
-        
+
         public IServiceCollection ConfigureTelegramBot(IConfiguration configuration)
         {
             var botConfigSection = configuration.GetSection(TelegramBotOptions.KeyName).Get<TelegramBotOptions>();
 
             if (botConfigSection is null)
                 throw new InvalidConfigurationException();
-            
+
             var telegramBotClientOptions = new TelegramBotClientOptions(token: botConfigSection.Token, baseUrl: botConfigSection.BotApiServer);
-            
+
             services.AddHttpClient("TgWebhook")
                 .RemoveAllLoggers()
                 .ConfigureHttpClient(_ => { })
                 .AddTypedClient<ITelegramBotClient>(
                     httpClient => new TelegramBotClient(telegramBotClientOptions, httpClient));
-            
+
             services.ConfigureTelegramBotMvc();
             services.ConfigureTelegramBot<Microsoft.AspNetCore.Http.Json.JsonOptions>(opt => opt.SerializerOptions);
-            
+
             return services;
         }
-        
+
         public IServiceCollection ConfigureOptions(IConfiguration configuration)
         {
+            services.Configure<TelegramApiOptions>(
+                configuration.GetSection(TelegramApiOptions.KeyName));
+
             services.Configure<TelegramBotOptions>(
                 configuration.GetSection(TelegramBotOptions.KeyName));
-        
+
             services.Configure<JwtOptions>(
                 configuration.GetSection(JwtOptions.KeyName));
 
             services.Configure<CorsOptions>(
                 configuration.GetSection(CorsOptions.KeyName));
-        
+
             return services;
         }
 
@@ -123,10 +138,10 @@ public static class ServiceCollectionExtensions
 
             return services;
         }
-        
+
         public IServiceCollection ConfigureAuthentication(IConfiguration configuration)
         {
-            services.AddAuthenticationJwtBearer(s => 
+            services.AddAuthenticationJwtBearer(s =>
                     s.SigningKey = configuration.GetValue<string>($"{JwtOptions.KeyName}:SigningKey") ?? throw new ArgumentNullException()
                 );
             services.AddAuthorization();

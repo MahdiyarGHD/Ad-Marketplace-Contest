@@ -12,11 +12,11 @@ bld.Host.UseSerilog((ctx, lc) => lc
     .ReadFrom.Configuration(ctx.Configuration)
 );
 
-bld.Services.AddFastEndpoints(o => 
+bld.Services.AddFastEndpoints(o =>
 {
     o.Assemblies =
     [
-        typeof(Program).Assembly,              
+        typeof(Program).Assembly,
         typeof(UpdateHandler).Assembly
     ];
 });
@@ -42,13 +42,9 @@ await app.MigrateAndSeedAsync();
 app.UseCustomExceptionHandler();
 app.UseAuthentication();
 app.UseAuthorization();
-
 app.UseCors(CorsOptions.PolicyName);
 
-app.UseFastEndpoints(c =>
-{
-    c.Serializer.Options.DefaultIgnoreCondition = JsonIgnoreCondition.Never;
-});
+app.UseFastEndpoints();
 app.UseSwaggerGen();
 app.ConfigureAppStart();
 app.Run();
