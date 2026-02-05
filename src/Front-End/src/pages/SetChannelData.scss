@@ -10,5 +10,13 @@
         .price {
             flex: 1;
         }
+
+        .price-type,
+        .ad-format {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            //flex: none;
+        }
     }
 }

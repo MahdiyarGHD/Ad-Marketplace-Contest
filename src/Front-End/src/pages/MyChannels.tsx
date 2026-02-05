@@ -9,8 +9,15 @@ import { backButton } from "@tma.js/sdk-react";
 import { invokeHapticFeedbackImpact } from "../utils/common";
 import useChannelStore from "../stores/useChannelStore";
 
+const ChannelStatus: { [key: number]: string } = {
+	0: "Pending",
+	1: "Pending",
+	2: "Active",
+	3: "Inactive",
+};
+
 function MyChannels() {
-	const { getMyChannels } = useChannelStore();
+	const { myChannels, getMyChannels } = useChannelStore();
 
 	const navigate = useNavigate();
 
@@ -41,7 +48,7 @@ function MyChannels() {
 			</PageHeader>
 
 			<div className="ChatList">
-				<Transition state eachElement eachElementDelay={50}>
+				<Transition state eachElement eachElementDelay={20}>
 					<div
 						className="Item primary"
 						onClick={() => navigate("/add-channel")}
@@ -51,14 +58,20 @@ function MyChannels() {
 						</div>
 						<div className="title">Add Your Channel</div>
 					</div>
-					<div className="ChatItem">
-						<Avatar id="1" title="Channel 1" photo="" />
-						<div className="body">
-							<div className="title">Channel 1</div>
-							<div className="subtitle">Subtitle 1</div>
+					{myChannels.map((channel) => (
+						<div
+							key={channel.chat_id}
+							className="ChatItem"
+							onClick={() => navigate("/set-channel-data")}
+						>
+							<Avatar id={channel.chat_id} title={channel.title} photo="" />
+							<div className="body">
+								<div className="title">{channel.title}</div>
+								<div className="subtitle">{channel.chat_id}</div>
+							</div>
+							<div className="meta">{ChannelStatus[channel.status]}</div>
 						</div>
-						<div className="meta">Pending</div>
-					</div>
+					))}
 				</Transition>
 			</div>
 
