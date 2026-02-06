@@ -8,16 +8,49 @@ import "./Home.scss";
 import Transition from "../components/Transition";
 import Tabs, { TabContent } from "../components/Tabs";
 import { buildClassName } from "../utils/common";
-import useCategoryStore from "../stores/useCategoryStore";
+import useCategoryStore, { type Category } from "../stores/useCategoryStore";
+import useChannelStore, { type Channel } from "../stores/useChannelStore";
+import Avatar from "../components/Avatar";
 
 function Home() {
 	const [tabIndex, setTabIndex] = useState(0);
 
 	const { getCategories } = useCategoryStore();
+	const { influencers, getInfluencers } = useChannelStore();
 
 	useEffect(() => {
 		getCategories();
+
+		getInfluencers();
 	}, []);
+
+	const renderCategory = (category: Category) => (
+		<div className="Item" key={category.id}>
+			<div className="icon">{category.icon}</div>
+			<div className="body">
+				<div className="title">{category.name}</div>
+				{/* <div className="subtitle">Description</div> */}
+			</div>
+			<div className="meta">
+				{/* <div className="count">12</div> */}
+				<ChevronRight />
+			</div>
+		</div>
+	);
+
+	const renderChannel = (channel: Channel) => (
+		<div className="ChatItem" key={channel.id}>
+			<Avatar id={channel.chat_id} title={channel.title} photo="" />
+			<div className="body">
+				<div className="title">{channel.title}</div>
+				{/* <div className="subtitle">Description</div> */}
+			</div>
+			<div className="meta">
+				{/* <div className="count">12</div> */}
+				<ChevronRight />
+			</div>
+		</div>
+	);
 
 	return (
 		<div className="Home">
@@ -51,24 +84,23 @@ function Home() {
 				}
 			>
 				<TabContent state={true}>
-					<div className="Categories Section">
-						<div className="title">Categories</div>
-						<div className="Items">
-							<Transition state eachElement eachElementDelay={20}>
-								<div className="Item">
-									<div className="icon">😂</div>
-									<div className="body">
-										<div className="title">Category 1</div>
-										<div className="subtitle">Description</div>
-									</div>
-									<div className="meta">
-										{/* <div className="count">12</div> */}
-										<ChevronRight />
-									</div>
-								</div>
-							</Transition>
+					{influencers.elements.map((element) => (
+						<div className="Section" key={element.label}>
+							<div className="flex">
+								<div className="icon">{element.icon}</div>
+								<h2 className="title">{element.label}</h2>
+							</div>
+							<div className="Items">
+								<Transition state eachElement eachElementDelay={20}>
+									{element.items.map((item) =>
+										element.$type === "channel"
+											? renderChannel(item as Channel)
+											: renderCategory(item as Category),
+									)}
+								</Transition>
+							</div>
 						</div>
-					</div>
+					))}
 				</TabContent>
 				<TabContent state={true}>
 					<div className="Categories Section">

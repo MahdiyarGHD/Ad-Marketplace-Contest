@@ -1,8 +1,16 @@
 import { create } from "zustand";
 import { requestAPI } from "../utils/api";
 
+export type Category = {
+	id: string;
+	name: string;
+	description?: string;
+	icon: string;
+	display_order?: number;
+};
+
 type CategoryState = {
-	categories: any[];
+	categories: Category[];
 	getCategories: () => Promise<void>;
 };
 
