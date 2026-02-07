@@ -7,6 +7,7 @@ using AdMarketplace.Infra.Helpers;
 using AdMarketplace.Infra.Interfaces;
 using AdMarketplace.Infra.Queues;
 using AdMarketplace.Infra.Services.AgentServices;
+using AdMarketplace.Infra.Services.CampaignServices;
 using AdMarketplace.Infra.Services.CategoryServices;
 using AdMarketplace.Infra.Services.ChannelServices;
 using AdMarketplace.Infra.Services.TelegramServices;
@@ -34,6 +35,12 @@ public static class ServiceCollectionExtensions
             services.AddScoped<IAgentService, AgentService>();
             services.AddScoped<IClientFactory, ClientFactory>();
             services.AddScoped<IAnalyticsUpdateService, AnalyticsUpdateService>();
+            
+            services.AddScoped<ICampaignService, CampaignService>();
+            services.AddScoped<ICampaignApplicationService, CampaignApplicationService>();
+            services.AddScoped<ICampaignInvitationService, CampaignInvitationService>();
+            services.AddScoped<IChannelApplicationService, ChannelApplicationService>();
+            services.AddScoped<IDealService, DealService>();
             
             services.AddSingleton<IAnalyticsUpdateQueue, AnalyticsUpdateQueue>();
             services.AddHostedService<AnalyticsConsumerWorker>();
@@ -129,7 +136,7 @@ public static class ServiceCollectionExtensions
                     if (allowAnyOrigin)
                         policy.AllowAnyOrigin();
                     else
-                        policy.WithOrigins(corsOptions.Origins.ToArray());
+                        policy.WithOrigins([.. corsOptions.Origins]);
 
                     policy.AllowAnyMethod();
                     policy.AllowAnyHeader();
