@@ -1,9 +1,11 @@
 import { create } from "zustand";
 import { requestAPI } from "../utils/api";
+import type { Category } from "./useCategoryStore";
 
 export const PriceTypes = ["Per hour", "Per day", "Per 1000 views"];
 
 export type Channel = {
+	id?: string;
 	chat_id: number;
 	category_id: number;
 	category?: {
@@ -35,6 +37,16 @@ type ChannelState = {
 	setDraftChannelPriceType: (priceType: number, index: number) => void;
 	setDraftChannelAdFormat: (adFormat: number, index: number) => void;
 	setDraftChannelPrice: (priceTon: number, index: number) => void;
+
+	influencers: {
+		elements: {
+			$type: string;
+			icon: string;
+			label: string;
+			items: Channel[] | Category[];
+		}[];
+	};
+	getInfluencers: () => Promise<void>;
 };
 
 const useChannelStore = create<ChannelState>((set, get) => ({
@@ -49,6 +61,9 @@ const useChannelStore = create<ChannelState>((set, get) => ({
 		],
 	},
 	unVerifiedChannels: [],
+	influencers: {
+		elements: [],
+	},
 	async getMyChannels() {
 		const response = await requestAPI("/api/channels/my", {}, "GET");
 
@@ -140,6 +155,18 @@ const useChannelStore = create<ChannelState>((set, get) => ({
 				),
 			},
 		}));
+	},
+
+	getInfluencers: async () => {
+		const response = await requestAPI("/api/channels/home", {}, "GET");
+
+		console.log(response);
+
+		if (response.value) {
+			set({
+				influencers: response.value,
+			});
+		}
 	},
 }));
 
