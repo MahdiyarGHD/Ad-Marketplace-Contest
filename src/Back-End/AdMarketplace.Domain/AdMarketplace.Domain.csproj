@@ -5,7 +5,8 @@
         <RootNamespace>AdMarketplace.Domain</RootNamespace>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-    </PropertyGroup>
+      <UserSecretsId>5c1a4eae-4fbb-4e86-9cee-5abfcaa63526</UserSecretsId>
+  </PropertyGroup>
 
     <ItemGroup>
       <PackageReference Include="ErrorOr" Version="2.0.1" />
