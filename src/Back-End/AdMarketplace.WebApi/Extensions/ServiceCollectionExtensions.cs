@@ -13,6 +13,7 @@ using AdMarketplace.Infra.Services.ChannelServices;
 using AdMarketplace.Infra.Services.TelegramServices;
 using AdMarketplace.Infra.Services.UserServices;
 using AdMarketplace.Workers.ChannelAnalytics;
+using AdMarketplace.Workers.DealLifecycle;
 using FastEndpoints.Security;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Protocols.Configuration;
@@ -35,6 +36,7 @@ public static class ServiceCollectionExtensions
             services.AddScoped<IAgentService, AgentService>();
             services.AddScoped<IClientFactory, ClientFactory>();
             services.AddScoped<IAnalyticsUpdateService, AnalyticsUpdateService>();
+            services.AddScoped<IPostingService, PostingService>();
             
             services.AddScoped<ICampaignService, CampaignService>();
             services.AddScoped<ICampaignApplicationService, CampaignApplicationService>();
@@ -44,6 +46,9 @@ public static class ServiceCollectionExtensions
             
             services.AddSingleton<IAnalyticsUpdateQueue, AnalyticsUpdateQueue>();
             services.AddHostedService<AnalyticsConsumerWorker>();
+            services.AddHostedService<DealAutoCancelWorker>();
+            services.AddHostedService<AutoPostingWorker>();
+            services.AddHostedService<PostVerificationWorker>();
 
             return services;
         }

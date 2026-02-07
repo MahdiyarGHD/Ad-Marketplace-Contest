@@ -435,3 +435,10 @@ Desktop.ini
 .DS_Store
 src/CSharp/Backend/Source/TreatmentAdvice.WebApi/appsettings.Development.json
 src/CSharp/Backend/Source/TreatmentAdvice.WebApi/appsettings.Development.json
+
+# IDE and session files
+.vscode/
+.zed/
+AdMarketplace.WebApi/Sessions/
+*.session
+core

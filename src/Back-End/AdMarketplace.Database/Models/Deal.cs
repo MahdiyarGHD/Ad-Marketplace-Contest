@@ -24,6 +24,7 @@ public class Deal : IDateTimeSchema
     public DateTimeOffset? ScheduledPostTime { get; private set; }
     public DateTimeOffset? ActualPostTime { get; private set; }
     public long? PostedMessageId { get; private set; }
+    public string? PostedTextHash { get; private set; }
     
     public long? DraftMessageId { get; private set; }
     public DraftStatusType DraftStatus { get; private set; }
@@ -121,9 +122,10 @@ public class Deal : IDateTimeSchema
         UpdatedAt = DateTimeOffset.UtcNow;
     }
     
-    public void MarkAsPosted(long messageId)
+    public void MarkAsPosted(long messageId, string? textHash = null)
     {
         PostedMessageId = messageId;
+        PostedTextHash = textHash;
         ActualPostTime = DateTimeOffset.UtcNow;
         Status = DealStatusType.Posted;
         LastActivityAt = DateTimeOffset.UtcNow;
@@ -143,4 +145,15 @@ public class Deal : IDateTimeSchema
         FundsReleasedAt = DateTimeOffset.UtcNow;
         UpdatedAt = DateTimeOffset.UtcNow;
     }
+
+    public void Cancel()
+    {
+        Status = DealStatusType.Cancelled;
+        UpdatedAt = DateTimeOffset.UtcNow;
+    }
+
+    public bool HasFundedEscrow =>
+        Status != DealStatusType.AwaitingPayment &&
+        Status != DealStatusType.Cancelled &&
+        TransactionHash is not null;
 }
