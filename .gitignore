@@ -1,4 +1,3 @@
 .github/
 src/.vscode/
-compose.yaml
 appsettings.json
