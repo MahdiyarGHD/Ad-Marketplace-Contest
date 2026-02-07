@@ -18,7 +18,7 @@ function Profile() {
 	const launchParams = useLaunchParams();
 	const navigate = useNavigate();
 
-	const { first_name, username } = launchParams.tgWebAppData?.user || {};
+	const { id, first_name, username } = launchParams.tgWebAppData?.user || {};
 
 	return (
 		<div className="Profile">
@@ -28,7 +28,7 @@ function Profile() {
 			</PageHeader>
 
 			<div className="User">
-				<Avatar id="user" title={first_name ?? ""} photo="" size={80} />
+				<Avatar id={id!} title={first_name ?? ""} photo="" size={80} />
 				<div className="info">
 					<div className="title">{first_name}</div>
 					<div className="subtitle">@{username}</div>

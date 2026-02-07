@@ -97,6 +97,8 @@ body {
 	--primary-background: #000;
 	--primary-text: #fff;
 	--secondary-background: #0001;
+	--shimmer-color-1: #0004;
+	--shimmer-color-2: #000;
 
 	--topbar-height: 60px;
 
@@ -116,6 +118,8 @@ body[data-theme="dark"] {
 	--primary-background: #fff;
 	--primary-text: #000;
 	--secondary-background: #fff1;
+	--shimmer-color-1: #fff5;
+	--shimmer-color-2: #fff;
 }
 
 .Mobile[data-theme="dark"] {

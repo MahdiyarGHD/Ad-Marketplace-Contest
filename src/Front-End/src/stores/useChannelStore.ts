@@ -16,6 +16,7 @@ export type Channel = {
 		display_order: number;
 	};
 	title: string;
+	username?: string;
 	status: number;
 	pricing: {
 		ad_format: number;
@@ -47,6 +48,9 @@ type ChannelState = {
 		}[];
 	};
 	getInfluencers: () => Promise<void>;
+
+	activeChannel?: Channel;
+	setActiveChannel: (channel: Channel) => void;
 };
 
 const useChannelStore = create<ChannelState>((set, get) => ({
@@ -167,6 +171,10 @@ const useChannelStore = create<ChannelState>((set, get) => ({
 				influencers: response.value,
 			});
 		}
+	},
+
+	setActiveChannel(channel) {
+		set({ activeChannel: channel });
 	},
 }));
 

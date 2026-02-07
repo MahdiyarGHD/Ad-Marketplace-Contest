@@ -1,5 +1,6 @@
 import { Children, isValidElement, memo, useEffect, useRef } from "react";
 import Transition from "./Transition";
+import { buildClassName } from "../utils/common";
 
 function Tabs({
 	tabs,
@@ -91,14 +92,20 @@ function Tabs({
 	);
 }
 
-export const TabContent = memo(
-	({ state, children }: { state: boolean; children: React.ReactNode }) => {
-		return (
-			<div className="TabContent">
-				<Transition state={state}>{children}</Transition>
-			</div>
-		);
-	},
-);
+export const TabContent = ({
+	state,
+	className,
+	children,
+}: {
+	state: boolean;
+	className?: string;
+	children: React.ReactNode;
+}) => {
+	return (
+		<div className={buildClassName("TabContent", className)}>
+			<Transition state={state}>{children}</Transition>
+		</div>
+	);
+};
 
 export default memo(Tabs);

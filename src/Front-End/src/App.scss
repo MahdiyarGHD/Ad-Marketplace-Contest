@@ -292,6 +292,35 @@ body {
     }
 }
 
+.Profile {
+    .User, .Chat {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        text-align: center;
+        gap: 1rem;
+        margin-bottom: 1rem;
+
+        .info {
+            display: flex;
+            align-items: center;
+            flex-direction: column;
+            gap: 0.25rem;
+
+            .title {
+                font-size: 1.5rem;
+                font-weight: bold;
+            }
+    
+            .subtitle {
+                font-size: 1rem;
+                color: var(--secondary-text);
+            }
+        }
+    }
+}
+
 .Placeholder {
     display: flex;
     flex-direction: column;
@@ -565,8 +594,7 @@ input {
     }
 }
 
-.MenuItem.Loading,
-.Shimmer {
+.MenuItem.Loading {
     background-image: linear-gradient(90deg, #ffffff10, #ffffff30, #ffffff10);
     background-size: 200%;
     animation: ItemLoading 1s linear infinite;
@@ -577,26 +605,21 @@ input {
     /* background-image: none; */
     /* background: linear-gradient(#fff1) padding-box,
         linear-gradient(90deg, #fff1, #fff4, #fff1) border-box; */
-    background: linear-gradient(rgba(var(--primary-rgb), .9)) padding-box,
-        linear-gradient(90deg, #fff0, #fff, #fff0) border-box;
+    background: linear-gradient(90deg, var(--shimmer-color-1), var(--shimmer-color-2), var(--shimmer-color-1)) border-box;
     opacity: .25;
     border: 1px solid transparent;
     background-size: 400%;
     /* border: 1px solid #fff1; */
-    animation: Shimmer 1.5s ease infinite;
+    animation: Shimmer 5s linear infinite;
 }
 
 @keyframes Shimmer {
     0% {
-        background-position-x: 100%;
-    }
-
-    70% {
-        background-position-x: -0%;
+        background-position-x: 200%;
     }
 
     100% {
-        background-position-x: -0%;
+        background-position-x: -200%;
     }
 }
 
@@ -634,7 +657,7 @@ input {
 
 .Toast {
     background-color: #000d;
-    color: var(--text-color);
+    color: #f5f5f5;
     backdrop-filter: blur(10px);
     width: fit-content;
     padding: 16px;
@@ -671,6 +694,61 @@ input {
 .Toast .icon {
     padding: 0;
     margin: 0;
+}
+
+.Skeleton {
+    .Section {
+        .flex {
+            margin: .5rem 1.25rem 0 1.25rem;
+            .title {
+                width: 40%;
+                height: 1.25rem;
+                background-color: var(--hover-bg);
+                border-radius: 8px;
+            }
+        }
+    }
+    .Items {
+        .Item {
+            gap: .5rem;
+
+            .Avatar {
+                width: 42px;
+                height: 42px;
+                background-color: var(--shimmer-color-1);
+                animation: AvatarShimmer calc(5s / 3) linear infinite;
+            }
+            .body {
+                .title {
+                    width: 50%;
+                    height: 1rem;
+                    background-color: var(--hover-bg);
+                    border-radius: 8px;
+                }
+
+                .subtitle {
+                    width: 30%;
+                    height: .8rem;
+                    background-color: var(--hover-bg);
+                    border-radius: 8px;
+                }
+            }
+        }
+    }
+}
+
+@keyframes AvatarShimmer {
+    from {
+        opacity: .75;
+    }
+
+    50% {
+        opacity: .25;
+    }
+
+    to {
+        opacity: .75;
+    }
 }
 
 :root {
