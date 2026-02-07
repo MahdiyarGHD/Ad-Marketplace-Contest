@@ -21,7 +21,7 @@ public class Endpoint(
         if (userResult.IsError)
             return userResult.Errors;
 
-        var result = await dealService.FundEscrowAsync(req.Id, req.TransactionHash, req.WalletAddress);
+        var result = await dealService.FundEscrowAsync(req.Id, userResult.Value.Id, req.TransactionHash, req.WalletAddress);
 
         if (result.IsError)
             return result.Errors;

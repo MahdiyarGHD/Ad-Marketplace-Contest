@@ -27,7 +27,7 @@ public interface IDealService
     Task<ErrorOr<List<Deal>>> GetByStatusAsync(DealStatusType status, int skip, int take);
     Task<ErrorOr<List<Deal>>> GetExpiredDealsAsync();
 
-    Task<ErrorOr<Deal>> FundEscrowAsync(Guid id, string transactionHash, string walletAddress);
+    Task<ErrorOr<Deal>> FundEscrowAsync(Guid id, Guid advertiserId, string transactionHash, string walletAddress);
     Task<ErrorOr<Deal>> SubmitDraftAsync(Guid id, Guid channelOwnerId, long messageId);
     Task<ErrorOr<Deal>> ApproveDraftAsync(Guid id, Guid advertiserId);
     Task<ErrorOr<Deal>> RejectDraftAsync(Guid id, Guid advertiserId, string feedback);

@@ -48,6 +48,15 @@ public class DealService(AdMarketDbContext dbContext) : IDealService
 
             if (application.Campaign.AdvertiserId != advertiserId)
                 return Error.Forbidden("Deal.Forbidden", "You don't have permission to create a deal for this application");
+
+            if (application.ChannelId != channelId)
+                return Error.Validation("Deal.ChannelMismatch", "Channel ID does not match the application's channel");
+
+            if (application.CampaignId != campaignId)
+                return Error.Validation("Deal.CampaignMismatch", "Campaign ID does not match the application's campaign");
+
+            if (application.Campaign.Status != CampaignStatusType.Active)
+                return Error.Validation("Campaign.NotActive", "Campaign is no longer active");
         }
 
         if (invitationId.HasValue)
@@ -68,6 +77,15 @@ public class DealService(AdMarketDbContext dbContext) : IDealService
 
             if (invitation.Campaign.AdvertiserId != advertiserId)
                 return Error.Forbidden("Deal.Forbidden", "You don't have permission to create a deal for this invitation");
+
+            if (invitation.ChannelId != channelId)
+                return Error.Validation("Deal.ChannelMismatch", "Channel ID does not match the invitation's channel");
+
+            if (campaignId.HasValue && invitation.CampaignId != campaignId.Value)
+                return Error.Validation("Deal.CampaignMismatch", "Campaign ID does not match the invitation's campaign");
+
+            if (invitation.Campaign.Status != CampaignStatusType.Active)
+                return Error.Validation("Campaign.NotActive", "Campaign is no longer active");
         }
 
         if (channelApplicationId.HasValue)
@@ -88,6 +106,9 @@ public class DealService(AdMarketDbContext dbContext) : IDealService
 
             if (channelApplication.AdvertiserId != advertiserId)
                 return Error.Forbidden("Deal.Forbidden", "You don't have permission to create a deal for this channel application");
+
+            if (channelApplication.ChannelId != channelId)
+                return Error.Validation("Deal.ChannelMismatch", "Channel ID does not match the channel application's channel");
         }
 
         var deal = Deal.Create(
@@ -214,7 +235,7 @@ public class DealService(AdMarketDbContext dbContext) : IDealService
         return deals;
     }
 
-    public async Task<ErrorOr<Deal>> FundEscrowAsync(Guid id, string transactionHash, string walletAddress)
+    public async Task<ErrorOr<Deal>> FundEscrowAsync(Guid id, Guid advertiserId, string transactionHash, string walletAddress)
     {
         var deal = await dbContext.Deals
             .AsTracking()
@@ -222,8 +243,14 @@ public class DealService(AdMarketDbContext dbContext) : IDealService
         if (deal is null)
             return Error.NotFound("Deal.NotFound", "Deal not found");
 
+        if (deal.AdvertiserId != advertiserId)
+            return Error.Forbidden("Deal.Forbidden", "You don't have permission to fund this deal");
+
         if (deal.Status != DealStatusType.AwaitingPayment)
             return Error.Validation("Deal.InvalidStatus", "Deal is not awaiting payment");
+
+        if (deal.AutoCancelAt.HasValue && deal.AutoCancelAt.Value <= DateTimeOffset.UtcNow)
+            return Error.Validation("Deal.Expired", "Deal has expired and can no longer be funded");
 
         deal.FundEscrow(transactionHash, walletAddress);
         await dbContext.SaveChangesAsync();
@@ -335,8 +362,13 @@ public class DealService(AdMarketDbContext dbContext) : IDealService
         if (deal is null)
             return Error.NotFound("Deal.NotFound", "Deal not found");
 
-        if (deal.Status == DealStatusType.Completed)
-            return Error.Validation("Deal.AlreadyCompleted", "Deal is already completed");
+        if (deal.Status != DealStatusType.EscrowFunded &&
+            deal.Status != DealStatusType.DraftSubmitted &&
+            deal.Status != DealStatusType.DraftRejected &&
+            deal.Status != DealStatusType.DraftApproved &&
+            deal.Status != DealStatusType.Scheduled &&
+            deal.Status != DealStatusType.Disputed)
+            return Error.Validation("Deal.InvalidStatus", "Deal cannot be refunded in its current status");
 
         deal.Refund();
         await dbContext.SaveChangesAsync();

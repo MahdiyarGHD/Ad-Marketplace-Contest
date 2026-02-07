@@ -25,12 +25,29 @@ public class CampaignApplicationService(AdMarketDbContext dbContext) : ICampaign
         if (campaign.Status != CampaignStatusType.Active)
             return Error.Validation("Campaign.NotActive", "Campaign is not active");
 
+        if (campaign.ApplicationDeadline.HasValue && campaign.ApplicationDeadline.Value <= DateTimeOffset.UtcNow)
+            return Error.Validation("Campaign.DeadlinePassed", "The application deadline for this campaign has passed");
+
         var channel = await dbContext.Channels.FindAsync(channelId);
         if (channel is null)
             return Error.NotFound("Channel.NotFound", "Channel not found");
 
+        if (channel.OwnerId == campaign.AdvertiserId)
+            return Error.Validation("Application.SelfDeal", "You cannot apply your own channel to your own campaign");
+
+        if (proposedPriceTon <= 0)
+            return Error.Validation("Application.InvalidPrice", "Proposed price must be greater than zero");
+
+        if (campaign.MaxPricePerPlacement.HasValue && proposedPriceTon > campaign.MaxPricePerPlacement.Value)
+            return Error.Validation("Application.PriceExceedsMax", "Proposed price exceeds the campaign's maximum price per placement");
+
+        if (proposedPostingTime.HasValue && proposedPostingTime.Value <= DateTimeOffset.UtcNow)
+            return Error.Validation("Application.InvalidPostingTime", "Proposed posting time must be in the future");
+
         var existingApplication = await dbContext.CampaignApplications
-            .FirstOrDefaultAsync(a => a.CampaignId == campaignId && a.ChannelId == channelId);
+            .FirstOrDefaultAsync(a => a.CampaignId == campaignId && a.ChannelId == channelId &&
+                                      a.Status != ApplicationStatusType.Rejected &&
+                                      a.Status != ApplicationStatusType.Withdrawn);
 
         if (existingApplication is not null)
             return Error.Conflict("Application.AlreadyExists", "You have already applied to this campaign");
@@ -124,6 +141,9 @@ public class CampaignApplicationService(AdMarketDbContext dbContext) : ICampaign
 
         if (application.Status != ApplicationStatusType.Pending)
             return Error.Validation("Application.NotPending", "Application is not pending");
+
+        if (application.Campaign.Status != CampaignStatusType.Active)
+            return Error.Validation("Campaign.NotActive", "Campaign is no longer active");
 
         application.Accept();
         await dbContext.SaveChangesAsync();

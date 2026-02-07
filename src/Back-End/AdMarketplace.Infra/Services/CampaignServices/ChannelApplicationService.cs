@@ -28,8 +28,16 @@ public class ChannelApplicationService(AdMarketDbContext dbContext) : IChannelAp
         if (channel.OwnerId == advertiserId)
             return Error.Validation("ChannelApplication.SelfApply", "You cannot apply to your own channel");
 
+        if (proposedPriceTon <= 0)
+            return Error.Validation("ChannelApplication.InvalidPrice", "Proposed price must be greater than zero");
+
+        if (proposedPostingTime.HasValue && proposedPostingTime.Value <= DateTimeOffset.UtcNow)
+            return Error.Validation("ChannelApplication.InvalidPostingTime", "Proposed posting time must be in the future");
+
         var existingApplication = await dbContext.ChannelApplications
-            .FirstOrDefaultAsync(a => a.ChannelId == channelId && a.AdvertiserId == advertiserId);
+            .FirstOrDefaultAsync(a => a.ChannelId == channelId && a.AdvertiserId == advertiserId &&
+                                      a.Status != ApplicationStatusType.Rejected &&
+                                      a.Status != ApplicationStatusType.Withdrawn);
 
         if (existingApplication is not null)
             return Error.Conflict("ChannelApplication.AlreadyExists", "You have already sent an application to this channel");

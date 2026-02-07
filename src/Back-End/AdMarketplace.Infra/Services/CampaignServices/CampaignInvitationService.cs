@@ -29,8 +29,22 @@ public class CampaignInvitationService(AdMarketDbContext dbContext) : ICampaignI
         if (channel is null)
             return Error.NotFound("Channel.NotFound", "Channel not found");
 
+        if (channel.OwnerId == campaign.AdvertiserId)
+            return Error.Validation("Invitation.SelfDeal", "You cannot invite your own channel to your own campaign");
+
+        if (proposedPriceTon <= 0)
+            return Error.Validation("Invitation.InvalidPrice", "Proposed price must be greater than zero");
+
+        if (campaign.MaxPricePerPlacement.HasValue && proposedPriceTon > campaign.MaxPricePerPlacement.Value)
+            return Error.Validation("Invitation.PriceExceedsMax", "Proposed price exceeds the campaign's maximum price per placement");
+
+        if (proposedPostingTime.HasValue && proposedPostingTime.Value <= DateTimeOffset.UtcNow)
+            return Error.Validation("Invitation.InvalidPostingTime", "Proposed posting time must be in the future");
+
         var existingInvitation = await dbContext.CampaignInvitations
-            .FirstOrDefaultAsync(i => i.CampaignId == campaignId && i.ChannelId == channelId);
+            .FirstOrDefaultAsync(i => i.CampaignId == campaignId && i.ChannelId == channelId &&
+                                      i.Status != InvitationStatusType.Rejected &&
+                                      i.Status != InvitationStatusType.Withdrawn);
 
         if (existingInvitation is not null)
             return Error.Conflict("Invitation.AlreadyExists", "You have already invited this channel to this campaign");
@@ -125,6 +139,9 @@ public class CampaignInvitationService(AdMarketDbContext dbContext) : ICampaignI
 
         if (invitation.Status != InvitationStatusType.Pending)
             return Error.Validation("Invitation.InvalidStatus", "Invitation is not pending");
+
+        if (invitation.Campaign.Status != CampaignStatusType.Active)
+            return Error.Validation("Campaign.NotActive", "Campaign is no longer active");
 
         invitation.Accept();
         await dbContext.SaveChangesAsync();

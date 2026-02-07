@@ -28,6 +28,36 @@ public class CampaignService(AdMarketDbContext dbContext) : ICampaignService
         if (advertiser is null)
             return Error.NotFound("User.NotFound", "Advertiser not found");
 
+        if (budgetTon <= 0)
+            return Error.Validation("Campaign.InvalidBudget", "Budget must be greater than zero");
+
+        if (maxPricePerPlacement.HasValue)
+        {
+            if (maxPricePerPlacement.Value <= 0)
+                return Error.Validation("Campaign.InvalidMaxPrice", "Max price per placement must be greater than zero");
+
+            if (maxPricePerPlacement.Value > budgetTon)
+                return Error.Validation("Campaign.MaxPriceExceedsBudget", "Max price per placement cannot exceed total budget");
+        }
+
+        if (startsAt.HasValue && startsAt.Value <= DateTimeOffset.UtcNow)
+            return Error.Validation("Campaign.InvalidStartDate", "Start date must be in the future");
+
+        if (endsAt.HasValue && startsAt.HasValue && endsAt.Value <= startsAt.Value)
+            return Error.Validation("Campaign.InvalidEndDate", "End date must be after start date");
+
+        if (applicationDeadline.HasValue)
+        {
+            if (applicationDeadline.Value <= DateTimeOffset.UtcNow)
+                return Error.Validation("Campaign.InvalidDeadline", "Application deadline must be in the future");
+
+            if (endsAt.HasValue && applicationDeadline.Value >= endsAt.Value)
+                return Error.Validation("Campaign.DeadlineAfterEnd", "Application deadline must be before end date");
+
+            if (startsAt.HasValue && applicationDeadline.Value >= startsAt.Value)
+                return Error.Validation("Campaign.DeadlineAfterStart", "Application deadline must be before start date");
+        }
+
         if (categoryId.HasValue)
         {
             var categoryExists = await dbContext.Categories.AnyAsync(c => c.Id == categoryId.Value);
@@ -182,6 +212,43 @@ public class CampaignService(AdMarketDbContext dbContext) : ICampaignService
         if (campaign.AdvertiserId != advertiserId)
             return Error.Forbidden("Campaign.Forbidden", "You don't have permission to update this campaign");
 
+        if (campaign.Status == CampaignStatusType.Completed || campaign.Status == CampaignStatusType.Cancelled)
+            return Error.Validation("Campaign.NotEditable", "Cannot update a completed or cancelled campaign");
+
+        if (budgetTon.HasValue && budgetTon.Value <= 0)
+            return Error.Validation("Campaign.InvalidBudget", "Budget must be greater than zero");
+
+        if (maxPricePerPlacement.HasValue && maxPricePerPlacement.Value <= 0)
+            return Error.Validation("Campaign.InvalidMaxPrice", "Max price per placement must be greater than zero");
+
+        var effectiveBudget = budgetTon ?? campaign.BudgetTon;
+        var effectiveMaxPrice = maxPricePerPlacement ?? campaign.MaxPricePerPlacement;
+        if (effectiveMaxPrice.HasValue && effectiveMaxPrice.Value > effectiveBudget)
+            return Error.Validation("Campaign.MaxPriceExceedsBudget", "Max price per placement cannot exceed total budget");
+
+        var effectiveStartsAt = startsAt ?? campaign.StartsAt;
+        var effectiveEndsAt = endsAt ?? campaign.EndsAt;
+        var effectiveDeadline = applicationDeadline ?? campaign.ApplicationDeadline;
+
+        if (effectiveEndsAt.HasValue && effectiveStartsAt.HasValue && effectiveEndsAt.Value <= effectiveStartsAt.Value)
+            return Error.Validation("Campaign.InvalidEndDate", "End date must be after start date");
+
+        if (effectiveDeadline.HasValue)
+        {
+            if (effectiveEndsAt.HasValue && effectiveDeadline.Value >= effectiveEndsAt.Value)
+                return Error.Validation("Campaign.DeadlineAfterEnd", "Application deadline must be before end date");
+
+            if (effectiveStartsAt.HasValue && effectiveDeadline.Value >= effectiveStartsAt.Value)
+                return Error.Validation("Campaign.DeadlineAfterStart", "Application deadline must be before start date");
+        }
+
+        if (categoryId.HasValue)
+        {
+            var categoryExists = await dbContext.Categories.AnyAsync(c => c.Id == categoryId.Value);
+            if (!categoryExists)
+                return Error.NotFound("Category.NotFound", "Category not found");
+        }
+
         campaign.Update(
             title: title,
             description: description,
@@ -200,6 +267,15 @@ public class CampaignService(AdMarketDbContext dbContext) : ICampaignService
         return campaign;
     }
 
+    private static readonly Dictionary<CampaignStatusType, HashSet<CampaignStatusType>> ValidStatusTransitions = new()
+    {
+        { CampaignStatusType.Draft, [CampaignStatusType.Active, CampaignStatusType.Cancelled] },
+        { CampaignStatusType.Active, [CampaignStatusType.Paused, CampaignStatusType.Completed, CampaignStatusType.Cancelled] },
+        { CampaignStatusType.Paused, [CampaignStatusType.Active, CampaignStatusType.Cancelled] },
+        { CampaignStatusType.Completed, [] },
+        { CampaignStatusType.Cancelled, [] }
+    };
+
     public async Task<ErrorOr<Campaign>> UpdateStatusAsync(Guid id, Guid advertiserId, CampaignStatusType status)
     {
         var campaign = await dbContext.Campaigns
@@ -210,6 +286,29 @@ public class CampaignService(AdMarketDbContext dbContext) : ICampaignService
 
         if (campaign.AdvertiserId != advertiserId)
             return Error.Forbidden("Campaign.Forbidden", "You don't have permission to update this campaign");
+
+        if (!ValidStatusTransitions.TryGetValue(campaign.Status, out var allowedTransitions) ||
+            !allowedTransitions.Contains(status))
+            return Error.Validation("Campaign.InvalidTransition",
+                $"Cannot transition from {campaign.Status} to {status}");
+
+        if (status == CampaignStatusType.Active)
+        {
+            if (campaign.BudgetTon <= 0)
+                return Error.Validation("Campaign.NotReady", "Cannot activate a campaign without a valid budget");
+        }
+
+        if (status == CampaignStatusType.Cancelled)
+        {
+            var hasActiveDeals = await dbContext.Deals.AnyAsync(d =>
+                d.CampaignId == id &&
+                d.Status != DealStatusType.Completed &&
+                d.Status != DealStatusType.Cancelled &&
+                d.Status != DealStatusType.Refunded);
+
+            if (hasActiveDeals)
+                return Error.Validation("Campaign.HasActiveDeals", "Cannot cancel a campaign with active deals");
+        }
 
         campaign.UpdateStatus(status);
         await dbContext.SaveChangesAsync();
