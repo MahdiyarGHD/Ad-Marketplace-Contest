@@ -84,6 +84,8 @@ function SetChannelData() {
 			invokeHapticFeedbackImpact("medium");
 			setTimeout(() => invokeHapticFeedbackImpact("soft"), 200);
 			setTimeout(() => invokeHapticFeedbackImpact("soft"), 300);
+		} else {
+			showToast({ title: response.message });
 		}
 	};
 

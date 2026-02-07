@@ -12,9 +12,12 @@ import useCategoryStore, { type Category } from "../stores/useCategoryStore";
 import useChannelStore, { type Channel } from "../stores/useChannelStore";
 import Avatar from "../components/Avatar";
 import { useNavigate } from "react-router-dom";
+import useAppStore from "../stores/useAppStore";
 
 function Home() {
 	const [tabIndex, setTabIndex] = useState(0);
+
+	const { isAuth } = useAppStore();
 
 	const { getCategories } = useCategoryStore();
 	const { influencers, getInfluencers, setActiveChannel } = useChannelStore();
@@ -28,10 +31,11 @@ function Home() {
 	};
 
 	useEffect(() => {
-		getCategories();
+		if (!isAuth) return;
 
+		getCategories();
 		getInfluencers();
-	}, []);
+	}, [isAuth]);
 
 	const renderCategory = (category: Category) => (
 		<div className="Item" key={category.id}>
@@ -102,6 +106,9 @@ function Home() {
 							<div className="flex">
 								<div className="icon">{element.icon}</div>
 								<h2 className="title">{element.label}</h2>
+								<div className="meta">
+									Show All <ChevronRight size={18} />
+								</div>
 							</div>
 							<div className="Items">
 								<Transition state eachElement eachElementDelay={20}>
