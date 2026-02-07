@@ -11,12 +11,21 @@ import { buildClassName } from "../utils/common";
 import useCategoryStore, { type Category } from "../stores/useCategoryStore";
 import useChannelStore, { type Channel } from "../stores/useChannelStore";
 import Avatar from "../components/Avatar";
+import { useNavigate } from "react-router-dom";
 
 function Home() {
 	const [tabIndex, setTabIndex] = useState(0);
 
 	const { getCategories } = useCategoryStore();
-	const { influencers, getInfluencers } = useChannelStore();
+	const { influencers, getInfluencers, setActiveChannel } = useChannelStore();
+
+	const navigate = useNavigate();
+
+	const showChannelProfile = (channel: Channel) => {
+		setActiveChannel(channel);
+
+		navigate(`/channel/${channel.id}`);
+	};
 
 	useEffect(() => {
 		getCategories();
@@ -39,7 +48,11 @@ function Home() {
 	);
 
 	const renderChannel = (channel: Channel) => (
-		<div className="ChatItem" key={channel.id}>
+		<div
+			className="ChatItem"
+			key={channel.id}
+			onClick={() => showChannelProfile(channel)}
+		>
 			<Avatar id={channel.chat_id} title={channel.title} photo="" />
 			<div className="body">
 				<div className="title">{channel.title}</div>
@@ -83,7 +96,7 @@ function Home() {
 					</>
 				}
 			>
-				<TabContent state={true}>
+				<TabContent state={true} className="scrollable">
 					{influencers.elements.map((element) => (
 						<div className="Section" key={element.label}>
 							<div className="flex">
@@ -101,6 +114,7 @@ function Home() {
 							</div>
 						</div>
 					))}
+					{influencers.elements.length === 0 && <LoadingSkeleton />}
 				</TabContent>
 				<TabContent state={true}>
 					<div className="Categories Section">
@@ -126,5 +140,28 @@ function Home() {
 		</div>
 	);
 }
+
+const LoadingSkeleton = memo(() => (
+	<div className="Skeleton">
+		{Array.from({ length: 3 }).map(() => (
+			<div className="Section" key={Math.random()}>
+				<div className="flex">
+					<div className="title Shimmer"></div>
+				</div>
+				<div className="Items">
+					{Array.from({ length: 5 }).map(() => (
+						<div className="Item" key={Math.random()}>
+							<div className="Avatar" />
+							<div className="body">
+								<div className="title Shimmer" />
+								<div className="subtitle Shimmer" />
+							</div>
+						</div>
+					))}
+				</div>
+			</div>
+		))}
+	</div>
+));
 
 export default memo(Home);
