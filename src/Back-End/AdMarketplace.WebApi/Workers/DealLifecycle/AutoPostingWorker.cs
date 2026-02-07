@@ -40,6 +40,8 @@ public class AutoPostingWorker(
         using var scope = serviceProvider.CreateScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<AdMarketDbContext>();
         var postingService = scope.ServiceProvider.GetRequiredService<IPostingService>();
+        var notificationService = scope.ServiceProvider.GetRequiredService<INotificationService>();
+        var channelService = scope.ServiceProvider.GetRequiredService<IChannelService>();
 
         var now = DateTimeOffset.UtcNow;
 
@@ -56,7 +58,7 @@ public class AutoPostingWorker(
         {
             try
             {
-                await PostDealAsync(deal, postingService, ct);
+                await PostDealAsync(deal, postingService, notificationService, channelService, ct);
             }
             catch (Exception ex)
             {
@@ -71,8 +73,19 @@ public class AutoPostingWorker(
     private async Task PostDealAsync(
         Database.Models.Deal deal,
         IPostingService postingService,
+        INotificationService notificationService,
+        IChannelService channelService,
         CancellationToken ct)
     {
+        var adminCheck = await channelService.VerifyBotAdminAsync(deal.ChannelId, ct);
+        if (adminCheck.IsError || !adminCheck.Value)
+        {
+            logger.LogWarning(
+                "Bot is no longer admin in channel for deal {DealId}, skipping post",
+                deal.Id);
+            return;
+        }
+
         var channelChatId = deal.Channel.ChatId;
         var ownerTelegramId = deal.Channel.Owner.UserId;
         var draftMessageId = deal.DraftMessageId!.Value;
@@ -105,6 +118,8 @@ public class AutoPostingWorker(
         }
 
         deal.MarkAsPosted(postedMessageId, textHash);
+
+        await notificationService.NotifyDealPostedAsync(deal.Id, ct);
 
         logger.LogInformation(
             "Deal {DealId} posted successfully, message ID: {PostedMessageId}",

@@ -22,7 +22,7 @@ public static class LifeTimeExtensions
 
                 await bot.SetWebhook(
                     botOptions.Value.WebhookUrl,
-                    allowedUpdates: [UpdateType.Message, UpdateType.MyChatMember, UpdateType.ChatMember],
+                    allowedUpdates: [UpdateType.Message, UpdateType.MyChatMember, UpdateType.ChatMember, UpdateType.CallbackQuery, UpdateType.ChannelPost, UpdateType.EditedChannelPost],
                     secretToken: botOptions.Value.SecretToken
                 );
 

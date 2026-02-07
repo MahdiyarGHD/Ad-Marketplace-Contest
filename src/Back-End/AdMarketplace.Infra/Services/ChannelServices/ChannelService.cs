@@ -5,10 +5,15 @@ using AdMarketplace.Domain.Types;
 using AdMarketplace.Infra.Interfaces;
 using ErrorOr;
 using Microsoft.EntityFrameworkCore;
+using Telegram.Bot;
+using Telegram.Bot.Types;
 
 namespace AdMarketplace.Infra.Services.ChannelServices;
 
-public class ChannelService(AdMarketDbContext dbContext, ICategoryService categoryService) : IChannelService
+public class ChannelService(
+    AdMarketDbContext dbContext,
+    ICategoryService categoryService,
+    ITelegramBotClient botClient) : IChannelService
 {
     public async Task<ErrorOr<Channel>> CreateAsync(
         long chatId,
@@ -233,5 +238,72 @@ public class ChannelService(AdMarketDbContext dbContext, ICategoryService catego
         await dbContext.SaveChangesAsync();
 
         return true;
+    }
+
+    public async Task<ErrorOr<bool>> VerifyBotAdminAsync(Guid channelId, CancellationToken ct = default)
+    {
+        var channel = await dbContext.Channels
+            .AsTracking()
+            .FirstOrDefaultAsync(c => c.Id == channelId, ct);
+
+        if (channel is null)
+            return Error.NotFound("Channel.NotFound", "Channel not found");
+
+        try
+        {
+            var me = await botClient.GetMe(ct);
+            var botMember = await botClient.GetChatMember(channel.ChatId, me.Id, ct);
+
+            var isAdmin = botMember is ChatMemberAdministrator
+            {
+                CanPromoteMembers: true,
+                CanInviteUsers: true,
+                CanDeleteMessages: true,
+                CanPostMessages: true,
+                CanEditMessages: true,
+            };
+
+            if (isAdmin && channel.Status == ChannelStatusType.UnReady)
+            {
+                channel.SetStatus(ChannelStatusType.PartiallyReady);
+                await dbContext.SaveChangesAsync(ct);
+            }
+            else if (!isAdmin && channel.Status is ChannelStatusType.Ready or ChannelStatusType.PartiallyReady)
+            {
+                channel.SetStatus(ChannelStatusType.UnReady);
+                await dbContext.SaveChangesAsync(ct);
+            }
+
+            return isAdmin;
+        }
+        catch (Telegram.Bot.Exceptions.ApiRequestException)
+        {
+            if (channel.Status is ChannelStatusType.Ready or ChannelStatusType.PartiallyReady)
+            {
+                channel.SetStatus(ChannelStatusType.UnReady);
+                await dbContext.SaveChangesAsync(ct);
+            }
+
+            return false;
+        }
+    }
+
+    public async Task<ErrorOr<List<ChatMember>>> GetChannelAdminsAsync(Guid channelId, CancellationToken ct = default)
+    {
+        var channel = await dbContext.Channels
+            .FirstOrDefaultAsync(c => c.Id == channelId, ct);
+
+        if (channel is null)
+            return Error.NotFound("Channel.NotFound", "Channel not found");
+
+        try
+        {
+            var admins = await botClient.GetChatAdministrators(channel.ChatId, ct);
+            return admins.ToList();
+        }
+        catch (Telegram.Bot.Exceptions.ApiRequestException ex)
+        {
+            return Error.Failure("Telegram.ApiError", $"Failed to fetch channel admins: {ex.Message}");
+        }
     }
 }

@@ -37,6 +37,7 @@ public static class ServiceCollectionExtensions
             services.AddScoped<IClientFactory, ClientFactory>();
             services.AddScoped<IAnalyticsUpdateService, AnalyticsUpdateService>();
             services.AddScoped<IPostingService, PostingService>();
+            services.AddScoped<INotificationService, NotificationService>();
             
             services.AddScoped<ICampaignService, CampaignService>();
             services.AddScoped<ICampaignApplicationService, CampaignApplicationService>();
@@ -46,9 +47,11 @@ public static class ServiceCollectionExtensions
             
             services.AddSingleton<IAnalyticsUpdateQueue, AnalyticsUpdateQueue>();
             services.AddHostedService<AnalyticsConsumerWorker>();
+            services.AddHostedService<AnalyticsProducerWorker>();
             services.AddHostedService<DealAutoCancelWorker>();
             services.AddHostedService<AutoPostingWorker>();
             services.AddHostedService<PostVerificationWorker>();
+
 
             return services;
         }

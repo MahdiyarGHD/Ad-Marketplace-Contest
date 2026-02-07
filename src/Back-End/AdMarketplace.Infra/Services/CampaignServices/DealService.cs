@@ -7,7 +7,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace AdMarketplace.Infra.Services.CampaignServices;
 
-public class DealService(AdMarketDbContext dbContext) : IDealService
+public class DealService(
+    AdMarketDbContext dbContext,
+    INotificationService notificationService) : IDealService
 {
     public async Task<ErrorOr<Deal>> CreateAsync(
         Guid? campaignId,
@@ -126,6 +128,8 @@ public class DealService(AdMarketDbContext dbContext) : IDealService
 
         dbContext.Deals.Add(deal);
         await dbContext.SaveChangesAsync();
+
+        await notificationService.NotifyDealCreatedAsync(deal.Id);
 
         return deal;
     }
@@ -255,6 +259,8 @@ public class DealService(AdMarketDbContext dbContext) : IDealService
         deal.FundEscrow(transactionHash, walletAddress);
         await dbContext.SaveChangesAsync();
 
+        await notificationService.NotifyEscrowFundedAsync(deal.Id);
+
         return deal;
     }
 
@@ -277,6 +283,8 @@ public class DealService(AdMarketDbContext dbContext) : IDealService
         deal.SubmitDraft(messageId);
         await dbContext.SaveChangesAsync();
 
+        await notificationService.NotifyDraftSubmittedAsync(deal.Id);
+
         return deal;
     }
 
@@ -296,6 +304,8 @@ public class DealService(AdMarketDbContext dbContext) : IDealService
 
         deal.ApproveDraft();
         await dbContext.SaveChangesAsync();
+
+        await notificationService.NotifyDraftApprovedAsync(deal.Id);
 
         return deal;
     }
@@ -317,6 +327,8 @@ public class DealService(AdMarketDbContext dbContext) : IDealService
         deal.RejectDraft(feedback);
         await dbContext.SaveChangesAsync();
 
+        await notificationService.NotifyDraftRejectedAsync(deal.Id, feedback);
+
         return deal;
     }
 
@@ -334,6 +346,8 @@ public class DealService(AdMarketDbContext dbContext) : IDealService
         deal.MarkAsPosted(messageId);
         await dbContext.SaveChangesAsync();
 
+        await notificationService.NotifyDealPostedAsync(deal.Id);
+
         return deal;
     }
 
@@ -350,6 +364,8 @@ public class DealService(AdMarketDbContext dbContext) : IDealService
 
         deal.ReleaseFunds();
         await dbContext.SaveChangesAsync();
+
+        await notificationService.NotifyDealCompletedAsync(deal.Id);
 
         return deal;
     }
@@ -372,6 +388,8 @@ public class DealService(AdMarketDbContext dbContext) : IDealService
 
         deal.Refund();
         await dbContext.SaveChangesAsync();
+
+        await notificationService.NotifyDealRefundedAsync(deal.Id);
 
         return deal;
     }

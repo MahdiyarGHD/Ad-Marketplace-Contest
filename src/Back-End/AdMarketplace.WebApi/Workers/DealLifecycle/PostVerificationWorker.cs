@@ -41,6 +41,7 @@ public class PostVerificationWorker(
         using var scope = serviceProvider.CreateScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<AdMarketDbContext>();
         var postingService = scope.ServiceProvider.GetRequiredService<IPostingService>();
+        var notificationService = scope.ServiceProvider.GetRequiredService<INotificationService>();
 
         var postedDeals = await dbContext.Deals
             .AsTracking()
@@ -82,6 +83,7 @@ public class PostVerificationWorker(
                 {
                     logger.LogWarning("Post deleted for deal {DealId}, disputing", deal.Id);
                     deal.UpdateStatus(DealStatusType.Disputed);
+                    await notificationService.NotifyDealDisputedAsync(deal.Id, ct);
                     modified = true;
                     continue;
                 }
@@ -90,6 +92,7 @@ public class PostVerificationWorker(
                 {
                     logger.LogWarning("Post edited for deal {DealId}, disputing", deal.Id);
                     deal.UpdateStatus(DealStatusType.Disputed);
+                    await notificationService.NotifyDealDisputedAsync(deal.Id, ct);
                     modified = true;
                     continue;
                 }
@@ -100,6 +103,7 @@ public class PostVerificationWorker(
                     logger.LogInformation(
                         "Deal {DealId} passed verification window, releasing funds", deal.Id);
                     deal.ReleaseFunds();
+                    await notificationService.NotifyDealCompletedAsync(deal.Id, ct);
                     modified = true;
                 }
             }

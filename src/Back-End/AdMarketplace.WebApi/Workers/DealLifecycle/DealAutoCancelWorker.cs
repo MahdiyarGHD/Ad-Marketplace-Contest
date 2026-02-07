@@ -1,5 +1,6 @@
 using AdMarketplace.Database;
 using AdMarketplace.Domain.Types;
+using AdMarketplace.Infra.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -38,6 +39,7 @@ public class DealAutoCancelWorker(
     {
         using var scope = serviceProvider.CreateScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<AdMarketDbContext>();
+        var notificationService = scope.ServiceProvider.GetRequiredService<INotificationService>();
 
         var now = DateTimeOffset.UtcNow;
 
@@ -61,11 +63,13 @@ public class DealAutoCancelWorker(
             {
                 deal.Refund();
                 logger.LogInformation("Refunded expired deal {DealId} (was {Status})", deal.Id, deal.Status);
+                await notificationService.NotifyDealRefundedAsync(deal.Id, ct);
             }
             else
             {
                 deal.Cancel();
                 logger.LogInformation("Cancelled expired deal {DealId} (was {Status})", deal.Id, deal.Status);
+                await notificationService.NotifyDealCancelledAsync(deal.Id, ct);
             }
         }
 

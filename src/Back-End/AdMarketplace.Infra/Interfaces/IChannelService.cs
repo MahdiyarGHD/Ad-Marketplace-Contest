@@ -2,6 +2,7 @@ using AdMarketplace.Database.Models;
 using AdMarketplace.Domain.Contracts.Common;
 using AdMarketplace.Domain.Types;
 using ErrorOr;
+using Telegram.Bot.Types;
 
 namespace AdMarketplace.Infra.Interfaces;
 
@@ -40,4 +41,6 @@ public interface IChannelService
         List<(AdFormatType AdFormat, PriceType PriceType, decimal PriceTon)> pricings);
 
     Task<ErrorOr<bool>> SetStatusAsync(Guid id, Guid ownerId, ChannelStatusType status);
+    Task<ErrorOr<bool>> VerifyBotAdminAsync(Guid channelId, CancellationToken ct = default);
+    Task<ErrorOr<List<ChatMember>>> GetChannelAdminsAsync(Guid channelId, CancellationToken ct = default);
 }
