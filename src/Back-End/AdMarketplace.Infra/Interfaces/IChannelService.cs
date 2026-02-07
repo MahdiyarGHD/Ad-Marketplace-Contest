@@ -21,6 +21,18 @@ public interface IChannelService
     Task<ErrorOr<List<Channel>>> GetAllActiveAsync(int skip, int take);
     Task<ErrorOr<List<Channel>>> GetByCategoryIdAsync(Guid categoryId, int skip, int take);
 
+    Task<ErrorOr<List<Channel>>> SearchAsync(
+        Guid? categoryId = null,
+        int? minSubscribers = null,
+        int? maxSubscribers = null,
+        int? minAverageViews = null,
+        AdFormatType? adFormat = null,
+        PriceType? priceType = null,
+        decimal? maxPrice = null,
+        string? language = null,
+        int skip = 0,
+        int take = 20);
+
     Task<ErrorOr<Channel>> UpdateAsync(
         Guid id,
         Guid ownerId,

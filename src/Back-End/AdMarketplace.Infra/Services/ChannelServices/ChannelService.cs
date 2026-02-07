@@ -111,6 +111,63 @@ public class ChannelService(AdMarketDbContext dbContext, ICategoryService catego
         return channels;
     }
 
+    public async Task<ErrorOr<List<Channel>>> SearchAsync(
+        Guid? categoryId = null,
+        int? minSubscribers = null,
+        int? maxSubscribers = null,
+        int? minAverageViews = null,
+        AdFormatType? adFormat = null,
+        PriceType? priceType = null,
+        decimal? maxPrice = null,
+        string? language = null,
+        int skip = 0,
+        int take = 20)
+    {
+        var query = dbContext.Channels
+            .Include(c => c.Owner)
+            .Include(c => c.Category)
+            .Include(c => c.Pricings)
+            .Where(c => c.Status == ChannelStatusType.Ready)
+            .AsQueryable();
+
+        if (categoryId.HasValue)
+            query = query.Where(c => c.CategoryId == categoryId.Value);
+
+        if (minSubscribers.HasValue)
+            query = query.Where(c => c.SubscriberCount >= minSubscribers.Value);
+
+        if (maxSubscribers.HasValue)
+            query = query.Where(c => c.SubscriberCount <= maxSubscribers.Value);
+
+        if (minAverageViews.HasValue)
+            query = query.Where(c => c.AverageViews >= minAverageViews.Value);
+
+        if (adFormat.HasValue)
+            query = query.Where(c => c.Pricings.Any(p => p.AdFormat == adFormat.Value));
+
+        if (priceType.HasValue)
+            query = query.Where(c => c.Pricings.Any(p => p.PriceType == priceType.Value));
+
+        if (maxPrice.HasValue)
+            query = query.Where(c => c.Pricings.Any(p => p.PriceTon <= maxPrice.Value));
+
+        var channels = await query
+            .OrderByDescending(c => c.SubscriberCount)
+            .ToListAsync();
+
+        if (!string.IsNullOrEmpty(language))
+            channels = channels
+                .Where(c => c.LanguageDistributionJson != null &&
+                            c.LanguageDistributionJson.Any(l =>
+                                l.Language.Equals(language, StringComparison.OrdinalIgnoreCase)))
+                .ToList();
+
+        return channels
+            .Skip(skip)
+            .Take(take)
+            .ToList();
+    }
+
     public async Task<ErrorOr<Channel>> UpdateAsync(
         Guid id,
         Guid ownerId,
