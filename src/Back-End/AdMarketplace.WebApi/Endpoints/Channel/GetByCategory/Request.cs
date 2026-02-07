@@ -5,5 +5,5 @@ namespace AdMarketplace.Endpoints.Channel.GetByCategory;
 
 public class Request : PaginationRequestContract
 {
-    public required Guid CategoryId { get; set; }
+    public Guid CategoryId { get; set; }
 }
