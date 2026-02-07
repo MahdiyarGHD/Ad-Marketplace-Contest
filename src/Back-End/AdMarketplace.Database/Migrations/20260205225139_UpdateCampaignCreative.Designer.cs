@@ -3,6 +3,7 @@ using System;
 using AdMarketplace.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AdMarketplace.Database.Migrations
 {
     [DbContext(typeof(AdMarketDbContext))]
-    partial class AdMarketDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260205225139_UpdateCampaignCreative")]
+    partial class UpdateCampaignCreative
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -164,9 +167,6 @@ namespace AdMarketplace.Database.Migrations
                         .HasPrecision(18, 9)
                         .HasColumnType("numeric(18,9)");
 
-                    b.Property<byte>("ProposedPriceType")
-                        .HasColumnType("smallint");
-
                     b.Property<string>("RejectionReason")
                         .HasMaxLength(512)
                         .HasColumnType("character varying(512)");
@@ -185,58 +185,6 @@ namespace AdMarketplace.Database.Migrations
                         .IsUnique();
 
                     b.ToTable("CampaignApplications", "AdMarketplace");
-                });
-
-            modelBuilder.Entity("AdMarketplace.Database.Models.CampaignInvitation", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("CampaignId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("ChannelId")
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTimeOffset>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Message")
-                        .HasMaxLength(1024)
-                        .HasColumnType("character varying(1024)");
-
-                    b.Property<byte>("ProposedAdFormat")
-                        .HasColumnType("smallint");
-
-                    b.Property<DateTimeOffset?>("ProposedPostingTime")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<decimal>("ProposedPriceTon")
-                        .HasPrecision(18, 9)
-                        .HasColumnType("numeric(18,9)");
-
-                    b.Property<byte>("ProposedPriceType")
-                        .HasColumnType("smallint");
-
-                    b.Property<string>("RejectionReason")
-                        .HasMaxLength(512)
-                        .HasColumnType("character varying(512)");
-
-                    b.Property<byte>("Status")
-                        .HasColumnType("smallint");
-
-                    b.Property<DateTimeOffset?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ChannelId");
-
-                    b.HasIndex("CampaignId", "ChannelId")
-                        .IsUnique();
-
-                    b.ToTable("CampaignInvitations", "AdMarketplace");
                 });
 
             modelBuilder.Entity("AdMarketplace.Database.Models.Category", b =>
@@ -338,58 +286,6 @@ namespace AdMarketplace.Database.Migrations
                     b.ToTable("Channels", "AdMarketplace");
                 });
 
-            modelBuilder.Entity("AdMarketplace.Database.Models.ChannelApplication", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("AdvertiserId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("ChannelId")
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTimeOffset>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Message")
-                        .HasMaxLength(1024)
-                        .HasColumnType("character varying(1024)");
-
-                    b.Property<byte>("ProposedAdFormat")
-                        .HasColumnType("smallint");
-
-                    b.Property<DateTimeOffset?>("ProposedPostingTime")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<decimal>("ProposedPriceTon")
-                        .HasPrecision(18, 9)
-                        .HasColumnType("numeric(18,9)");
-
-                    b.Property<byte>("ProposedPriceType")
-                        .HasColumnType("smallint");
-
-                    b.Property<string>("RejectionReason")
-                        .HasMaxLength(512)
-                        .HasColumnType("character varying(512)");
-
-                    b.Property<byte>("Status")
-                        .HasColumnType("smallint");
-
-                    b.Property<DateTimeOffset?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AdvertiserId");
-
-                    b.HasIndex("ChannelId", "AdvertiserId")
-                        .IsUnique();
-
-                    b.ToTable("ChannelApplications", "AdMarketplace");
-                });
-
             modelBuilder.Entity("AdMarketplace.Database.Models.ChannelPricing", b =>
                 {
                     b.Property<Guid>("Id")
@@ -444,16 +340,13 @@ namespace AdMarketplace.Database.Migrations
                         .HasPrecision(18, 9)
                         .HasColumnType("numeric(18,9)");
 
-                    b.Property<Guid?>("ApplicationId")
+                    b.Property<Guid>("ApplicationId")
                         .HasColumnType("uuid");
 
                     b.Property<DateTimeOffset?>("AutoCancelAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid?>("CampaignId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid?>("ChannelApplicationId")
+                    b.Property<Guid>("CampaignId")
                         .HasColumnType("uuid");
 
                     b.Property<Guid>("ChannelId")
@@ -475,17 +368,11 @@ namespace AdMarketplace.Database.Migrations
                     b.Property<DateTimeOffset?>("FundsReleasedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid?>("InvitationId")
-                        .HasColumnType("uuid");
-
                     b.Property<DateTimeOffset?>("LastActivityAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<long?>("PostedMessageId")
                         .HasColumnType("bigint");
-
-                    b.Property<byte>("PriceType")
-                        .HasColumnType("smallint");
 
                     b.Property<DateTimeOffset?>("ScheduledPostTime")
                         .HasColumnType("timestamp with time zone");
@@ -511,13 +398,7 @@ namespace AdMarketplace.Database.Migrations
 
                     b.HasIndex("CampaignId");
 
-                    b.HasIndex("ChannelApplicationId")
-                        .IsUnique();
-
                     b.HasIndex("ChannelId");
-
-                    b.HasIndex("InvitationId")
-                        .IsUnique();
 
                     b.HasIndex("Status");
 
@@ -627,12 +508,10 @@ namespace AdMarketplace.Database.Migrations
                                         .ValueGeneratedOnAdd();
 
                                     b2.Property<string>("Text")
-                                        .IsRequired()
-                                        .HasMaxLength(64);
+                                        .IsRequired();
 
                                     b2.Property<string>("Url")
-                                        .IsRequired()
-                                        .HasMaxLength(512);
+                                        .IsRequired();
 
                                     b2.HasKey("CampaignCreativeContractCampaignId", "__synthesizedOrdinal");
 
@@ -653,7 +532,7 @@ namespace AdMarketplace.Database.Migrations
 
                             b1.Property<int?>("MinAverageViews");
 
-                            b1.Property<int?>("MinPremiumCount");
+                            b1.Property<int?>("MinPremiumPercentage");
 
                             b1.Property<int?>("MinSubscribers");
 
@@ -662,8 +541,6 @@ namespace AdMarketplace.Database.Migrations
                             b1.PrimitiveCollection<string>("PreferredCategoryIds");
 
                             b1.PrimitiveCollection<string>("PreferredLanguages");
-
-                            b1.PrimitiveCollection<string>("PreferredPriceTypes");
 
                             b1.HasKey("CampaignId");
 
@@ -698,25 +575,6 @@ namespace AdMarketplace.Database.Migrations
                         .WithMany()
                         .HasForeignKey("ChannelId")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Campaign");
-
-                    b.Navigation("Channel");
-                });
-
-            modelBuilder.Entity("AdMarketplace.Database.Models.CampaignInvitation", b =>
-                {
-                    b.HasOne("AdMarketplace.Database.Models.Campaign", "Campaign")
-                        .WithMany()
-                        .HasForeignKey("CampaignId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("AdMarketplace.Database.Models.Channel", "Channel")
-                        .WithMany()
-                        .HasForeignKey("ChannelId")
-                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Campaign");
@@ -776,25 +634,6 @@ namespace AdMarketplace.Database.Migrations
                     b.Navigation("Owner");
                 });
 
-            modelBuilder.Entity("AdMarketplace.Database.Models.ChannelApplication", b =>
-                {
-                    b.HasOne("AdMarketplace.Database.Models.User", "Advertiser")
-                        .WithMany()
-                        .HasForeignKey("AdvertiserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("AdMarketplace.Database.Models.Channel", "Channel")
-                        .WithMany("ChannelApplications")
-                        .HasForeignKey("ChannelId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Advertiser");
-
-                    b.Navigation("Channel");
-                });
-
             modelBuilder.Entity("AdMarketplace.Database.Models.ChannelPricing", b =>
                 {
                     b.HasOne("AdMarketplace.Database.Models.Channel", "Channel")
@@ -817,28 +656,20 @@ namespace AdMarketplace.Database.Migrations
                     b.HasOne("AdMarketplace.Database.Models.CampaignApplication", "Application")
                         .WithOne("Deal")
                         .HasForeignKey("AdMarketplace.Database.Models.Deal", "ApplicationId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.HasOne("AdMarketplace.Database.Models.Campaign", "Campaign")
                         .WithMany("Deals")
                         .HasForeignKey("CampaignId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("AdMarketplace.Database.Models.ChannelApplication", "ChannelApplication")
-                        .WithOne("Deal")
-                        .HasForeignKey("AdMarketplace.Database.Models.Deal", "ChannelApplicationId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.HasOne("AdMarketplace.Database.Models.Channel", "Channel")
                         .WithMany()
                         .HasForeignKey("ChannelId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
-
-                    b.HasOne("AdMarketplace.Database.Models.CampaignInvitation", "Invitation")
-                        .WithOne("Deal")
-                        .HasForeignKey("AdMarketplace.Database.Models.Deal", "InvitationId")
-                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Advertiser");
 
@@ -847,10 +678,6 @@ namespace AdMarketplace.Database.Migrations
                     b.Navigation("Campaign");
 
                     b.Navigation("Channel");
-
-                    b.Navigation("ChannelApplication");
-
-                    b.Navigation("Invitation");
                 });
 
             modelBuilder.Entity("AdMarketplace.Database.Models.UserChannelConnection", b =>
@@ -876,21 +703,9 @@ namespace AdMarketplace.Database.Migrations
                     b.Navigation("Deal");
                 });
 
-            modelBuilder.Entity("AdMarketplace.Database.Models.CampaignInvitation", b =>
-                {
-                    b.Navigation("Deal");
-                });
-
             modelBuilder.Entity("AdMarketplace.Database.Models.Channel", b =>
                 {
-                    b.Navigation("ChannelApplications");
-
                     b.Navigation("Pricings");
-                });
-
-            modelBuilder.Entity("AdMarketplace.Database.Models.ChannelApplication", b =>
-                {
-                    b.Navigation("Deal");
                 });
 #pragma warning restore 612, 618
         }
