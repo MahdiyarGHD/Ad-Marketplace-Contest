@@ -11,6 +11,11 @@ public class AdMarketDbContext(DbContextOptions<AdMarketDbContext> dbContextOpti
     public DbSet<Category> Categories => Set<Category>();
     public DbSet<UserChannelConnection> UserChannelConnection => Set<UserChannelConnection>();
     public DbSet<ChannelPricing> ChannelPricings => Set<ChannelPricing>();
+    public DbSet<Campaign> Campaigns => Set<Campaign>();
+    public DbSet<CampaignApplication> CampaignApplications => Set<CampaignApplication>();
+    public DbSet<CampaignInvitation> CampaignInvitations => Set<CampaignInvitation>();
+    public DbSet<ChannelApplication> ChannelApplications => Set<ChannelApplication>();
+    public DbSet<Deal> Deals => Set<Deal>();
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

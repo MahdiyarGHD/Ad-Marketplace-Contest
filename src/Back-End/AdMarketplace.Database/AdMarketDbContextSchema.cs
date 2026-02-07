@@ -34,4 +34,29 @@ public static class AdMarketDbContextSchema
     {
         public const string TableName = "ChannelPricings";
     }
+    
+    public static class Campaign
+    {
+        public const string TableName = "Campaigns";
+    }
+    
+    public static class CampaignApplication
+    {
+        public const string TableName = "CampaignApplications";
+    }
+    
+    public static class CampaignInvitation
+    {
+        public const string TableName = "CampaignInvitations";
+    }
+    
+    public static class ChannelApplication
+    {
+        public const string TableName = "ChannelApplications";
+    }
+    
+    public static class Deal
+    {
+        public const string TableName = "Deals";
+    }
 }

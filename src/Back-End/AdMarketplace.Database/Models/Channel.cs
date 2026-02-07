@@ -30,6 +30,7 @@ public class Channel : IDateTimeSchema
     public Category? Category { get; private set; }
     public Agent? Agent { get; private set; }
     public ICollection<ChannelPricing> Pricings { get; private set; } = [];
+    public ICollection<ChannelApplication> ChannelApplications { get; private set; } = [];
     
     public static Channel Create(
         long chatId,
