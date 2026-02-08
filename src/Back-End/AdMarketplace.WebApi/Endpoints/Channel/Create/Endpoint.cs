@@ -1,4 +1,5 @@
 using System.Linq.Expressions;
+using AdMarketplace.Database;
 using AdMarketplace.Domain.Contracts.Common;
 using AdMarketplace.Extensions;
 using AdMarketplace.Infra.Interfaces;
@@ -16,7 +17,8 @@ public class Endpoint(
     IUserChannelConnectionService userChannelConnectionService,
     IChannelPricingService channelPricingService,
     IAnalyticsUpdateQueue analyticsQueue,
-    ITelegramBotClient botClient)
+    ITelegramBotClient botClient,
+    AdMarketDbContext dbContext)
     : Endpoint<Request, ErrorOr<Response>>
 {
     public override void Configure()
@@ -37,6 +39,23 @@ public class Endpoint(
         if (connectionResult.IsError)
             return connectionResult.Errors;
 
+        var pricings = req.Pricings
+            .Select(p => (p.AdFormat, p.PriceType, p.PriceTon))
+            .ToList();
+
+        if (pricings.Count == 0)
+            return Error.Validation("ChannelPricing.EmptyList", "At least one pricing must be provided");
+
+        if (pricings.Any(p => p.PriceTon <= 0))
+            return Error.Validation("ChannelPricing.InvalidPrice", "All prices must be greater than zero");
+
+        var hasDuplicates = pricings
+            .GroupBy(p => (p.AdFormat, p.PriceType))
+            .Any(g => g.Count() > 1);
+
+        if (hasDuplicates)
+            return Error.Validation("ChannelPricing.DuplicatePricing", "Duplicate pricing entries found in request");
+
         var botValidationResult = await ValidateBotPermissionsAsync(req.ChatId, ct);
         if (botValidationResult.IsError)
             return botValidationResult.Errors;
@@ -54,10 +73,6 @@ public class Endpoint(
         if (channelResult.IsError)
             return channelResult.Errors;
 
-        var pricings = req.Pricings
-            .Select(p => (p.AdFormat, p.PriceType, p.PriceTon))
-            .ToList();
-
         var pricingResult = await channelPricingService.CreateBulkAsync(channelResult.Value.Id, pricings);
         if (pricingResult.IsError)
             return pricingResult.Errors;
@@ -66,6 +81,9 @@ public class Endpoint(
 
         if(!attachResult.IsError)
             await analyticsQueue.EnqueueAsync(new AnalyticsUpdateMessage(channelResult.Value.Id, DateTime.UtcNow), ct);
+
+        channelResult.Value.SetStatus(Domain.Types.ChannelStatusType.Ready);
+        await dbContext.SaveChangesAsync(ct);
 
         return MapToResponse(channelResult.Value, pricingResult.Value);
     }
@@ -103,6 +121,7 @@ public class Endpoint(
             Id = channel.Id,
             ChatId = channel.ChatId,
             Title = channel.Title,
+            Status = channel.Status,
             CreatedAt = channel.CreatedAt,
             Pricings = [..pricings.Select(p => new PricingResponse
             {

@@ -47,11 +47,7 @@ var app = bld.Build();
 
 await app.MigrateAndSeedAsync();
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwaggerGen(); 
-}
-
+app.UseSwaggerGen(); 
 app.UseCustomExceptionHandler();
 app.UseAuthentication();
 app.UseAuthorization();

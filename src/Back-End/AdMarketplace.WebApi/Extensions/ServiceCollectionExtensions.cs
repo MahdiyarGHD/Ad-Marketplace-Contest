@@ -88,7 +88,16 @@ public static class ServiceCollectionExtensions
             services.AddDbContext<AdMarketDbContext>(options =>
             {
                 options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
-                options.UseNpgsql(configuration.GetConnectionString(AdMarketDbContextSchema.DefaultConnectionStringName));
+                options.UseNpgsql(
+                    configuration.GetConnectionString(AdMarketDbContextSchema.DefaultConnectionStringName),
+                    npgsqlOptions =>
+                    {
+                        npgsqlOptions.EnableRetryOnFailure(
+                            maxRetryCount: 5,
+                            maxRetryDelay: TimeSpan.FromSeconds(10),
+                            errorCodesToAdd: null);
+                        npgsqlOptions.CommandTimeout(60);
+                    });
             });
 
             return services;
