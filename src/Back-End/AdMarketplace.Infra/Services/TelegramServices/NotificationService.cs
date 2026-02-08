@@ -44,11 +44,15 @@ public class NotificationService(
         if (deal is null) return;
 
         var advertiserChatId = deal.Advertiser.UserId;
+        var ownerChatId = deal.Channel.Owner.UserId;
         var text = $"📝 Draft submitted for review on \"{deal.Channel.Title}\"\n" +
                    $"Please review and approve or reject.\n" +
                    $"Deal ID: {deal.Id}";
 
         await SendSafeAsync(advertiserChatId, text, ct);
+
+        if (deal.DraftMessageId.HasValue)
+            await CopyMessageSafeAsync(advertiserChatId, ownerChatId, (int)deal.DraftMessageId.Value, ct);
     }
 
     public async Task NotifyDraftApprovedAsync(Guid dealId, CancellationToken ct = default)
@@ -179,6 +183,18 @@ public class NotificationService(
         catch (Exception ex)
         {
             logger.LogWarning(ex, "Failed to send notification to chat {ChatId}", chatId);
+        }
+    }
+
+    private async Task CopyMessageSafeAsync(long toChatId, long fromChatId, int messageId, CancellationToken ct)
+    {
+        try
+        {
+            await botClient.CopyMessage(toChatId, fromChatId, messageId, cancellationToken: ct);
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning(ex, "Failed to copy draft message {MessageId} to chat {ChatId}", messageId, toChatId);
         }
     }
 }

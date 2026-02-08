@@ -12,7 +12,8 @@ namespace AdMarketplace.Bot;
 
 public sealed class UpdateHandler(
     IUserService userService,
-    UserChannelConnectionHandler userChannelConnectionHandler)
+    UserChannelConnectionHandler userChannelConnectionHandler,
+    DraftSubmissionHandler draftSubmissionHandler)
 {
     public async Task HandleUpdate(Update update, CancellationToken ct)
     {
@@ -31,6 +32,8 @@ public sealed class UpdateHandler(
         
         // Update Handlers
         await userChannelConnectionHandler.HandleUpdateAsync(update, ct);
+        await draftSubmissionHandler.HandleUpdateAsync(update, ct);
+        await draftSubmissionHandler.HandleCallbackAsync(update, ct);
     }
 
 }
