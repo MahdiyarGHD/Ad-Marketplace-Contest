@@ -24,7 +24,7 @@ export async function requestAPI<
 		const res = await fetch(import.meta.env.VITE_BACKEND_BASE_URL + path, {
 			method,
 			headers: {
-				"Content-Type": "application/json",
+				"Content-Type": method === "POST" ? "application/json" : "",
 				...headers,
 			},
 			body: method === "POST" && body ? JSON.stringify(body) : undefined,
@@ -33,7 +33,7 @@ export async function requestAPI<
 		if (!res.ok) {
 			const error = await res.json();
 			throw new Error(
-				`API Error ${res.status}: ${error.message || res.statusText}`,
+				`API Error ${res.status}: ${error.first_error || error.message || res.statusText}`,
 			);
 		}
 

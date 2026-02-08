@@ -1,0 +1,64 @@
+.Statistics {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0.5rem;
+    gap: .5rem;
+
+    .Item {
+        flex: calc(50% - .25rem);
+        display: flex;
+        flex-direction: column;
+        gap: .25rem;
+        padding: .75rem;
+        border-radius: 0.75rem;
+        background: var(--secondary-bg-color);
+
+        .title {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: var(--text-color);
+        }
+        
+        .subtitle {
+            font-size: 0.875rem;
+            color: var(--secondary-text);
+        }
+    }
+}
+
+.StatItems {
+    display: flex;
+    flex-direction: column;
+    margin: .5rem;
+    gap: .5rem;
+
+    .Item {
+        display: flex;
+        align-items: stretch;
+        gap: .5rem;
+
+        .flex-1 {
+            flex: 1;
+        }
+
+        > div {
+            display: flex;
+            flex-direction: column;
+            background-color: var(--secondary-bg-color);
+            border-radius: .75rem;
+            padding: .75rem;
+            gap: .25rem;
+
+            .title {
+                // font-size: 1.25rem;
+                font-weight: bold;
+                color: var(--text-color);
+            }
+            
+            .subtitle {
+                font-size: 0.875rem;
+                color: var(--secondary-text);
+            }
+        }
+    }
+}
