@@ -21,9 +21,12 @@ bld.Services.AddFastEndpoints(o =>
     ];
 });
 
-bld.Services.SwaggerDocument(options =>
-        options.AutoTagPathSegmentIndex = 2
+if (bld.Environment.IsDevelopment())
+{
+    bld.Services.SwaggerDocument(options =>
+            options.AutoTagPathSegmentIndex = 2
 );
+}
 
 bld.Services.ConfigureJsonSerializer();
 bld.Services.ConfigureOptions(bld.Configuration);
@@ -39,12 +42,16 @@ var app = bld.Build();
 
 await app.MigrateAndSeedAsync();
 
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwaggerGen(); 
+}
+
 app.UseCustomExceptionHandler();
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseCors(CorsOptions.PolicyName);
 
 app.UseFastEndpoints();
-app.UseSwaggerGen();
 app.ConfigureAppStart();
 app.Run();
