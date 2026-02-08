@@ -34,7 +34,9 @@ jobs:
             fi
 
             git checkout ${{ github.ref_name }}
-
+            
+            cd src/Back-End || echo "Warning: Could not change directory to src/Back-End"
+            
             printf "TELEGRAM_TOKEN=${{ secrets.TELEGRAM_TOKEN }}\nWEBHOOK_URL=${{ secrets.WEBHOOK_URL }}\n" > .env
 
             echo "Starting Docker Compose..."
