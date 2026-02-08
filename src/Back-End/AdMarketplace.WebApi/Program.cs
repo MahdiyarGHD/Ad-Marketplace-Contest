@@ -24,8 +24,13 @@ bld.Services.AddFastEndpoints(o =>
 if (bld.Environment.IsDevelopment())
 {
     bld.Services.SwaggerDocument(options =>
-            options.AutoTagPathSegmentIndex = 2
-);
+    {
+        options.AutoTagPathSegmentIndex = 2;
+        options.SerializerSettings = s =>
+        {
+            s.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.SnakeCaseLower;
+        };
+    });
 }
 
 bld.Services.ConfigureJsonSerializer();
@@ -51,7 +56,6 @@ app.UseCustomExceptionHandler();
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseCors(CorsOptions.PolicyName);
-
 app.UseFastEndpoints();
 app.ConfigureAppStart();
 app.Run();
