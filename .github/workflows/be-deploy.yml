@@ -19,7 +19,7 @@ jobs:
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_KEY }}
+          password: ${{ secrets.SSH_PASSWORD }}
           script: |
             cd src/Back-End || git clone https://github.com/MahdiyarGHD/Ad-Marketplace-Contest.git /var/admarketplace && cd /var/admarketplace
             git pull origin Develop
