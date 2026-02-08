@@ -20,7 +20,7 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           password: ${{ secrets.SSH_PASSWORD }}
           script: |
-            cd src/Back-End || git clone https://github.com/MahdiyarGHD/Ad-Marketplace-Contest.git /var/admarketplace && cd /var/admarketplace
+            cd src/Back-End || cd /var/admarketplace
             git pull origin Develop
             
             echo "TELEGRAM_TOKEN=${{ secrets.TELEGRAM_TOKEN }}" > .env
