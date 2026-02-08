@@ -10,9 +10,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -20,11 +17,20 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           password: ${{ secrets.SSH_PASSWORD }}
           script: |
-            cd src/Back-End || cd /var/admarketplace
-            git pull origin Develop
-            
-            echo "TELEGRAM_TOKEN=${{ secrets.TELEGRAM_TOKEN }}" > .env
-            echo "WEBHOOK_URL=${{ secrets.WEBHOOK_URL }}" > .env
-            
+            DEPLOY_DIR="/var/www/admarketplace"
+
+            if [ ! -d "$DEPLOY_DIR" ]; then
+              echo "Directory does not exist. Cloning repository..."
+              git clone https://github.com/MahdiyarGHD/Ad-Marketplace-Contest.git "$DEPLOY_DIR"
+            fi
+
+            cd "$DEPLOY_DIR" || exit 1  # 'exit 1' stops the script if cd fails
+
+            git fetch --all --tags
+            git checkout ${{ github.ref_name }} 
+
+            printf "TELEGRAM_TOKEN=${{ secrets.TELEGRAM_TOKEN }}\nWEBHOOK_URL=${{ secrets.WEBHOOK_URL }}\n" > .env
+
+            docker compose down
             docker compose up -d --build
             docker image prune -f
