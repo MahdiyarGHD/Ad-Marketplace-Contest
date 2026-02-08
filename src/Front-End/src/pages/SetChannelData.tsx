@@ -28,6 +28,7 @@ const AdFormats = ["Post"];
 function SetChannelData() {
 	const {
 		draftChannel,
+		clearDraftChannel,
 		addDraftChannelPrice,
 		setDraftChannelPrice,
 		setDraftChannelPriceType,
@@ -84,8 +85,9 @@ function SetChannelData() {
 			invokeHapticFeedbackImpact("medium");
 			setTimeout(() => invokeHapticFeedbackImpact("soft"), 200);
 			setTimeout(() => invokeHapticFeedbackImpact("soft"), 300);
+			clearDraftChannel();
 		} else {
-			showToast({ title: response.message });
+			showToast({ title: response.first_error.description });
 		}
 	};
 
@@ -167,7 +169,7 @@ function SetChannelData() {
 					);
 
 					return (
-						<div className="Items" key={index}>
+						<div className="Items" key={Math.random()}>
 							<div className="Item">
 								<div className="icon">
 									<DollarSignIcon />
@@ -248,16 +250,21 @@ function SetChannelData() {
 				})}
 			</div>
 			<div className="Section">
-				<div className="Items">
-					<div className="Item primary" onClick={() => addDraftChannelPrice()}>
-						<div className="icon">
-							<PlusIcon />
-						</div>
-						<div className="body">
-							<div className="title">Add Price...</div>
+				{draftChannel.pricing!.length < PriceTypes.length && (
+					<div className="Items">
+						<div
+							className="Item primary"
+							onClick={() => addDraftChannelPrice()}
+						>
+							<div className="icon">
+								<PlusIcon />
+							</div>
+							<div className="body">
+								<div className="title">Add Price...</div>
+							</div>
 						</div>
 					</div>
-				</div>
+				)}
 				<div className="description">Set your price for sponsored content</div>
 			</div>
 		</div>

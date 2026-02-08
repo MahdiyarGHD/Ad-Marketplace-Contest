@@ -622,7 +622,7 @@ input {
     border: 1px solid transparent;
     background-size: 400%;
     /* border: 1px solid #fff1; */
-    animation: Shimmer 5s linear infinite;
+    // animation: OpacityShimmer 5s linear infinite;
 }
 
 @keyframes Shimmer {
@@ -712,7 +712,9 @@ input {
     .Section {
         .flex {
             margin: .5rem 1.25rem 0 1.25rem;
+            
             .title {
+                flex: none;
                 width: 40%;
                 height: 1.25rem;
                 background-color: var(--hover-bg);
@@ -728,7 +730,7 @@ input {
                 width: 42px;
                 height: 42px;
                 background-color: var(--shimmer-color-1);
-                animation: AvatarShimmer calc(5s / 3) linear infinite;
+                animation: OpacityShimmer calc(5s / 3) linear infinite;
             }
             .body {
                 .title {
@@ -749,7 +751,7 @@ input {
     }
 }
 
-@keyframes AvatarShimmer {
+@keyframes OpacityShimmer {
     from {
         opacity: .75;
     }
