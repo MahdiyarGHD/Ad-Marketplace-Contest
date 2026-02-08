@@ -117,6 +117,7 @@ public class ChannelService(
     }
 
     public async Task<ErrorOr<List<Channel>>> SearchAsync(
+        string? keyword = null,
         Guid? categoryId = null,
         int? minSubscribers = null,
         int? maxSubscribers = null,
@@ -134,6 +135,10 @@ public class ChannelService(
             .Include(c => c.Pricings)
             .Where(c => c.Status == ChannelStatusType.Ready)
             .AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(keyword))
+            query = query.Where(c => EF.Functions.ILike(c.Title, $"%{keyword}%")
+                                      || (c.Username != null && EF.Functions.ILike(c.Username, $"%{keyword}%")));
 
         if (categoryId.HasValue)
             query = query.Where(c => c.CategoryId == categoryId.Value);

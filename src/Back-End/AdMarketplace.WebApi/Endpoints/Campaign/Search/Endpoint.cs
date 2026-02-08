@@ -1,15 +1,17 @@
+using AdMarketplace.Domain.Contracts.Common;
 using AdMarketplace.Domain.Types;
 using AdMarketplace.Infra.Interfaces;
 using ErrorOr;
 using FastEndpoints;
 
-namespace AdMarketplace.Endpoints.Campaign.GetActive;
+namespace AdMarketplace.Endpoints.Campaign.Search;
 
-public class Endpoint(ICampaignService campaignService) : Endpoint<Request, ErrorOr<Response>>
+public class Endpoint(ICampaignService campaignService)
+    : Endpoint<Request, ErrorOr<Response>>
 {
     public override void Configure()
     {
-        Get("/api/campaigns/active");
+        Get("/api/campaigns/search");
     }
 
     public override async Task<ErrorOr<Response>> ExecuteAsync(Request req, CancellationToken ct)
@@ -19,7 +21,7 @@ public class Endpoint(ICampaignService campaignService) : Endpoint<Request, Erro
             categoryId: req.CategoryId,
             minBudget: req.MinBudget,
             maxBudget: req.MaxBudget,
-            status: CampaignStatusType.Active,
+            status: req.Status,
             adFormat: req.AdFormat,
             priceType: req.PriceType,
             skip: req.Skip,

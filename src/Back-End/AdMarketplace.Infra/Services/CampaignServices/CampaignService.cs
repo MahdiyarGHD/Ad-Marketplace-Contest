@@ -142,6 +142,7 @@ public class CampaignService(AdMarketDbContext dbContext) : ICampaignService
     }
 
     public async Task<ErrorOr<List<Campaign>>> SearchAsync(
+        string? keyword = null,
         Guid? categoryId = null,
         decimal? minBudget = null,
         decimal? maxBudget = null,
@@ -155,6 +156,10 @@ public class CampaignService(AdMarketDbContext dbContext) : ICampaignService
             .Include(c => c.Advertiser)
             .Include(c => c.Category)
             .AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(keyword))
+            query = query.Where(c => EF.Functions.ILike(c.Title, $"%{keyword}%")
+                                      || EF.Functions.ILike(c.Description, $"%{keyword}%"));
 
         if (categoryId.HasValue)
             query = query.Where(c => c.CategoryId == categoryId.Value);

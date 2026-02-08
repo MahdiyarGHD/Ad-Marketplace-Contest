@@ -26,6 +26,7 @@ public interface ICampaignService
     Task<ErrorOr<List<Campaign>>> GetActiveAsync(int skip, int take);
     Task<ErrorOr<List<Campaign>>> GetByCategoryIdAsync(Guid categoryId, int skip, int take);
     Task<ErrorOr<List<Campaign>>> SearchAsync(
+        string? keyword = null,
         Guid? categoryId = null,
         decimal? minBudget = null,
         decimal? maxBudget = null,

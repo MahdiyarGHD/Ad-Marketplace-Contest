@@ -16,6 +16,7 @@ public class Endpoint(IChannelService channelService)
     public override async Task<ErrorOr<Response>> ExecuteAsync(Request req, CancellationToken ct)
     {
         var result = await channelService.SearchAsync(
+            keyword: req.Query,
             categoryId: req.CategoryId,
             minSubscribers: req.MinSubscribers,
             maxSubscribers: req.MaxSubscribers,

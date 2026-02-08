@@ -23,6 +23,7 @@ public interface IChannelService
     Task<ErrorOr<List<Channel>>> GetByCategoryIdAsync(Guid categoryId, int skip, int take);
 
     Task<ErrorOr<List<Channel>>> SearchAsync(
+        string? keyword = null,
         Guid? categoryId = null,
         int? minSubscribers = null,
         int? maxSubscribers = null,
