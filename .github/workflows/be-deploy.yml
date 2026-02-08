@@ -1,0 +1,47 @@
+name: Deploy to Server
+
+on:
+  push:
+    tags:
+      - 'v*release*'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          script: |
+            APP_DIR="/var/www/admarketplace"
+            REPO_URL="https://${{ secrets.GH_PAT }}@github.com/${{ github.repository }}.git"
+
+            if [ -d "$APP_DIR" ]; then
+              echo "Directory exists. Updating..."
+              cd "$APP_DIR"
+              
+              git remote set-url origin "$REPO_URL"
+              
+              git fetch --all --tags
+            else
+              echo "Cloning fresh repository..."
+              git clone "$REPO_URL" "$APP_DIR"
+              cd "$APP_DIR"
+            fi
+
+            git checkout ${{ github.ref_name }}
+            
+            cd src/Back-End || echo "Warning: Could not change directory to src/Back-End"
+            
+            printf "TELEGRAM_TOKEN=${{ secrets.TELEGRAM_TOKEN }}\nWEBHOOK_URL=${{ secrets.WEBHOOK_URL }}\n" > .env
+
+            echo "Starting Docker Compose..."
+            docker compose down --remove-orphans
+            docker compose up -d --build
+            
+            docker image prune -f
+            echo "Deployment of ${{ github.ref_name }} successful!"
