@@ -82,9 +82,6 @@ public class Endpoint(
         if(!attachResult.IsError)
             await analyticsQueue.EnqueueAsync(new AnalyticsUpdateMessage(channelResult.Value.Id, DateTime.UtcNow), ct);
 
-        channelResult.Value.SetStatus(Domain.Types.ChannelStatusType.Ready);
-        await dbContext.SaveChangesAsync(ct);
-
         return MapToResponse(channelResult.Value, pricingResult.Value);
     }
 
