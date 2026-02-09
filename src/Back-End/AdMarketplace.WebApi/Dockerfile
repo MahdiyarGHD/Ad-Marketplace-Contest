@@ -6,6 +6,7 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 USER $APP_UID
+RUN chown -R appuser:appuser /app/Sessions
 WORKDIR /app
 EXPOSE 8080
 
