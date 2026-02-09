@@ -38,5 +38,10 @@ RUN dotnet publish "./AdMarketplace.WebApi.csproj" -c $BUILD_CONFIGURATION -o /a
 
 FROM base AS final
 WORKDIR /app
+
+USER root
 COPY --from=publish /app/publish .
+RUN chown -R appuser:appuser /app
+USER appuser
+
 ENTRYPOINT ["dotnet", "AdMarketplace.WebApi.dll"]
