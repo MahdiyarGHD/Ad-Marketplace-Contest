@@ -6,7 +6,7 @@ RUN apt-get update && \
 
 RUN mkdir -p /app/Sessions
 
-RUN adduser --disabled-password --gecos "" appuser && \
+RUN useradd -m -U -s /bin/bash appuser && \
     chown -R appuser:appuser /app
 
 RUN chown -R appuser:appuser /app/Sessions
