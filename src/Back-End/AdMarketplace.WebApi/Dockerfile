@@ -1,13 +1,20 @@
 ﻿FROM mcr.hamdocker.ir/dotnet/aspnet:10.0 AS base
-
 USER root
 RUN apt-get update && \
     apt-get install -y libgssapi-krb5-2 && \
     rm -rf /var/lib/apt/lists/*
 
-USER $APP_UID
+RUN mkdir -p /app/Sessions
+
+RUN useradd -m -U -s /bin/bash appuser && \
+    chown -R appuser:appuser /app
+
+RUN chown -R appuser:appuser /app/Sessions
+
 WORKDIR /app
 EXPOSE 8080
+
+USER appuser
 
 FROM mcr.hamdocker.ir/dotnet/sdk:10.0  AS build
 ARG BUILD_CONFIGURATION=Release
@@ -30,6 +37,9 @@ ARG BUILD_CONFIGURATION=Release
 RUN dotnet publish "./AdMarketplace.WebApi.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
+
 WORKDIR /app
-COPY --from=publish /app/publish .
+
+COPY --from=publish --chown=appuser:appuser /app/publish .
+
 ENTRYPOINT ["dotnet", "AdMarketplace.WebApi.dll"]
