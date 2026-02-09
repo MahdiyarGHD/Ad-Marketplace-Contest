@@ -62,7 +62,7 @@ function Profile() {
 							<ChevronRightIcon />
 						</div>
 					</div>
-					<div className="Item">
+					<div className="Item" onClick={() => navigate("/my-campaigns")}>
 						<div className="icon">
 							<MegaphoneIcon />
 						</div>

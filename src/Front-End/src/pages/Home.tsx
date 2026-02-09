@@ -3,7 +3,13 @@ import PageHeader, {
 	PageHeaderButtons,
 	PageHeaderTitle,
 } from "../components/PageHeader";
-import { ChevronRight, SearchIcon } from "lucide-react";
+import {
+	ChevronRight,
+	MegaphoneIcon,
+	MessageCircleIcon,
+	PlusIcon,
+	SearchIcon,
+} from "lucide-react";
 import "./Home.scss";
 import Transition from "../components/Transition";
 import Tabs, { TabContent } from "../components/Tabs";
@@ -13,6 +19,7 @@ import useChannelStore, { type Channel } from "../stores/useChannelStore";
 import Avatar from "../components/Avatar";
 import { useNavigate } from "react-router-dom";
 import useAppStore from "../stores/useAppStore";
+import Menu, { DropdownMenu, MenuItem } from "../components/Menu";
 
 function Home() {
 	const [tabIndex, setTabIndex] = useState(0);
@@ -74,6 +81,22 @@ function Home() {
 			<PageHeader>
 				<PageHeaderTitle>Ad Marketplace</PageHeaderTitle>
 				<PageHeaderButtons>
+					<div className="Add">
+						<Menu custom={({ onClick }) => <PlusIcon onClick={onClick} />}>
+							<DropdownMenu className="right">
+								<MenuItem
+									title="Add Channel"
+									icon={<MessageCircleIcon />}
+									onClick={() => navigate("/add-channel")}
+								/>
+								<MenuItem
+									title="Add Campaign"
+									icon={<MegaphoneIcon />}
+									onClick={() => navigate("/add-campaign")}
+								/>
+							</DropdownMenu>
+						</Menu>
+					</div>
 					<div className="Search">
 						<SearchIcon />
 					</div>

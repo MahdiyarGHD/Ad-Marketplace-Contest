@@ -3,24 +3,41 @@ import PageHeader, { PageHeaderTitle } from "../../components/PageHeader";
 import Transition from "../../components/Transition";
 import useCategoryStore from "../../stores/useCategoryStore";
 import { memo, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { invokeHapticFeedbackImpact } from "../../utils/common";
 import { backButton } from "@tma.js/sdk-react";
 import useChannelStore from "../../stores/useChannelStore";
+import useCampaignStore from "../../stores/useCampaignStore";
 
 function SelectCategory() {
 	const { categories } = useCategoryStore();
 	const { setDraftChannelCategory } = useChannelStore();
+	const { setDraftCampaignCategory, setDraftCampaignPreferredCategory } =
+		useCampaignStore();
+
+	const { set } = useParams();
 
 	const navigate = useNavigate();
 
 	const onBackButton = () => {
-		navigate("/set-channel-data");
+		window.history.back();
 	};
 
 	const onSelectCategory = (category: any) => {
-		setDraftChannelCategory(category);
-		navigate("/set-channel-data");
+		switch (set) {
+			case "channel":
+				setDraftChannelCategory(category);
+				navigate("/set-channel-data");
+				break;
+			case "campaign":
+				setDraftCampaignCategory(category);
+				navigate("/add-campaign");
+				break;
+			case "campaign-preferred":
+				setDraftCampaignPreferredCategory(category);
+				navigate("/add-campaign");
+				break;
+		}
 	};
 
 	useEffect(() => {

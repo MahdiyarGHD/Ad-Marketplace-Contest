@@ -48,7 +48,7 @@ function SetChannelData() {
 	};
 
 	const onSelectCategory = () => {
-		navigate("/select-category");
+		navigate("/select-category/channel");
 	};
 
 	const handleSave = async () => {
@@ -169,7 +169,8 @@ function SetChannelData() {
 					);
 
 					return (
-						<div className="Items" key={Math.random()}>
+						// biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
+						<div className="Items" key={index}>
 							<div className="Item">
 								<div className="icon">
 									<DollarSignIcon />
@@ -189,8 +190,8 @@ function SetChannelData() {
 								<div className="meta">TON</div>
 							</div>
 							<Menu
-								custom={
-									<div className="Item">
+								custom={({ onClick }) => (
+									<div className="Item" onClick={onClick}>
 										<div className="icon">
 											<ClockIcon />
 										</div>
@@ -202,7 +203,7 @@ function SetChannelData() {
 											<ChevronDown />
 										</div>
 									</div>
-								}
+								)}
 							>
 								<DropdownMenu className="right">
 									{availablePriceType.map((type) => (
@@ -220,8 +221,8 @@ function SetChannelData() {
 								</DropdownMenu>
 							</Menu>
 							<Menu
-								custom={
-									<div className="Item">
+								custom={({ onClick }) => (
+									<div className="Item" onClick={onClick}>
 										<div className="icon">
 											<SendHorizontalIcon />
 										</div>
@@ -233,7 +234,7 @@ function SetChannelData() {
 											<ChevronDown />
 										</div>
 									</div>
-								}
+								)}
 							>
 								<DropdownMenu className="right">
 									{AdFormats.map((format, i) => (
