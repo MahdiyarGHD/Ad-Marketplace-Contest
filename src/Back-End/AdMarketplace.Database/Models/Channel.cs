@@ -24,6 +24,7 @@ public class Channel : IDateTimeSchema
     public DateTimeOffset CreatedAt { get; private init; }
     public DateTimeOffset? UpdatedAt { get; private set; }
     public DateTimeOffset? LastReadinessCheckAt { get; private set; }
+    public int ReadinessRetryCount { get; private set; }
     
     
     // Navigation properties
@@ -106,6 +107,9 @@ public class Channel : IDateTimeSchema
     {
         Status = type;
         UpdatedAt = DateTimeOffset.UtcNow;
+
+        if (type == ChannelStatusType.Ready)
+            ReadinessRetryCount = 0;
     }
 
     public void AttachAgent(Guid agentId)
@@ -123,5 +127,6 @@ public class Channel : IDateTimeSchema
     public void MarkReadinessChecked()
     {
         LastReadinessCheckAt = DateTimeOffset.UtcNow;
+        ReadinessRetryCount++;
     }
 }

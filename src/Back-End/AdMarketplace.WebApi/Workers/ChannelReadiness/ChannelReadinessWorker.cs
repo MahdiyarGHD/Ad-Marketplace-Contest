@@ -58,7 +58,7 @@ public class ChannelReadinessWorker(
 
         foreach (var channel in channels)
         {
-            if (!ShouldRetry(channel.LastReadinessCheckAt, channel.CreatedAt, now))
+            if (!ShouldRetry(channel.LastReadinessCheckAt, channel.ReadinessRetryCount, now))
                 continue;
 
             try
@@ -141,33 +141,22 @@ public class ChannelReadinessWorker(
         }
     }
 
-    private static bool ShouldRetry(DateTimeOffset? lastCheck, DateTimeOffset createdAt, DateTimeOffset now)
+    private static bool ShouldRetry(DateTimeOffset? lastCheck, int retryCount, DateTimeOffset now)
     {
         if (!lastCheck.HasValue)
             return true;
 
         var timeSinceLastCheck = now - lastCheck.Value;
-        var timeSinceCreation = now - createdAt;
-
-        var interval = CalculateRetryInterval(timeSinceCreation);
+        var interval = CalculateRetryInterval(retryCount);
         return timeSinceLastCheck >= interval;
     }
 
-    private static TimeSpan CalculateRetryInterval(TimeSpan timeSinceCreation)
+    private static TimeSpan CalculateRetryInterval(int retryCount)
     {
-        if (timeSinceCreation <= BaseRetryInterval)
+        if (retryCount <= 0)
             return BaseRetryInterval;
 
-        var minutesSinceCreation = timeSinceCreation.TotalMinutes;
-        var intervalMinutes = BaseRetryInterval.TotalMinutes;
-
-        while (intervalMinutes * BackoffMultiplier < minutesSinceCreation)
-        {
-            intervalMinutes *= BackoffMultiplier;
-            if (intervalMinutes >= MaxRetryInterval.TotalMinutes)
-                return MaxRetryInterval;
-        }
-
+        var intervalMinutes = BaseRetryInterval.TotalMinutes * Math.Pow(BackoffMultiplier, retryCount);
         return TimeSpan.FromMinutes(Math.Min(intervalMinutes, MaxRetryInterval.TotalMinutes));
     }
 
