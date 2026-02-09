@@ -33,6 +33,7 @@ type ChannelState = {
 	verifyChannel: () => Promise<void>;
 	setUnVerifiedChannels: (channels: Channel[]) => void;
 	setDraftChannel: (channel: Channel) => void;
+	clearDraftChannel: () => void;
 	addDraftChannelPrice: () => void;
 	setDraftChannelCategory: (category: any) => void;
 	setDraftChannelPriceType: (priceType: number, index: number) => void;
@@ -95,6 +96,19 @@ const useChannelStore = create<ChannelState>((set, get) => ({
 				title: channel.title,
 			},
 		}));
+	},
+	clearDraftChannel() {
+		set({
+			draftChannel: {
+				pricing: [
+					{
+						ad_format: 0,
+						price_type: 0,
+						price_ton: 0,
+					},
+				],
+			},
+		});
 	},
 	setDraftChannelCategory(category: any) {
 		set((state) => ({
