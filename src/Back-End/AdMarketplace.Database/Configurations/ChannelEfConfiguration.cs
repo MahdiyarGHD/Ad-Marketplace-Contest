@@ -73,6 +73,9 @@ public class ChannelEfConfiguration : IEntityTypeConfiguration<Channel>
             .HasForeignKey(x => x.CategoryId)
             .OnDelete(DeleteBehavior.SetNull);
         
+        builder.Property(x => x.LastReadinessCheckAt)
+            .IsRequired(false);
+
         builder.Property(x => x.AgentId)
             .IsRequired(false);
 
