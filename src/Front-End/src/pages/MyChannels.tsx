@@ -48,16 +48,18 @@ function MyChannels() {
 			</PageHeader>
 
 			<div className="ChatList">
-				<Transition state eachElement eachElementDelay={20}>
-					<div
-						className="Item primary"
-						onClick={() => navigate("/add-channel")}
-					>
-						<div className="icon">
-							<PlusIcon />
-						</div>
-						<div className="title">Add Your Channel</div>
+				<div className="Item primary" onClick={() => navigate("/add-channel")}>
+					<div className="icon">
+						<PlusIcon />
 					</div>
+					<div className="title">Add Your Channel</div>
+				</div>
+				<Transition
+					state
+					eachElement
+					eachElementDelay={40}
+					key={myChannels?.length}
+				>
 					{myChannels.map((channel) => (
 						<div
 							key={channel.chat_id}

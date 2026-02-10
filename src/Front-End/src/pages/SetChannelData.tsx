@@ -15,6 +15,7 @@ import {
 	TagIcon,
 } from "lucide-react";
 import useChannelStore, {
+	AdFormats,
 	PriceTypes,
 	type Channel,
 } from "../stores/useChannelStore";
@@ -22,8 +23,6 @@ import Menu, { DropdownMenu, MenuItem } from "../components/Menu";
 import TextTransition from "../components/TextTransition";
 import { requestAPI } from "../utils/api";
 import useUIStore from "../stores/useUIStore";
-
-const AdFormats = ["Post"];
 
 function SetChannelData() {
 	const {
@@ -52,7 +51,7 @@ function SetChannelData() {
 	};
 
 	const handleSave = async () => {
-		if (!draftChannel.pricing) return;
+		if (!draftChannel.pricings) return;
 
 		try {
 			if (!draftChannel.chat_id) {
@@ -71,7 +70,7 @@ function SetChannelData() {
 			{
 				chat_id: draftChannel.chat_id,
 				category_id: draftChannel.category_id,
-				pricings: draftChannel.pricing.map((item) => ({
+				pricings: draftChannel.pricings.map((item) => ({
 					ad_format: item.ad_format + 1,
 					price_type: item.price_type + 1,
 					price_ton: item.price_ton,
@@ -117,7 +116,7 @@ function SetChannelData() {
 		return () => mainButton.offClick(handleSave);
 	}, [draftChannel]);
 
-	const allPriceTypes = draftChannel.pricing?.map((item) => item.price_type);
+	const allPriceTypes = draftChannel.pricings?.map((item) => item.price_type);
 
 	return (
 		<div className="SetChannelData scrollable">
@@ -161,7 +160,7 @@ function SetChannelData() {
 			</div>
 			<div className="Section Pricing">
 				<div className="title">Pricing</div>
-				{draftChannel.pricing?.map((item, index) => {
+				{draftChannel.pricings?.map((item, index) => {
 					const availablePriceType = PriceTypes.filter(
 						(type, i) =>
 							!allPriceTypes!.includes(i) ||
@@ -251,7 +250,7 @@ function SetChannelData() {
 				})}
 			</div>
 			<div className="Section">
-				{draftChannel.pricing!.length < PriceTypes.length && (
+				{(draftChannel.pricings?.length ?? 0) < PriceTypes.length && (
 					<div className="Items">
 						<div
 							className="Item primary"

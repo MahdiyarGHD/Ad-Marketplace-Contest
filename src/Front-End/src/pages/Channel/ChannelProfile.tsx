@@ -6,17 +6,29 @@ import PageHeader, {
 import Avatar from "../../components/Avatar";
 import { useNavigate, useParams } from "react-router-dom";
 import { requestAPI } from "../../utils/api";
-import useChannelStore from "../../stores/useChannelStore";
+import useChannelStore, {
+	AdFormats,
+	PriceTypes,
+} from "../../stores/useChannelStore";
 import { useShallow } from "zustand/shallow";
 import { backButton } from "@tma.js/sdk-react";
 import { buildClassName, invokeHapticFeedbackImpact } from "../../utils/common";
 import "../Statistics.scss";
+import { Shimmer } from "../../components/Shimmer";
+import Transition from "../../components/Transition";
 
 function ChannelProfile() {
 	const { id } = useParams();
 
-	const { chat_id, title, username } =
-		useChannelStore(useShallow((state) => state.activeChannel)) || {};
+	const {
+		chat_id,
+		title,
+		username,
+		category_id,
+		subscriber_count,
+		average_views,
+		pricings,
+	} = useChannelStore(useShallow((state) => state.activeChannel)) || {};
 	const { setActiveChannel } = useChannelStore();
 
 	const navigate = useNavigate();
@@ -73,36 +85,57 @@ function ChannelProfile() {
 
 			<div className="Statistics">
 				<div className="Item">
-					<div className="title">369</div>
+					<Shimmer className="title">
+						<span>{subscriber_count}</span>
+					</Shimmer>
 					<div className="subtitle">Subscribers</div>
 				</div>
 				<div className="Item">
-					<div className="title">369</div>
-					<div className="subtitle">Subscribers</div>
-				</div>
-				<div className="Item">
-					<div className="title">369</div>
-					<div className="subtitle">Subscribers</div>
+					<Shimmer className="title" state={!!average_views}>
+						<span>{average_views}</span>
+					</Shimmer>
+					<div className="subtitle">Average Views</div>
 				</div>
 			</div>
 			<div className="Section">
 				<div className="title">Pricing</div>
-				<div className="StatItems">
-					<div className="Item">
-						<div className="flex-1">
-							{/* <DollarSign /> */}
-							<div className="title">100 TON</div>
-							<div className="subtitle">Price</div>
-						</div>
-						<div>
-							<div className="title">Per hour</div>
-							<div className="subtitle">Price type</div>
-						</div>
-						<div>
-							<div className="title">Post</div>
-							<div className="subtitle">Ad format</div>
-						</div>
-					</div>
+				<div
+					className={buildClassName(
+						"StatItems",
+						!pricings?.length && "loading",
+					)}
+				>
+					<Transition
+						state
+						key={pricings?.length}
+						eachElement
+						eachElementDelay={100}
+					>
+						{(pricings ?? Array.from({ length: 1 })).map((price, index) => (
+							// biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
+							<div className="Item" key={index}>
+								<div className="flex-1">
+									{/* <DollarSign /> */}
+									<Shimmer className="title" state={!!price?.price_ton}>
+										{price?.price_ton} TON
+									</Shimmer>
+									<div className="subtitle">Price</div>
+								</div>
+								<div>
+									<Shimmer className="title" state={!!price?.price_type}>
+										{PriceTypes[price?.price_type - 1]}
+									</Shimmer>
+									<div className="subtitle">Price type</div>
+								</div>
+								<div>
+									<Shimmer className="title" state={!!price?.ad_format}>
+										{AdFormats[price?.ad_format - 1]}
+									</Shimmer>
+									<div className="subtitle">Ad format</div>
+								</div>
+							</div>
+						))}
+					</Transition>
 				</div>
 			</div>
 		</div>

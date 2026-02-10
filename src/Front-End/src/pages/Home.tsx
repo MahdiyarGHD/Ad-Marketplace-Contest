@@ -134,7 +134,7 @@ function Home() {
 								</div>
 							</div>
 							<div className="Items">
-								<Transition state eachElement eachElementDelay={20}>
+								<Transition state eachElement eachElementDelay={40}>
 									{element.items.map((item) =>
 										element.$type === "channel"
 											? renderChannel(item as Channel)
