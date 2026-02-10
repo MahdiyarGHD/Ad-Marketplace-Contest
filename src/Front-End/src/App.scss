@@ -269,6 +269,10 @@ body {
                 align-items: center;
             }
 
+            &.multiline {
+                padding-top: .5rem;
+            }
+
             .title {
                 line-height: 1.2;
             }

@@ -161,7 +161,7 @@ function AddCampaign() {
 				<div className="title">Targeting</div>
 				<div className="Items">
 					<div className="Item">
-						<div className="body">
+						<div className="body multiline">
 							<div className="title">Subscribers Count</div>
 							<div className="flex">
 								<input type="text" placeholder="Min" />
