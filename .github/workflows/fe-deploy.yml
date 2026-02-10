@@ -1,7 +1,7 @@
 on:
   push:
-    tags:
-      - 'v*fe-release*'
+    branches:
+      - "Develop"
 
 jobs:
   deploy:
