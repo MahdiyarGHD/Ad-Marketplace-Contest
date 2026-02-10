@@ -16,6 +16,8 @@ import { buildClassName, invokeHapticFeedbackImpact } from "../../utils/common";
 import "../Statistics.scss";
 import { Shimmer } from "../../components/Shimmer";
 import Transition from "../../components/Transition";
+import { TagIcon } from "lucide-react";
+import useCategoryStore from "../../stores/useCategoryStore";
 
 function ChannelProfile() {
 	const { id } = useParams();
@@ -30,6 +32,10 @@ function ChannelProfile() {
 		pricings,
 	} = useChannelStore(useShallow((state) => state.activeChannel)) || {};
 	const { setActiveChannel } = useChannelStore();
+
+	const { getCategory } = useCategoryStore();
+
+	const category = getCategory(category_id ?? "");
 
 	const navigate = useNavigate();
 
@@ -79,6 +85,18 @@ function ChannelProfile() {
 					</div>
 					<div className="subtitle">
 						{username ? `@${username}` : "private channel"}
+					</div>
+				</div>
+			</div>
+
+			<div className="Items">
+				<div
+					className="Item"
+					onClick={() => navigate(`/category/${category_id}`)}
+				>
+					<div className="icon">{category?.icon ?? <TagIcon />}</div>
+					<div className="body">
+						<Shimmer className="title">{category?.name}</Shimmer>
 					</div>
 				</div>
 			</div>

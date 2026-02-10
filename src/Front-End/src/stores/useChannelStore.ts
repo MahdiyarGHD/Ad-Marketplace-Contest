@@ -8,7 +8,7 @@ export const PriceTypes = ["Per hour", "Per day", "Per 1000 views"];
 export type Channel = {
 	id?: string;
 	chat_id: number;
-	category_id: number;
+	category_id: string;
 	category?: {
 		id: string;
 		name: string;
@@ -18,7 +18,7 @@ export type Channel = {
 	};
 	title: string;
 	username?: string;
-	description: string;
+	description?: string;
 	subscriber_count: number;
 	average_views: number;
 	language_distribution_json: [
