@@ -1,5 +1,6 @@
 using AdMarketplace.Database;
 using AdMarketplace.Domain.Contracts.Common;
+using AdMarketplace.Domain.Types;
 using AdMarketplace.Infra.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -42,7 +43,7 @@ public class AnalyticsProducerWorker(
         var dbContext = scope.ServiceProvider.GetRequiredService<AdMarketDbContext>();
 
         var channelIds = await dbContext.Channels
-            .Where(c => c.AgentId != null)
+            .Where(c => c.Status == ChannelStatusType.Ready)
             .Select(c => c.Id)
             .ToListAsync(ct);
 

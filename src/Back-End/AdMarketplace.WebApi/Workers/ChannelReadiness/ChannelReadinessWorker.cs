@@ -15,9 +15,9 @@ public class ChannelReadinessWorker(
     ILogger<ChannelReadinessWorker> logger) : BackgroundService
 {
     private static readonly TimeSpan PollInterval = TimeSpan.FromSeconds(30);
+    private static readonly TimeSpan ChannelThrottleDelay = TimeSpan.FromSeconds(3);
     private static readonly TimeSpan BaseRetryInterval = TimeSpan.FromMinutes(1);
-    private static readonly TimeSpan MaxRetryInterval = TimeSpan.FromHours(6);
-    private const double BackoffMultiplier = 1.5;
+    private static readonly TimeSpan MaxRetryInterval = TimeSpan.FromDays(2);
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
@@ -45,12 +45,10 @@ public class ChannelReadinessWorker(
         using var scope = serviceProvider.CreateScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<AdMarketDbContext>();
         var botClient = scope.ServiceProvider.GetRequiredService<ITelegramBotClient>();
-        var agentService = scope.ServiceProvider.GetRequiredService<IAgentService>();
         var analyticsQueue = scope.ServiceProvider.GetRequiredService<IAnalyticsUpdateQueue>();
 
         var channels = await dbContext.Channels
             .AsTracking()
-            .Include(c => c.Agent)
             .Where(c => c.Status == ChannelStatusType.UnReady || c.Status == ChannelStatusType.PartiallyReady)
             .ToListAsync(ct);
 
@@ -58,105 +56,129 @@ public class ChannelReadinessWorker(
 
         foreach (var channel in channels)
         {
-            if (!ShouldRetry(channel.LastReadinessCheckAt, channel.ReadinessRetryCount, now))
+            if (!ShouldRetry(channel, now))
                 continue;
 
             try
             {
-                await CheckAndFixChannelAsync(channel, dbContext, botClient, agentService, analyticsQueue, ct);
+                await CheckAndFixChannelAsync(channel, dbContext, botClient, analyticsQueue, ct);
             }
             catch (Exception ex)
             {
                 logger.LogError(ex, "Failed readiness check for channel {ChannelId}", channel.Id);
-                channel.MarkReadinessChecked();
             }
-        }
 
-        await dbContext.SaveChangesAsync(ct);
+            channel.MarkReadinessChecked();
+            await dbContext.SaveChangesAsync(ct);
+            await Task.Delay(ChannelThrottleDelay, ct);
+        }
     }
 
-    private async Task CheckAndFixChannelAsync(
+    private async Task<bool> CheckAndFixChannelAsync(
         Database.Models.Channel channel,
         AdMarketDbContext dbContext,
         ITelegramBotClient botClient,
-        IAgentService agentService,
         IAnalyticsUpdateQueue analyticsQueue,
         CancellationToken ct)
     {
-        channel.MarkReadinessChecked();
-
         var botOk = await VerifyBotPermissionsAsync(botClient, channel.ChatId, ct);
         if (!botOk)
         {
-            logger.LogWarning("Bot lacks required permissions in channel {ChannelId} (ChatId={ChatId})", channel.Id, channel.ChatId);
-            channel.SetStatus(ChannelStatusType.UnReady);
-            channel.DetachAgent();
-            return;
+            logger.LogWarning("Bot not admin in channel {ChannelId} (ChatId={ChatId})", channel.Id, channel.ChatId);
+            if (channel.Status != ChannelStatusType.UnReady)
+                channel.SetStatus(ChannelStatusType.UnReady);
+            if (channel.AgentId.HasValue)
+                channel.DetachAgent();
+            return false;
         }
 
         if (channel.Status == ChannelStatusType.UnReady)
             channel.SetStatus(ChannelStatusType.PartiallyReady);
 
-        var agentOk = channel.AgentId.HasValue
-            && await VerifyAgentInChannelAsync(botClient, channel.ChatId, channel.Agent!, ct);
+        var activeAgents = await dbContext.Agents
+            .Where(a => a.IsActive)
+            .ToListAsync(ct);
 
-        if (agentOk)
+        if (activeAgents.Count == 0)
         {
+            logger.LogWarning("No active agents available for channel {ChannelId}", channel.Id);
+            return false;
+        }
+
+        foreach (var agent in activeAgents)
+        {
+            var status = await GetAgentChannelStatusAsync(botClient, channel.ChatId, agent.UserId, ct);
+
+            if (status == AgentChannelStatus.NotInChannel)
+                continue;
+
+            if (status == AgentChannelStatus.InChannelNeedsPromotion)
+            {
+                try
+                {
+                    await botClient.PromoteChatMember(
+                        chatId: channel.ChatId,
+                        userId: agent.UserId,
+                        canPostMessages: true,
+                        canEditMessages: true,
+                        canDeleteMessages: true,
+                        canInviteUsers: true,
+                        canPinMessages: true);
+                }
+                catch (Telegram.Bot.Exceptions.ApiRequestException ex)
+                {
+                    logger.LogWarning(ex, "Failed to promote agent {AgentId} in channel {ChannelId}", agent.Id, channel.Id);
+                    continue;
+                }
+            }
+
+            channel.AttachAgent(agent.Id);
             channel.SetStatus(ChannelStatusType.Ready);
-            logger.LogInformation("Channel {ChannelId} is now Ready", channel.Id);
+            logger.LogInformation("Channel {ChannelId} Ready — agent {AgentId}", channel.Id, agent.Id);
             await analyticsQueue.EnqueueAsync(
                 new Domain.Contracts.Common.AnalyticsUpdateMessage(channel.Id, DateTimeOffset.UtcNow), ct);
-            return;
+            return true;
         }
 
-        if (channel.AgentId.HasValue)
-        {
-            channel.DetachAgent();
-            await dbContext.SaveChangesAsync(ct);
-        }
+        logger.LogInformation("No agent in channel {ChannelId}, attempting fresh attach", channel.Id);
 
-        logger.LogInformation("Attempting to attach agent to channel {ChannelId}", channel.Id);
+        using var attachScope = serviceProvider.CreateScope();
+        var agentService = attachScope.ServiceProvider.GetRequiredService<IAgentService>();
         var attachResult = await agentService.AttachAgentToChannel(channel.Id);
 
-        if (!attachResult.IsError)
+        if (attachResult.IsError)
         {
-            logger.LogInformation("Agent attached to channel {ChannelId}, now Ready", channel.Id);
-            await analyticsQueue.EnqueueAsync(
-                new Domain.Contracts.Common.AnalyticsUpdateMessage(channel.Id, DateTimeOffset.UtcNow), ct);
-            return;
+            logger.LogWarning("Agent attach failed for channel {ChannelId}: {Error}", channel.Id, attachResult.FirstError.Description);
+            await dbContext.Entry(channel).ReloadAsync(ct);
+            return false;
         }
 
-        logger.LogWarning("First agent attach attempt failed for channel {ChannelId}, trying another agent", channel.Id);
+        await dbContext.Entry(channel).ReloadAsync(ct);
 
-        var retryResult = await agentService.AttachAgentToChannel(channel.Id);
-        if (!retryResult.IsError)
-        {
-            logger.LogInformation("Second agent attached to channel {ChannelId}, now Ready", channel.Id);
-            await analyticsQueue.EnqueueAsync(
-                new Domain.Contracts.Common.AnalyticsUpdateMessage(channel.Id, DateTimeOffset.UtcNow), ct);
-        }
-        else
-        {
-            logger.LogWarning("All agent attach attempts failed for channel {ChannelId}", channel.Id);
-        }
+        logger.LogInformation("Agent attached to channel {ChannelId}, now Ready", channel.Id);
+        await analyticsQueue.EnqueueAsync(
+            new Domain.Contracts.Common.AnalyticsUpdateMessage(channel.Id, DateTimeOffset.UtcNow), ct);
+        return true;
     }
 
-    private static bool ShouldRetry(DateTimeOffset? lastCheck, int retryCount, DateTimeOffset now)
+    private static bool ShouldRetry(Database.Models.Channel channel, DateTimeOffset now)
     {
-        if (!lastCheck.HasValue)
+        if (!channel.LastReadinessCheckAt.HasValue)
             return true;
 
-        var timeSinceLastCheck = now - lastCheck.Value;
-        var interval = CalculateRetryInterval(retryCount);
+        var timeSinceLastCheck = now - channel.LastReadinessCheckAt.Value;
+        var stuckSince = channel.UpdatedAt ?? channel.CreatedAt;
+        var stuckDuration = channel.LastReadinessCheckAt.Value - stuckSince;
+        if (stuckDuration < TimeSpan.Zero)
+            stuckDuration = TimeSpan.Zero;
+
+        var interval = CalculateRetryInterval(stuckDuration);
         return timeSinceLastCheck >= interval;
     }
 
-    private static TimeSpan CalculateRetryInterval(int retryCount)
+    private static TimeSpan CalculateRetryInterval(TimeSpan stuckDuration)
     {
-        if (retryCount <= 0)
-            return BaseRetryInterval;
-
-        var intervalMinutes = BaseRetryInterval.TotalMinutes * Math.Pow(BackoffMultiplier, retryCount);
+        var intervalMinutes = BaseRetryInterval.TotalMinutes + stuckDuration.TotalMinutes * 0.1;
         return TimeSpan.FromMinutes(Math.Min(intervalMinutes, MaxRetryInterval.TotalMinutes));
     }
 
@@ -167,14 +189,12 @@ public class ChannelReadinessWorker(
             var me = await botClient.GetMe(ct);
             var botMember = await botClient.GetChatMember(chatId, me.Id, ct);
 
-            return botMember is ChatMemberAdministrator
-            {
-                CanPromoteMembers: true,
-                CanInviteUsers: true,
-                CanDeleteMessages: true,
-                CanPostMessages: true,
-                CanEditMessages: true,
-            };
+            return botMember is ChatMemberAdministrator admin
+                && admin.CanPromoteMembers
+                && admin.CanInviteUsers
+                && admin.CanDeleteMessages
+                && admin.CanPostMessages == true
+                && admin.CanEditMessages == true;
         }
         catch (Telegram.Bot.Exceptions.ApiRequestException)
         {
@@ -182,31 +202,39 @@ public class ChannelReadinessWorker(
         }
     }
 
-    private static async Task<bool> VerifyAgentInChannelAsync(
+    private static async Task<AgentChannelStatus> GetAgentChannelStatusAsync(
         ITelegramBotClient botClient,
         long chatId,
-        Database.Models.Agent agent,
+        long agentUserId,
         CancellationToken ct)
     {
-        if (!agent.IsActive)
-            return false;
-
         try
         {
-            var member = await botClient.GetChatMember(chatId, agent.UserId, ct);
+            var member = await botClient.GetChatMember(chatId, agentUserId, ct);
 
-            return member is ChatMemberAdministrator
-            {
-                CanPostMessages: true,
-                CanEditMessages: true,
-                CanDeleteMessages: true,
-                CanInviteUsers: true,
-                CanPinMessages: true,
-            };
+            if (member is ChatMemberAdministrator admin
+                && admin.CanPostMessages == true
+                && admin.CanEditMessages == true
+                && admin.CanDeleteMessages
+                && admin.CanInviteUsers
+                && admin.CanPinMessages)
+                return AgentChannelStatus.ReadyAdmin;
+
+            if (member is ChatMemberAdministrator or ChatMemberMember)
+                return AgentChannelStatus.InChannelNeedsPromotion;
+
+            return AgentChannelStatus.NotInChannel;
         }
         catch (Telegram.Bot.Exceptions.ApiRequestException)
         {
-            return false;
+            return AgentChannelStatus.NotInChannel;
         }
+    }
+
+    private enum AgentChannelStatus
+    {
+        NotInChannel,
+        InChannelNeedsPromotion,
+        ReadyAdmin
     }
 }

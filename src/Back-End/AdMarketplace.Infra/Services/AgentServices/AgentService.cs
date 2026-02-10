@@ -65,7 +65,14 @@ public class AgentService(
             var chatInfo = await botClient.GetChat(channel.ChatId);
             var inviteLink = chatInfo.InviteLink ?? (await botClient.CreateChatInviteLink(channel.ChatId)).InviteLink;
 
-            await client.Messages_ImportChatInvite(inviteLink.Replace("https://t.me/+", ""));
+            try
+            {
+                await client.Messages_ImportChatInvite(inviteLink.Replace("https://t.me/+", ""));
+            }
+            catch (RpcException rpcEx) when (rpcEx.Code == 400 && rpcEx.Message is "USER_ALREADY_PARTICIPANT" or "INVITE_HASH_EXPIRED")
+            {
+                logger.LogInformation("Agent {AgentId} already in channel {ChannelId}, skipping join", agent.Id, channel.Id);
+            }
 
             await botClient.PromoteChatMember(
                 chatId: channel.ChatId,

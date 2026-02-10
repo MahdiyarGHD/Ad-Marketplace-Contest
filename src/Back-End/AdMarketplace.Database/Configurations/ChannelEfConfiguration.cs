@@ -76,10 +76,6 @@ public class ChannelEfConfiguration : IEntityTypeConfiguration<Channel>
         builder.Property(x => x.LastReadinessCheckAt)
             .IsRequired(false);
 
-        builder.Property(x => x.ReadinessRetryCount)
-            .IsRequired()
-            .HasDefaultValue(0);
-
         builder.Property(x => x.AgentId)
             .IsRequired(false);
 

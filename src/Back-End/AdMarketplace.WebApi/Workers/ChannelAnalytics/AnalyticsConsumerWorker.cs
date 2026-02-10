@@ -1,5 +1,8 @@
 using System.Threading.RateLimiting;
+using AdMarketplace.Database;
+using AdMarketplace.Domain.Types;
 using AdMarketplace.Infra.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -36,6 +39,18 @@ public class AnalyticsConsumerWorker(
             }
 
             using var scope = serviceProvider.CreateScope();
+            var dbContext = scope.ServiceProvider.GetRequiredService<AdMarketDbContext>();
+
+            var channel = await dbContext.Channels
+                .AsNoTracking()
+                .FirstOrDefaultAsync(c => c.Id == message.ChannelId, stoppingToken);
+
+            if (channel is null || channel.Status != ChannelStatusType.Ready)
+            {
+                logger.LogInformation("Skipping analytics update for channel {ChannelId} — not ready", message.ChannelId);
+                continue;
+            }
+
             var analyticsUpdateService = scope.ServiceProvider.GetRequiredService<IAnalyticsUpdateService>();
 
             await analyticsUpdateService.UpdateChannelAnalyticsAsync(
