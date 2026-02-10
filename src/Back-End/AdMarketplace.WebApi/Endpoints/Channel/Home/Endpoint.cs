@@ -153,6 +153,7 @@ public class Endpoint(AdMarketDbContext dbContext)
         return new ChannelItem
         {
             Id = channel.Id,
+            ChatId = channel.ChatId,
             Title = channel.Title,
             Username = channel.Username,
             SubscriberCount = channel.SubscriberCount,
