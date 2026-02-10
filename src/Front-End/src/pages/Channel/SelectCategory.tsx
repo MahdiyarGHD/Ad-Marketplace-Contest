@@ -1,41 +1,84 @@
-import { ChevronRight } from "lucide-react";
+import { CheckIcon, ChevronRight } from "lucide-react";
 import PageHeader, { PageHeaderTitle } from "../../components/PageHeader";
 import Transition from "../../components/Transition";
 import useCategoryStore from "../../stores/useCategoryStore";
 import { memo, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { invokeHapticFeedbackImpact } from "../../utils/common";
-import { backButton } from "@tma.js/sdk-react";
+import { backButton, mainButton } from "@tma.js/sdk-react";
 import useChannelStore from "../../stores/useChannelStore";
+import useCampaignStore from "../../stores/useCampaignStore";
+import { useShallow } from "zustand/shallow";
 
 function SelectCategory() {
 	const { categories } = useCategoryStore();
 	const { setDraftChannelCategory } = useChannelStore();
+	const { setDraftCampaignCategory, setDraftCampaignPreferredCategory } =
+		useCampaignStore();
+
+	const preferredCategoryIds =
+		useCampaignStore(
+			useShallow(
+				(state) => state.draftCampaign?.targeting?.preferred_category_ids,
+			),
+		) || [];
+
+	const { set } = useParams();
 
 	const navigate = useNavigate();
 
 	const onBackButton = () => {
-		navigate("/set-channel-data");
+		window.history.back();
 	};
 
 	const onSelectCategory = (category: any) => {
-		setDraftChannelCategory(category);
-		navigate("/set-channel-data");
+		switch (set) {
+			case "channel":
+				setDraftChannelCategory(category);
+				navigate("/set-channel-data");
+				break;
+			case "campaign":
+				setDraftCampaignCategory(category);
+				navigate("/add-campaign");
+				break;
+			case "campaign-preferred":
+				setDraftCampaignPreferredCategory(category);
+				break;
+		}
 	};
 
 	useEffect(() => {
 		backButton.show();
-
 		backButton.onClick(onBackButton);
+
+		if (set === "campaign-preferred") {
+			mainButton.show();
+
+			mainButton.setText("Done");
+
+			mainButton.onClick(onBackButton);
+		}
 
 		invokeHapticFeedbackImpact("medium");
 
 		return () => {
 			backButton.hide();
-
 			backButton.offClick(onBackButton);
+
+			if (set === "campaign-preferred") {
+				mainButton.hide();
+				mainButton.offClick(onBackButton);
+			}
 		};
-	}, []);
+	}, [set, navigate, invokeHapticFeedbackImpact]);
+
+	useEffect(() => {
+		mainButton.setText(
+			preferredCategoryIds.length > 0
+				? `Select ${preferredCategoryIds.length} Categories`
+				: "Done",
+		);
+	}, [preferredCategoryIds]);
 
 	return (
 		<div className="SelectCategory scrollable">
@@ -57,7 +100,11 @@ function SelectCategory() {
 								<div className="subtitle">{category.description}</div>
 							</div>
 							<div className="meta">
-								<ChevronRight />
+								{set === "campaign-preferred" ? (
+									preferredCategoryIds.includes(category.id) && <CheckIcon />
+								) : (
+									<ChevronRight />
+								)}
 							</div>
 						</div>
 					))}

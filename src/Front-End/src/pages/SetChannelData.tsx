@@ -15,6 +15,7 @@ import {
 	TagIcon,
 } from "lucide-react";
 import useChannelStore, {
+	AdFormats,
 	PriceTypes,
 	type Channel,
 } from "../stores/useChannelStore";
@@ -22,8 +23,6 @@ import Menu, { DropdownMenu, MenuItem } from "../components/Menu";
 import TextTransition from "../components/TextTransition";
 import { requestAPI } from "../utils/api";
 import useUIStore from "../stores/useUIStore";
-
-const AdFormats = ["Post"];
 
 function SetChannelData() {
 	const {
@@ -48,11 +47,11 @@ function SetChannelData() {
 	};
 
 	const onSelectCategory = () => {
-		navigate("/select-category");
+		navigate("/select-category/channel");
 	};
 
 	const handleSave = async () => {
-		if (!draftChannel.pricing) return;
+		if (!draftChannel.pricings) return;
 
 		try {
 			if (!draftChannel.chat_id) {
@@ -71,7 +70,7 @@ function SetChannelData() {
 			{
 				chat_id: draftChannel.chat_id,
 				category_id: draftChannel.category_id,
-				pricings: draftChannel.pricing.map((item) => ({
+				pricings: draftChannel.pricings.map((item) => ({
 					ad_format: item.ad_format + 1,
 					price_type: item.price_type + 1,
 					price_ton: item.price_ton,
@@ -117,7 +116,7 @@ function SetChannelData() {
 		return () => mainButton.offClick(handleSave);
 	}, [draftChannel]);
 
-	const allPriceTypes = draftChannel.pricing?.map((item) => item.price_type);
+	const allPriceTypes = draftChannel.pricings?.map((item) => item.price_type);
 
 	return (
 		<div className="SetChannelData scrollable">
@@ -161,7 +160,7 @@ function SetChannelData() {
 			</div>
 			<div className="Section Pricing">
 				<div className="title">Pricing</div>
-				{draftChannel.pricing?.map((item, index) => {
+				{draftChannel.pricings?.map((item, index) => {
 					const availablePriceType = PriceTypes.filter(
 						(type, i) =>
 							!allPriceTypes!.includes(i) ||
@@ -169,7 +168,8 @@ function SetChannelData() {
 					);
 
 					return (
-						<div className="Items" key={Math.random()}>
+						// biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
+						<div className="Items" key={index}>
 							<div className="Item">
 								<div className="icon">
 									<DollarSignIcon />
@@ -189,8 +189,8 @@ function SetChannelData() {
 								<div className="meta">TON</div>
 							</div>
 							<Menu
-								custom={
-									<div className="Item">
+								custom={({ onClick }) => (
+									<div className="Item" onClick={onClick}>
 										<div className="icon">
 											<ClockIcon />
 										</div>
@@ -202,7 +202,7 @@ function SetChannelData() {
 											<ChevronDown />
 										</div>
 									</div>
-								}
+								)}
 							>
 								<DropdownMenu className="right">
 									{availablePriceType.map((type) => (
@@ -220,8 +220,8 @@ function SetChannelData() {
 								</DropdownMenu>
 							</Menu>
 							<Menu
-								custom={
-									<div className="Item">
+								custom={({ onClick }) => (
+									<div className="Item" onClick={onClick}>
 										<div className="icon">
 											<SendHorizontalIcon />
 										</div>
@@ -233,7 +233,7 @@ function SetChannelData() {
 											<ChevronDown />
 										</div>
 									</div>
-								}
+								)}
 							>
 								<DropdownMenu className="right">
 									{AdFormats.map((format, i) => (
@@ -250,7 +250,7 @@ function SetChannelData() {
 				})}
 			</div>
 			<div className="Section">
-				{draftChannel.pricing!.length < PriceTypes.length && (
+				{(draftChannel.pricings?.length ?? 0) < PriceTypes.length && (
 					<div className="Items">
 						<div
 							className="Item primary"

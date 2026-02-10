@@ -7,17 +7,17 @@ import { useNavigate } from "react-router-dom";
 import Transition from "../components/Transition";
 import { backButton } from "@tma.js/sdk-react";
 import { invokeHapticFeedbackImpact } from "../utils/common";
-import useChannelStore from "../stores/useChannelStore";
+import useCampaignStore from "../stores/useCampaignStore";
 
-const ChannelStatus: { [key: number]: string } = {
+const CampaignStatus: { [key: number]: string } = {
 	0: "Pending",
 	1: "Pending",
 	2: "Active",
 	3: "Inactive",
 };
 
-function MyChannels() {
-	const { myChannels, getMyChannels } = useChannelStore();
+function MyCampaigns() {
+	const { myCampaigns, getMyCampaigns } = useCampaignStore();
 
 	const navigate = useNavigate();
 
@@ -32,7 +32,7 @@ function MyChannels() {
 
 		invokeHapticFeedbackImpact("medium");
 
-		getMyChannels();
+		getMyCampaigns();
 
 		return () => {
 			backButton.hide();
@@ -44,42 +44,40 @@ function MyChannels() {
 	return (
 		<div className="MyChannels">
 			<PageHeader>
-				<PageHeaderTitle>My Channels</PageHeaderTitle>
+				<PageHeaderTitle>My Campaigns</PageHeaderTitle>
 			</PageHeader>
 
 			<div className="ChatList">
-				<div className="Item primary" onClick={() => navigate("/add-channel")}>
-					<div className="icon">
-						<PlusIcon />
+				<Transition state eachElement eachElementDelay={20}>
+					<div
+						className="Item primary"
+						onClick={() => navigate("/add-campaign")}
+					>
+						<div className="icon">
+							<PlusIcon />
+						</div>
+						<div className="title">Add Your Campaign</div>
 					</div>
-					<div className="title">Add Your Channel</div>
-				</div>
-				<Transition
-					state
-					eachElement
-					eachElementDelay={40}
-					key={myChannels?.length}
-				>
-					{myChannels.map((channel) => (
+					{myCampaigns.map((campaign) => (
 						<div
-							key={channel.chat_id}
+							key={campaign.id}
 							className="ChatItem"
-							onClick={() => navigate("/set-channel-data")}
+							onClick={() => navigate("/set-campaign-data")}
 						>
-							<Avatar id={channel.chat_id} title={channel.title} photo="" />
+							<Avatar id={campaign.id!} isCampaign />
 							<div className="body">
-								<div className="title">{channel.title}</div>
-								<div className="subtitle">{channel.chat_id}</div>
+								<div className="title">{campaign.title}</div>
+								<div className="subtitle">{campaign.description}</div>
 							</div>
-							<div className="meta">{ChannelStatus[channel.status]}</div>
+							<div className="meta">{CampaignStatus[campaign.status]}</div>
 						</div>
 					))}
 				</Transition>
 			</div>
 
-			<div className="NoChannel"></div>
+			<div className="NoCampaign"></div>
 		</div>
 	);
 }
 
-export default memo(MyChannels);
+export default memo(MyCampaigns);

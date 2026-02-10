@@ -12,14 +12,20 @@ export type Category = {
 type CategoryState = {
 	categories: Category[];
 	getCategories: () => Promise<void>;
+	getCategory: (id: string) => Category | undefined;
 };
 
-const useCategoryStore = create<CategoryState>((set) => ({
+const useCategoryStore = create<CategoryState>((set, get) => ({
 	categories: [],
 	async getCategories() {
 		const response = await requestAPI("/api/categories", {}, "GET");
 
 		set({ categories: response.value });
+	},
+	getCategory(id: string) {
+		const category = get().categories.find((cat) => cat.id === id);
+
+		return category;
 	},
 }));
 

@@ -18,7 +18,7 @@ function AddChannel() {
 	const navigate = useNavigate();
 
 	const onBackButton = () => {
-		navigate("/my-channels");
+		window.history.back();
 	};
 
 	const onSelectChannel = () => {

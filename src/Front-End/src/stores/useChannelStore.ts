@@ -2,12 +2,13 @@ import { create } from "zustand";
 import { requestAPI } from "../utils/api";
 import type { Category } from "./useCategoryStore";
 
+export const AdFormats = ["Post"];
 export const PriceTypes = ["Per hour", "Per day", "Per 1000 views"];
 
 export type Channel = {
 	id?: string;
 	chat_id: number;
-	category_id: number;
+	category_id: string;
 	category?: {
 		id: string;
 		name: string;
@@ -17,8 +18,17 @@ export type Channel = {
 	};
 	title: string;
 	username?: string;
+	description?: string;
+	subscriber_count: number;
+	average_views: number;
+	language_distribution_json: [
+		{
+			language: string;
+			percentage: number;
+		},
+	];
 	status: number;
-	pricing: {
+	pricings: {
 		ad_format: number;
 		price_type: number;
 		price_ton: number;
@@ -57,7 +67,7 @@ type ChannelState = {
 const useChannelStore = create<ChannelState>((set, get) => ({
 	myChannels: [],
 	draftChannel: {
-		pricing: [
+		pricings: [
 			{
 				ad_format: 0,
 				price_type: 0,
@@ -100,7 +110,7 @@ const useChannelStore = create<ChannelState>((set, get) => ({
 	clearDraftChannel() {
 		set({
 			draftChannel: {
-				pricing: [
+				pricings: [
 					{
 						ad_format: 0,
 						price_type: 0,
@@ -120,7 +130,7 @@ const useChannelStore = create<ChannelState>((set, get) => ({
 		}));
 	},
 	addDraftChannelPrice() {
-		const allPriceTypes = get().draftChannel.pricing?.map(
+		const allPriceTypes = get().draftChannel.pricings?.map(
 			(item) => item.price_type,
 		);
 
@@ -131,8 +141,8 @@ const useChannelStore = create<ChannelState>((set, get) => ({
 		set((state) => ({
 			draftChannel: {
 				...state.draftChannel,
-				pricing: [
-					...(state.draftChannel.pricing ?? []),
+				pricings: [
+					...(state.draftChannel.pricings ?? []),
 					{
 						ad_format: 0,
 						price_type: PriceTypes.indexOf(availablePriceType[0]),
@@ -146,7 +156,7 @@ const useChannelStore = create<ChannelState>((set, get) => ({
 		set((state) => ({
 			draftChannel: {
 				...state.draftChannel,
-				pricing: state.draftChannel.pricing?.map((item, i) =>
+				pricings: state.draftChannel.pricings?.map((item, i) =>
 					i === index ? { ...item, price_type: priceType } : item,
 				),
 			},
@@ -156,7 +166,7 @@ const useChannelStore = create<ChannelState>((set, get) => ({
 		set((state) => ({
 			draftChannel: {
 				...state.draftChannel,
-				pricing: state.draftChannel.pricing?.map((item, i) =>
+				pricings: state.draftChannel.pricings?.map((item, i) =>
 					i === index ? { ...item, ad_format: adFormat } : item,
 				),
 			},
@@ -168,7 +178,7 @@ const useChannelStore = create<ChannelState>((set, get) => ({
 		set((state) => ({
 			draftChannel: {
 				...state.draftChannel,
-				pricing: state.draftChannel.pricing?.map((item, i) =>
+				pricings: state.draftChannel.pricings?.map((item, i) =>
 					i === index ? { ...item, price_ton: priceTon } : item,
 				),
 			},

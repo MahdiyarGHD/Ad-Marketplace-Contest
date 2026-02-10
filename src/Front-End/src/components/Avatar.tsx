@@ -1,23 +1,27 @@
 import { memo } from "react";
 import { buildClassName } from "../utils/common";
 import Transition from "./Transition";
+import { MegaphoneIcon } from "lucide-react";
 
 function Avatar({
 	id,
 	title,
 	photo,
 	size = 48,
+	isCampaign = false,
 }: {
 	id: string | number;
-	title: string;
+	title?: string;
 	photo?: string;
 	size?: number;
+	isCampaign?: boolean;
 }) {
 	return (
 		<div
 			className={buildClassName(
 				"Avatar",
 				`peer-color-${getPeerColorIndexById(getPeerIdFromChatId(id))}`,
+				isCampaign && "campaign",
 			)}
 			style={{
 				width: size,
@@ -25,7 +29,15 @@ function Avatar({
 				fontSize: size / 2,
 			}}
 		>
-			<span>{title ? Array.from(title.toString())[0].toUpperCase() : ""}</span>
+			{isCampaign ? (
+				<div className="campaign-icon">
+					<MegaphoneIcon />
+				</div>
+			) : (
+				<span>
+					{title ? Array.from(title.toString())[0].toUpperCase() : ""}
+				</span>
+			)}
 			<Transition state={!!photo}>
 				<img
 					style={{ width: size, height: size }}
