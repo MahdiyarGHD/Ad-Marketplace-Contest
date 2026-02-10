@@ -13,6 +13,7 @@ using AdMarketplace.Infra.Services.ChannelServices;
 using AdMarketplace.Infra.Services.TelegramServices;
 using AdMarketplace.Infra.Services.UserServices;
 using AdMarketplace.Workers.ChannelAnalytics;
+using AdMarketplace.Workers.ChannelReadiness;
 using AdMarketplace.Workers.DealLifecycle;
 using FastEndpoints.Security;
 using Microsoft.EntityFrameworkCore;
@@ -51,6 +52,7 @@ public static class ServiceCollectionExtensions
             services.AddHostedService<DealAutoCancelWorker>();
             services.AddHostedService<AutoPostingWorker>();
             services.AddHostedService<PostVerificationWorker>();
+            services.AddHostedService<ChannelReadinessWorker>();
 
 
             return services;

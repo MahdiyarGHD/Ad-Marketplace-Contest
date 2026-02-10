@@ -23,6 +23,7 @@ public class Channel : IDateTimeSchema
     
     public DateTimeOffset CreatedAt { get; private init; }
     public DateTimeOffset? UpdatedAt { get; private set; }
+    public DateTimeOffset? LastReadinessCheckAt { get; private set; }
     
     
     // Navigation properties
@@ -117,5 +118,10 @@ public class Channel : IDateTimeSchema
     {
         AgentId = null;
         UpdatedAt = DateTimeOffset.UtcNow;
+    }
+
+    public void MarkReadinessChecked()
+    {
+        LastReadinessCheckAt = DateTimeOffset.UtcNow;
     }
 }

@@ -7,7 +7,10 @@
       - TelegramBot__Token=${TELEGRAM_TOKEN}
       - TelegramBot__BotApiServer=https://api.telegram.org
       - TelegramBot__WebhookUrl=${WEBHOOK_URL}
-      - ConnectionStrings__Main=Host=postgres;Port=5432;Database=AdMarketplace;Userna>
+      - TelegramBot__SecretToken=${BOT_SECRET_TOKEN}
+      - TelegramApi__Credentials__0__ApiId=${TELEGRAM_API_ID}
+      - TelegramApi__Credentials__0__ApiHash=${TELEGRAM_API_HASH}
+      - ConnectionStrings__Main=Host=postgres;Port=5432;Database=AdMarketplace;Username=postgres;Password=postgres;Include Error Detail=true;
       - UNBUFFERED=1
       - DOTNET_LOGGING__CONSOLE__DISABLECOLORS=true
       - ASPNETCORE_ENVIRONMENT=Development
