@@ -139,7 +139,7 @@ function ChannelProfile() {
 									</Shimmer>
 									<div className="subtitle">Price</div>
 								</div>
-								<div>
+								<div className="flex-1">
 									<Shimmer className="title" state={!!price?.price_type}>
 										{PriceTypes[price?.price_type - 1]}
 									</Shimmer>

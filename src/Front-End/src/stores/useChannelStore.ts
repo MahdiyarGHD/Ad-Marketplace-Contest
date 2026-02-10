@@ -45,6 +45,7 @@ type ChannelState = {
 	setDraftChannel: (channel: Channel) => void;
 	clearDraftChannel: () => void;
 	addDraftChannelPrice: () => void;
+	removeDraftChannelPrice: (index: number) => void;
 	setDraftChannelCategory: (category: any) => void;
 	setDraftChannelPriceType: (priceType: number, index: number) => void;
 	setDraftChannelAdFormat: (adFormat: number, index: number) => void;
@@ -149,6 +150,14 @@ const useChannelStore = create<ChannelState>((set, get) => ({
 						price_ton: 0,
 					},
 				],
+			},
+		}));
+	},
+	removeDraftChannelPrice(index: number) {
+		set((state) => ({
+			draftChannel: {
+				...state.draftChannel,
+				pricings: state.draftChannel.pricings?.filter((_, i) => i !== index),
 			},
 		}));
 	},

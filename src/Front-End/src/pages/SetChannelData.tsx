@@ -29,6 +29,7 @@ function SetChannelData() {
 		draftChannel,
 		clearDraftChannel,
 		addDraftChannelPrice,
+		removeDraftChannelPrice,
 		setDraftChannelPrice,
 		setDraftChannelPriceType,
 		setDraftChannelAdFormat,
@@ -245,6 +246,17 @@ function SetChannelData() {
 									))}
 								</DropdownMenu>
 							</Menu>
+							{index !== 0 && (
+								<div
+									className="Item destructive"
+									onClick={() => removeDraftChannelPrice(index)}
+								>
+									<div className="icon"></div>
+									<div className="body">
+										<div className="title">Remove Price...</div>
+									</div>
+								</div>
+							)}
 						</div>
 					);
 				})}

@@ -19,28 +19,28 @@
 	font-family: "SF Pro Text";
 	font-style: normal;
 	font-weight: 300;
-	src: url("https://raw.githubusercontent.com/blaisck/sfwin/master/SFPro/TrueType/SFProText-Light.ttf");
+	src: url(./assets/fonts/SFProText/SFProText-Light.ttf);
 }
 
 @font-face {
 	font-family: "SF Pro Text";
 	font-style: normal;
 	font-weight: 400;
-	src: url("https://raw.githubusercontent.com/blaisck/sfwin/master/SFPro/TrueType/SFProText-Regular.ttf");
+	src: url(./assets/fonts/SFProText/SFProText-Regular.ttf);
 }
 
 @font-face {
 	font-family: "SF Pro Text";
 	font-style: normal;
 	font-weight: 500;
-	src: url("https://raw.githubusercontent.com/blaisck/sfwin/master/SFPro/TrueType/SFProText-Medium.ttf");
+	src: url(./assets/fonts/SFProText/SFProText-Medium.ttf);
 }
 
 @font-face {
 	font-family: "SF Pro Text";
 	font-style: normal;
 	font-weight: 600;
-	src: url("https://raw.githubusercontent.com/blaisck/sfwin/master/SFPro/TrueType/SFProText-SemiBold.ttf");
+	src: url(./assets/fonts/SFProText/SFProText-SemiBold.ttf);
 }
 
 * {
@@ -99,6 +99,7 @@ body {
 	--secondary-background: #0001;
 	--shimmer-color-1: #0004;
 	--shimmer-color-2: #000;
+	--dropdown-bg: var(--tg-theme-secondary-bg-color, #fff);
 
 	--topbar-height: 60px;
 
@@ -120,6 +121,7 @@ body[data-theme="dark"] {
 	--secondary-background: #fff1;
 	--shimmer-color-1: #fff5;
 	--shimmer-color-2: #fff;
+	--dropdown-bg: var(--tg-theme-secondary-bg-color, #111);
 }
 
 .Mobile[data-theme="dark"] {

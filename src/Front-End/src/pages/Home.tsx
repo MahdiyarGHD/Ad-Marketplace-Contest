@@ -13,7 +13,7 @@ import {
 import "./Home.scss";
 import Transition from "../components/Transition";
 import Tabs, { TabContent } from "../components/Tabs";
-import { buildClassName } from "../utils/common";
+import { buildClassName, invokeHapticFeedbackImpact } from "../utils/common";
 import useCategoryStore, { type Category } from "../stores/useCategoryStore";
 import useChannelStore, { type Channel } from "../stores/useChannelStore";
 import Avatar from "../components/Avatar";
@@ -82,7 +82,16 @@ function Home() {
 				<PageHeaderTitle>Ad Marketplace</PageHeaderTitle>
 				<PageHeaderButtons>
 					<div className="Add">
-						<Menu custom={({ onClick }) => <PlusIcon onClick={onClick} />}>
+						<Menu
+							custom={({ onClick }) => (
+								<PlusIcon
+									onClick={() => {
+										onClick();
+										invokeHapticFeedbackImpact("light");
+									}}
+								/>
+							)}
+						>
 							<DropdownMenu className="right">
 								<MenuItem
 									title="Add Channel"

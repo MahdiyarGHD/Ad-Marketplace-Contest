@@ -33,7 +33,7 @@ function AddCampaign() {
 	const navigate = useNavigate();
 
 	const onBackButton = () => {
-		navigate("/my-campaigns");
+		window.history.back();
 	};
 
 	const onSelectCategory = () => {
