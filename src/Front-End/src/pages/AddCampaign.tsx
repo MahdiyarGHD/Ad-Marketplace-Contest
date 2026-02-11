@@ -17,8 +17,6 @@ import TextTransition from "../components/TextTransition";
 import { requestAPI } from "../utils/api";
 import useUIStore from "../stores/useUIStore";
 import useCampaignStore, { type Campaign } from "../stores/useCampaignStore";
-import { DayPicker } from "react-day-picker";
-import MainButton from "../components/MainButton";
 import DatePicker from "../components/DatePicker";
 
 const AdFormats = ["Post"];

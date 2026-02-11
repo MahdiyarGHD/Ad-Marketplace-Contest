@@ -12,7 +12,7 @@ import { useShallow } from "zustand/shallow";
 import useUIStore from "../../stores/useUIStore";
 
 function SelectCategory() {
-	const { categories } = useCategoryStore();
+	const { categories, getCategories } = useCategoryStore();
 	const { setDraftChannelCategory } = useChannelStore();
 	const { setDraftCampaignCategory, setDraftCampaignPreferredCategory } =
 		useCampaignStore();
@@ -47,6 +47,12 @@ function SelectCategory() {
 				break;
 		}
 	};
+
+	useEffect(() => {
+		if (!categories?.length) {
+			getCategories();
+		}
+	}, []);
 
 	useEffect(() => {
 		backButton.show();

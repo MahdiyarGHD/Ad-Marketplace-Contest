@@ -145,7 +145,7 @@ function Home() {
 							<div
 								className={buildClassName(
 									"Items",
-									element.label === "Top Picks" && "row",
+									element.label === "Top Picks" && "row scrollable x",
 								)}
 							>
 								<Transition state eachElement eachElementDelay={40}>

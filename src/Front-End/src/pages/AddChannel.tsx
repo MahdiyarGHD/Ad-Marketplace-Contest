@@ -39,6 +39,10 @@ function AddChannel() {
 		});
 	};
 
+	const onDone = () => {
+		navigate("/my-channels");
+	};
+
 	useEffect(() => {
 		useUIStore.setState({
 			mainButton: {
@@ -67,6 +71,13 @@ function AddChannel() {
 			}, 5000);
 
 			return () => clearInterval(interval);
+		} else if (currentStatus === "success") {
+			useUIStore.setState({
+				mainButton: {
+					text: "Done",
+					onClick: onDone,
+				},
+			});
 		}
 	}, [currentStatus]);
 
