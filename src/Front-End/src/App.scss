@@ -347,6 +347,45 @@ body {
     .ChatItem {
         gap: 1rem;
     }
+
+    &.row {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        // scrollbar-width: none;
+
+        .ChatItem {
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            flex: none;
+            gap: .5rem;
+            padding: .5rem;
+            overflow: hidden;
+            scroll-snap-align: center;
+            
+            
+            .body {
+                width: 6rem;
+                text-overflow: ellipsis;
+                overflow: hidden;
+
+                .title {
+                    text-overflow: ellipsis;
+                    overflow: hidden;
+                    text-align: center;
+                    white-space: nowrap;
+                }
+            }
+
+            .meta {
+                display: none;
+            }
+        }
+    }
 }
 
 .ChatList {
@@ -379,6 +418,9 @@ body {
             .subtitle {
                 font-size: 1rem;
                 color: var(--secondary-text);
+                display: flex;
+                align-items: center;
+                line-height: 1.2;
             }
         }
     }
@@ -551,6 +593,10 @@ textarea {
 
 .scrollable {
     overflow-y: auto;
+}
+
+.pointer {
+    cursor: pointer;
 }
 
 .Menu {

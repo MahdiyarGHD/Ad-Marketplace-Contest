@@ -11,12 +11,12 @@ import useChannelStore, {
 	PriceTypes,
 } from "../../stores/useChannelStore";
 import { useShallow } from "zustand/shallow";
-import { backButton } from "@tma.js/sdk-react";
+import { backButton, openTelegramLink } from "@tma.js/sdk-react";
 import { buildClassName, invokeHapticFeedbackImpact } from "../../utils/common";
 import "../Statistics.scss";
 import { Shimmer } from "../../components/Shimmer";
 import Transition from "../../components/Transition";
-import { TagIcon } from "lucide-react";
+import { ChevronRightIcon, TagIcon } from "lucide-react";
 import useCategoryStore from "../../stores/useCategoryStore";
 
 function ChannelProfile() {
@@ -71,89 +71,97 @@ function ChannelProfile() {
 	}, [id]);
 
 	return (
-		<div className="ChannelProfile Profile">
-			<PageHeader>
-				<PageHeaderTitle>Profile</PageHeaderTitle>
-				<PageHeaderButtons />
-			</PageHeader>
+		<div className="scrollable">
+			<div className="ChannelProfile Profile">
+				<PageHeader>
+					<PageHeaderTitle>Profile</PageHeaderTitle>
+					<PageHeaderButtons />
+				</PageHeader>
 
-			<div className="Chat">
-				<Avatar id={chat_id!} title={title ?? "C"} photo="" size={80} />
-				<div className="info">
-					<div className={buildClassName("title", !title && "Shimmer")}>
-						{title}
-					</div>
-					<div className="subtitle">
-						{username ? `@${username}` : "private channel"}
-					</div>
-				</div>
-			</div>
-
-			<div className="Items">
-				<div
-					className="Item"
-					onClick={() => navigate(`/category/${category_id}`)}
-				>
-					<div className="icon">{category?.icon ?? <TagIcon />}</div>
-					<div className="body">
-						<Shimmer className="title">{category?.name}</Shimmer>
+				<div className="Chat">
+					<Avatar id={chat_id!} title={title ?? "C"} photo="" size={80} />
+					<div className="info">
+						<div className={buildClassName("title", !title && "Shimmer")}>
+							{title}
+						</div>
+						<div
+							className="subtitle pointer"
+							onClick={() =>
+								username && openTelegramLink(`https://t.me/${username}`)
+							}
+						>
+							{username ? `@${username}` : "private channel"}{" "}
+							{username && <ChevronRightIcon size={18} />}
+						</div>
 					</div>
 				</div>
-			</div>
 
-			<div className="Statistics">
-				<div className="Item">
-					<Shimmer className="title">
-						<span>{subscriber_count}</span>
-					</Shimmer>
-					<div className="subtitle">Subscribers</div>
-				</div>
-				<div className="Item">
-					<Shimmer className="title" state={!!average_views}>
-						<span>{average_views}</span>
-					</Shimmer>
-					<div className="subtitle">Average Views</div>
-				</div>
-			</div>
-			<div className="Section">
-				<div className="title">Pricing</div>
-				<div
-					className={buildClassName(
-						"StatItems",
-						!pricings?.length && "loading",
-					)}
-				>
-					<Transition
-						state
-						key={pricings?.length}
-						eachElement
-						eachElementDelay={100}
+				<div className="Items">
+					<div
+						className="Item"
+						onClick={() => navigate(`/category/${category_id}`)}
 					>
-						{(pricings ?? Array.from({ length: 1 })).map((price, index) => (
-							// biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
-							<div className="Item" key={index}>
-								<div className="flex-1">
-									{/* <DollarSign /> */}
-									<Shimmer className="title" state={!!price?.price_ton}>
-										{price?.price_ton} TON
-									</Shimmer>
-									<div className="subtitle">Price</div>
+						<div className="icon">{category?.icon ?? <TagIcon />}</div>
+						<div className="body">
+							<Shimmer className="title">{category?.name}</Shimmer>
+						</div>
+					</div>
+				</div>
+
+				<div className="Statistics">
+					<div className="Item">
+						<Shimmer className="title">
+							<span>{subscriber_count}</span>
+						</Shimmer>
+						<div className="subtitle">Subscribers</div>
+					</div>
+					<div className="Item">
+						<Shimmer className="title" state={!!average_views}>
+							<span>{average_views}</span>
+						</Shimmer>
+						<div className="subtitle">Average Views</div>
+					</div>
+				</div>
+				<div className="Section">
+					<div className="title">Pricing</div>
+					<div
+						className={buildClassName(
+							"StatItems",
+							!pricings?.length && "loading",
+						)}
+					>
+						<Transition
+							state
+							key={pricings?.length}
+							eachElement
+							eachElementDelay={100}
+						>
+							{(pricings ?? Array.from({ length: 1 })).map((price, index) => (
+								// biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
+								<div className="Item" key={index}>
+									<div className="flex-1">
+										{/* <DollarSign /> */}
+										<Shimmer className="title" state={!!price?.price_ton}>
+											{price?.price_ton} TON
+										</Shimmer>
+										<div className="subtitle">Price</div>
+									</div>
+									<div className="flex-1">
+										<Shimmer className="title" state={!!price?.price_type}>
+											{PriceTypes[price?.price_type - 1]}
+										</Shimmer>
+										<div className="subtitle">Price type</div>
+									</div>
+									<div>
+										<Shimmer className="title" state={!!price?.ad_format}>
+											{AdFormats[price?.ad_format - 1]}
+										</Shimmer>
+										<div className="subtitle">Ad format</div>
+									</div>
 								</div>
-								<div className="flex-1">
-									<Shimmer className="title" state={!!price?.price_type}>
-										{PriceTypes[price?.price_type - 1]}
-									</Shimmer>
-									<div className="subtitle">Price type</div>
-								</div>
-								<div>
-									<Shimmer className="title" state={!!price?.ad_format}>
-										{AdFormats[price?.ad_format - 1]}
-									</Shimmer>
-									<div className="subtitle">Ad format</div>
-								</div>
-							</div>
-						))}
-					</Transition>
+							))}
+						</Transition>
+					</div>
 				</div>
 			</div>
 		</div>

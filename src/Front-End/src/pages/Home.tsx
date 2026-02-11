@@ -67,7 +67,7 @@ function Home() {
 			<Avatar id={channel.chat_id} title={channel.title} photo="" />
 			<div className="body">
 				<div className="title">{channel.title}</div>
-				{/* <div className="subtitle">Description</div> */}
+				<div className="subtitle">{channel.subscriber_count} subscribers</div>
 			</div>
 			<div className="meta">
 				{/* <div className="count">12</div> */}
@@ -142,7 +142,12 @@ function Home() {
 									Show All <ChevronRight size={18} />
 								</div>
 							</div>
-							<div className="Items">
+							<div
+								className={buildClassName(
+									"Items",
+									element.label === "Top Picks" && "row",
+								)}
+							>
 								<Transition state eachElement eachElementDelay={40}>
 									{element.items.map((item) =>
 										element.$type === "channel"
