@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import "react-day-picker/style.css";
 import "./App.scss";
 import {
 	backButton,

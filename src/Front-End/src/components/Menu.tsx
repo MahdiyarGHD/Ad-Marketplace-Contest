@@ -115,7 +115,11 @@ const Menu = forwardRef(
 		return (
 			<>
 				<Transition state={isActive}>
-					<div ref={bg} className="bg animate" onClick={handleOpenMenu}></div>
+					<div
+						ref={bg}
+						className="bg transparent animate"
+						onClick={handleOpenMenu}
+					></div>
 				</Transition>
 				<div className="Menu" ref={menu}>
 					{/* {icon && <Icon iconNode={icon} onClick={handleOpenMenu} />} */}

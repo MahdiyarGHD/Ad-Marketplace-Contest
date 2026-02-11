@@ -1,4 +1,4 @@
-import { memo, useEffect } from "react";
+import { memo, useEffect, useState } from "react";
 import { backButton } from "@tma.js/sdk-react";
 import { invokeHapticFeedbackImpact } from "../utils/common";
 import { useNavigate } from "react-router";
@@ -17,10 +17,15 @@ import TextTransition from "../components/TextTransition";
 import { requestAPI } from "../utils/api";
 import useUIStore from "../stores/useUIStore";
 import useCampaignStore, { type Campaign } from "../stores/useCampaignStore";
+import { DayPicker } from "react-day-picker";
+import MainButton from "../components/MainButton";
+import DatePicker from "../components/DatePicker";
 
 const AdFormats = ["Post"];
 
 function AddCampaign() {
+	const [showDatePicker, setShowDatePicker] = useState(false);
+
 	const {
 		draftCampaign,
 		setDraftCampaign,
@@ -189,8 +194,32 @@ function AddCampaign() {
 						<div className="body multiline">
 							<div className="title">Subscribers Count</div>
 							<div className="flex">
-								<input type="text" placeholder="Min" />
-								<input type="text" placeholder="Max" />
+								<input
+									type="text"
+									placeholder="Min"
+									value={draftCampaign.targeting?.min_subscribers}
+									onChange={(e) =>
+										setDraftCampaign({
+											targeting: {
+												...draftCampaign.targeting,
+												min_subscribers: Number(e.target.value),
+											},
+										})
+									}
+								/>
+								<input
+									type="text"
+									placeholder="Max"
+									value={draftCampaign.targeting?.max_subscribers}
+									onChange={(e) =>
+										setDraftCampaign({
+											targeting: {
+												...draftCampaign.targeting,
+												max_subscribers: Number(e.target.value),
+											},
+										})
+									}
+								/>
 							</div>
 						</div>
 					</div>
@@ -199,7 +228,19 @@ function AddCampaign() {
 							<div className="title">Min Average Views</div>
 						</div>
 						<div className="meta">
-							<input type="text" placeholder="0" />
+							<input
+								type="text"
+								placeholder="0"
+								value={draftCampaign.targeting?.min_average_views}
+								onChange={(e) =>
+									setDraftCampaign({
+										targeting: {
+											...draftCampaign.targeting,
+											min_average_views: Number(e.target.value),
+										},
+									})
+								}
+							/>
 							<span>Views</span>
 						</div>
 					</div>
@@ -208,7 +249,19 @@ function AddCampaign() {
 							<div className="title">Min Premium Users</div>
 						</div>
 						<div className="meta">
-							<input type="text" placeholder="0" />
+							<input
+								type="text"
+								placeholder="0"
+								value={draftCampaign.targeting?.min_premium_count}
+								onChange={(e) =>
+									setDraftCampaign({
+										targeting: {
+											...draftCampaign.targeting,
+											min_premium_count: Number(e.target.value),
+										},
+									})
+								}
+							/>
 							<span>Users</span>
 						</div>
 					</div>
@@ -299,6 +352,39 @@ function AddCampaign() {
 							))}
 						</DropdownMenu>
 					</Menu>
+				</div>
+				<div className="Section">
+					<div className="Items">
+						<div className="Item" onClick={() => setShowDatePicker(true)}>
+							<div className="body">
+								<div className="title">Select Date</div>
+							</div>
+							<div className="meta">
+								{new Date(draftCampaign.starts_at).toLocaleDateString()} -{" "}
+								{new Date(draftCampaign.ends_at).toLocaleDateString()}
+							</div>
+						</div>
+						<DatePicker
+							show={showDatePicker}
+							title="Select Date"
+							selected={
+								draftCampaign.starts_at
+									? {
+											from: new Date(draftCampaign.starts_at),
+											to: new Date(draftCampaign.ends_at),
+										}
+									: undefined
+							}
+							onSelect={(date) =>
+								setDraftCampaign({
+									...draftCampaign,
+									starts_at: date?.from?.toISOString(),
+									ends_at: date?.to?.toISOString(),
+								})
+							}
+							onClose={() => setShowDatePicker(false)}
+						/>
+					</div>
 				</div>
 			</div>
 		</div>
