@@ -1,5 +1,5 @@
 import { memo, useEffect } from "react";
-import { backButton, mainButton } from "@tma.js/sdk-react";
+import { backButton } from "@tma.js/sdk-react";
 import { invokeHapticFeedbackImpact } from "../utils/common";
 import { useNavigate } from "react-router";
 import "./SetChannelData.scss";

@@ -4,7 +4,6 @@ import {
 	backButton,
 	init,
 	isTMA,
-	mainButton,
 	miniApp,
 	retrieveLaunchParams,
 	retrieveRawInitData,

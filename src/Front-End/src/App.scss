@@ -130,7 +130,6 @@ body {
     transition: transform 0.2s ease;
 
     &:active {
-        // background-color: var(--tg-theme-button-color-hover);
         transform: scale(.98);
     }
 }

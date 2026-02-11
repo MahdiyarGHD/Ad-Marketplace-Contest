@@ -5,7 +5,7 @@ import useCategoryStore from "../../stores/useCategoryStore";
 import { memo, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { invokeHapticFeedbackImpact } from "../../utils/common";
-import { backButton, mainButton } from "@tma.js/sdk-react";
+import { backButton } from "@tma.js/sdk-react";
 import useChannelStore from "../../stores/useChannelStore";
 import useCampaignStore from "../../stores/useCampaignStore";
 import { useShallow } from "zustand/shallow";
