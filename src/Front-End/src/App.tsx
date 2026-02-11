@@ -64,9 +64,9 @@ function App() {
 				if (!themeParams.isCssVarsBound()) themeParams.bindCssVars();
 			}
 
-			if (!mainButton.isMounted() && mainButton.mount.isAvailable()) {
-				mainButton.mount();
-			}
+			// if (!mainButton.isMounted() && mainButton.mount.isAvailable()) {
+			// 	mainButton.mount();
+			// }
 
 			if (backButton.mount.isAvailable()) backButton.mount();
 		}

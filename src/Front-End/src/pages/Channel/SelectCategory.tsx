@@ -9,6 +9,7 @@ import { backButton, mainButton } from "@tma.js/sdk-react";
 import useChannelStore from "../../stores/useChannelStore";
 import useCampaignStore from "../../stores/useCampaignStore";
 import { useShallow } from "zustand/shallow";
+import useUIStore from "../../stores/useUIStore";
 
 function SelectCategory() {
 	const { categories } = useCategoryStore();
@@ -52,11 +53,12 @@ function SelectCategory() {
 		backButton.onClick(onBackButton);
 
 		if (set === "campaign-preferred") {
-			mainButton.show();
-
-			mainButton.setText("Done");
-
-			mainButton.onClick(onBackButton);
+			useUIStore.setState({
+				mainButton: {
+					text: "Retry",
+					onClick: onBackButton,
+				},
+			});
 		}
 
 		invokeHapticFeedbackImpact("medium");
@@ -64,20 +66,19 @@ function SelectCategory() {
 		return () => {
 			backButton.hide();
 			backButton.offClick(onBackButton);
-
-			if (set === "campaign-preferred") {
-				mainButton.hide();
-				mainButton.offClick(onBackButton);
-			}
 		};
 	}, [set, navigate, invokeHapticFeedbackImpact]);
 
 	useEffect(() => {
-		mainButton.setText(
-			preferredCategoryIds.length > 0
-				? `Select ${preferredCategoryIds.length} Categories`
-				: "Done",
-		);
+		useUIStore.setState({
+			mainButton: {
+				text:
+					preferredCategoryIds.length > 0
+						? `Select ${preferredCategoryIds.length} Categories`
+						: "Done",
+				onClick: onBackButton,
+			},
+		});
 	}, [preferredCategoryIds]);
 
 	return (

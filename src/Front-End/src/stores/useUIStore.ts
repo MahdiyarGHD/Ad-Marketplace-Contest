@@ -10,9 +10,11 @@ type Toast = {
 type UIState = {
 	topBarTitle?: string;
 	topBarButtons?: ReactNode;
+	mainButton?: { text: string; onClick: () => void };
 	toasts: Toast[];
 	setTopBarTitle: (value: string) => void;
 	setTopBarButtons: (value: ReactNode) => void;
+	// setMainButton: (value: {text: string; onClick: () => void}) => void;
 	showToast: (toast: Toast) => void;
 	removeToast: (id: number) => void;
 };

@@ -115,6 +115,33 @@ body {
     }
 }
 
+.MainButton {
+    display: flex;
+    margin: 0.75rem;
+    min-height: 42px;
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+    color: var(--tg-theme-button-text-color);
+    background-color: var(--tg-theme-button-color);
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+
+    &:active {
+        // background-color: var(--tg-theme-button-color-hover);
+        transform: scale(.98);
+    }
+}
+
+.Mobile .MainButton {
+    margin: .5rem;
+    min-height: 44px;
+    border-radius: 10px;
+    font-weight: bold;
+}
+
 .Avatar {
     width: 32px;
     height: 32px;
@@ -362,7 +389,7 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin: 4rem 2rem;
+    margin: 0 2rem;
     gap: 1rem;
 
     .Title {
@@ -499,6 +526,17 @@ input, textarea {
     // border-radius: 8px;
     background-color: transparent;
     color: var(--text-color);
+}
+
+input[type=number] {
+    -moz-appearance:textfield;
+
+    &::-webkit-outer-spin-button,
+    &::-webkit-inner-spin-button {
+        /* display: none; <- Crashes Chrome on hover */
+        -webkit-appearance: none;
+        margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
+    }
 }
 
 textarea {

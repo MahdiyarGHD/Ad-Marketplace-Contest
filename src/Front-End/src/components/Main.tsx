@@ -1,11 +1,23 @@
-import { memo } from "react";
+import { memo, useEffect } from "react";
 import { Outlet } from "react-router-dom";
 import BottomBar from "./BottomBar";
 import TopBar from "./TopBar";
 import Transition from "./Transition";
 import Toasts from "./Toasts";
+import useUIStore from "../stores/useUIStore";
+import MainButton from "./MainButton";
 
 function Main({ bottomBarVisible = true }: { bottomBarVisible?: boolean }) {
+	const { mainButton } = useUIStore();
+
+	useEffect(() => {
+		return () => {
+			useUIStore.setState({
+				mainButton: undefined,
+			});
+		};
+	}, []);
+
 	return (
 		<div className="Main SafeArea">
 			<TopBar />
@@ -15,6 +27,10 @@ function Main({ bottomBarVisible = true }: { bottomBarVisible?: boolean }) {
 			</Transition>
 
 			<Toasts />
+
+			{mainButton && (
+				<MainButton text={mainButton.text} onClick={mainButton.onClick} />
+			)}
 
 			{bottomBarVisible && <BottomBar />}
 		</div>

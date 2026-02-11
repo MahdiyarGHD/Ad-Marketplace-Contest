@@ -23,6 +23,7 @@ const AdFormats = ["Post"];
 function AddCampaign() {
 	const {
 		draftCampaign,
+		setDraftCampaign,
 		clearDraftCampaign,
 		setDraftCampaignAdFormat,
 		setDraftCampaignPriceType,
@@ -79,10 +80,6 @@ function AddCampaign() {
 	};
 
 	useEffect(() => {
-		mainButton.setText("Save");
-
-		mainButton.show();
-
 		backButton.show();
 
 		backButton.onClick(onBackButton);
@@ -90,8 +87,6 @@ function AddCampaign() {
 		invokeHapticFeedbackImpact("medium");
 
 		return () => {
-			mainButton.hide();
-
 			backButton.hide();
 
 			backButton.offClick(onBackButton);
@@ -99,9 +94,12 @@ function AddCampaign() {
 	}, []);
 
 	useEffect(() => {
-		mainButton.onClick(handleSave);
-
-		return () => mainButton.offClick(handleSave);
+		useUIStore.setState({
+			mainButton: {
+				text: "Save",
+				onClick: handleSave,
+			},
+		});
 	}, [draftCampaign]);
 
 	return (
@@ -117,13 +115,24 @@ function AddCampaign() {
 							<MegaphoneIcon />
 						</div>
 						<div className="body">
-							<input type="text" placeholder="Campaign Title" />
+							<input
+								type="text"
+								placeholder="Campaign Title"
+								value={draftCampaign.title}
+								onChange={(e) => setDraftCampaign({ title: e.target.value })}
+							/>
 						</div>
 					</div>
 					<div className="Item">
 						<div className="icon"></div>
 						<div className="body">
-							<textarea placeholder="Campaign Description" />
+							<textarea
+								placeholder="Campaign Description"
+								value={draftCampaign.description}
+								onChange={(e) =>
+									setDraftCampaign({ description: e.target.value })
+								}
+							/>
 						</div>
 					</div>
 					<div className="Item" onClick={onSelectCategory}>
@@ -144,14 +153,30 @@ function AddCampaign() {
 							<DollarSignIcon />
 						</div>
 						<div className="body">
-							<input type="text" placeholder="Budget" />
+							<input
+								type="text"
+								placeholder="Budget"
+								value={draftCampaign.budget_ton || ""}
+								onChange={(e) =>
+									setDraftCampaign({ budget_ton: Number(e.target.value) })
+								}
+							/>
 						</div>
 						<div className="meta">TON</div>
 					</div>
 					<div className="Item">
 						<div className="icon"></div>
 						<div className="body">
-							<input type="text" placeholder="Max Price Per Placement" />
+							<input
+								type="number"
+								placeholder="Max Price Per Placement"
+								value={draftCampaign.max_price_per_placement || ""}
+								onChange={(e) =>
+									setDraftCampaign({
+										max_price_per_placement: Number(e.target.value),
+									})
+								}
+							/>
 						</div>
 						<div className="meta">TON</div>
 					</div>

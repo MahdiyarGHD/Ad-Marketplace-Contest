@@ -92,9 +92,12 @@ function SetChannelData() {
 	};
 
 	useEffect(() => {
-		mainButton.setText("Save");
-
-		mainButton.show();
+		useUIStore.setState({
+			mainButton: {
+				text: "Save",
+				onClick: handleSave,
+			},
+		});
 
 		backButton.show();
 
@@ -103,8 +106,6 @@ function SetChannelData() {
 		invokeHapticFeedbackImpact("medium");
 
 		return () => {
-			mainButton.hide();
-
 			backButton.hide();
 
 			backButton.offClick(onBackButton);
@@ -112,9 +113,12 @@ function SetChannelData() {
 	}, []);
 
 	useEffect(() => {
-		mainButton.onClick(handleSave);
-
-		return () => mainButton.offClick(handleSave);
+		useUIStore.setState({
+			mainButton: {
+				text: "Save",
+				onClick: handleSave,
+			},
+		});
 	}, [draftChannel]);
 
 	const allPriceTypes = draftChannel.pricings?.map((item) => item.price_type);

@@ -44,7 +44,7 @@ type CampaignState = {
 	myCampaigns: Campaign[];
 	draftCampaign: Campaign;
 	getMyCampaigns: () => Promise<void>;
-	setDraftCampaign: (campaign: Campaign) => void;
+	setDraftCampaign: (campaign: Partial<Campaign>) => void;
 	clearDraftCampaign: () => void;
 	setDraftCampaignCategory: (category: any) => void;
 	setDraftCampaignPreferredCategory: (category: any) => void;
