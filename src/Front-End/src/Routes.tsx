@@ -82,7 +82,7 @@ const router = createBrowserRouter(
 							element: <SelectCategory />,
 						},
 						{
-							path: "/categories",
+							path: "/categories/:type?",
 							element: <SelectCategory title="Browse Categories" />,
 						},
 						{
@@ -96,6 +96,10 @@ const router = createBrowserRouter(
 						{
 							path: "add-campaign",
 							element: <AddCampaign />,
+						},
+						{
+							path: "add-campaign/success",
+							element: <AddCampaign success />,
 						},
 						{
 							path: "my-campaigns",

@@ -144,13 +144,13 @@ function ChannelProfile() {
 
 				<div className="Statistics">
 					<div className="Item">
-						<Shimmer className="title" state={!!subscriber_count}>
+						<Shimmer className="title" state={subscriber_count !== undefined}>
 							<span>{subscriber_count}</span>
 						</Shimmer>
 						<div className="subtitle">Subscribers</div>
 					</div>
 					<div className="Item">
-						<Shimmer className="title" state={!!average_views}>
+						<Shimmer className="title" state={average_views !== undefined}>
 							<span>{average_views}</span>
 						</Shimmer>
 						<div className="subtitle">Average Views</div>

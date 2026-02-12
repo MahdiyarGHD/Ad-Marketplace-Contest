@@ -24,7 +24,7 @@ function SelectCategory({ title }: { title?: string }) {
 			),
 		) || [];
 
-	const { set } = useParams();
+	const { set, type } = useParams();
 
 	const navigate = useNavigate();
 
@@ -46,7 +46,7 @@ function SelectCategory({ title }: { title?: string }) {
 				setDraftCampaignPreferredCategory(category);
 				break;
 			default:
-				navigate(`/category/${category.id}`);
+				navigate(`/category/${category.id}?type=${type}`);
 				break;
 		}
 	};

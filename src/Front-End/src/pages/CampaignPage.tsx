@@ -22,10 +22,12 @@ function CampaignPage() {
 		id,
 		title,
 		category_id,
+		brief,
 		description,
 		budget_ton,
 		max_price_per_placement,
 		targeting,
+		creative,
 		// starts_at,
 		// ends_at,
 	} = useCampaignStore(useShallow((state) => state.activeCampaign)) || {};
@@ -79,7 +81,7 @@ function CampaignPage() {
 					<Avatar id={id ?? ""} size={80} isCampaign />
 					<div className="info">
 						<Shimmer className="title">{title}</Shimmer>
-						<div className="subtitle">campaign</div>
+						<div className="subtitle">{brief ?? "campaign"}</div>
 					</div>
 				</div>
 
@@ -114,92 +116,143 @@ function CampaignPage() {
 					<div className="Items">
 						<div className="Item">
 							<div className="body">
-								<div className="title">{description}</div>
+								<Shimmer className="title preWrap">{description}</Shimmer>
 							</div>
 						</div>
 					</div>
 				</div>
 
-				<div className="Section">
-					<div className="title">Targeting</div>
-					<div className="Items">
-						<div className="Item">
-							<div className="body">
-								<div className="title">Min Subscribers</div>
-							</div>
-							<div className="meta">{targeting?.min_subscribers}</div>
-						</div>
-						<div className="Item">
-							<div className="body">
-								<div className="title">Max Subscribers</div>
-							</div>
-							<div className="meta">{targeting?.max_subscribers}</div>
-						</div>
-						<div className="Item">
-							<div className="body">
-								<div className="title">Min Average Views</div>
-							</div>
-							<div className="meta">{targeting?.min_average_views}</div>
-						</div>
-						<div className="Item">
-							<div className="body">
-								<div className="title">Min Premium Users</div>
-							</div>
-							<div className="meta">{targeting?.min_premium_count}</div>
-						</div>
-					</div>
-				</div>
-				<div className="Section">
-					<div className="title">Preferred Categories</div>
-					<div className="Items">
-						{targeting?.preferred_category_ids.map((cat_id) => {
-							const category = getCategory(cat_id);
-							return (
-								<div
-									className="Item"
-									key={cat_id}
-									onClick={() => navigate(`/category/${cat_id}`)}
-								>
-									<div className="icon">{category?.icon ?? <TagIcon />}</div>
+				{!targeting && <LoadingSkeleton />}
+
+				{targeting && (
+					<div className="Section">
+						<div className="title">Targeting</div>
+						<div className="Items">
+							{targeting?.min_subscribers > 0 && (
+								<div className="Item">
 									<div className="body">
-										<div className="title">{category?.name}</div>
+										<div className="title">Min Subscribers</div>
+									</div>
+									<div className="meta">{targeting?.min_subscribers}</div>
+								</div>
+							)}
+							{targeting?.max_subscribers > 0 && (
+								<div className="Item">
+									<div className="body">
+										<div className="title">Max Subscribers</div>
+									</div>
+									<div className="meta">{targeting?.max_subscribers}</div>
+								</div>
+							)}
+							{targeting?.min_average_views > 0 && (
+								<div className="Item">
+									<div className="body">
+										<div className="title">Min Average Views</div>
+									</div>
+									<div className="meta">{targeting?.min_average_views}</div>
+								</div>
+							)}
+							{targeting?.min_premium_count > 0 && (
+								<div className="Item">
+									<div className="body">
+										<div className="title">Min Premium Users</div>
+									</div>
+									<div className="meta">{targeting?.min_premium_count}</div>
+								</div>
+							)}
+						</div>
+					</div>
+				)}
+				{!!targeting?.preferred_category_ids?.length && (
+					<div className="Section">
+						<div className="title">Preferred Categories</div>
+						<div className="Items">
+							{targeting?.preferred_category_ids.map((cat_id) => {
+								const category = getCategory(cat_id);
+								return (
+									<div
+										className="Item"
+										key={cat_id}
+										onClick={() => navigate(`/category/${cat_id}`)}
+									>
+										<div className="icon">{category?.icon ?? <TagIcon />}</div>
+										<div className="body">
+											<div className="title">{category?.name}</div>
+										</div>
+									</div>
+								);
+							})}
+						</div>
+					</div>
+				)}
+				{!!targeting?.preferred_ad_formats?.length && (
+					<div className="Section">
+						<div className="title">Preferred Ad Formats</div>
+						<div className="Items">
+							{targeting?.preferred_ad_formats.map((item) => (
+								<div className="Item" key={item}>
+									<div className="body">
+										<div className="title">
+											{AdFormats[item as AdFormat] || "Post"}
+										</div>
 									</div>
 								</div>
-							);
-						})}
+							))}
+						</div>
 					</div>
-				</div>
-				<div className="Section">
-					<div className="title">Preferred Ad Formats</div>
-					<div className="Items">
-						{targeting?.preferred_ad_formats.map((item) => (
-							<div className="Item" key={item}>
-								<div className="body">
-									<div className="title">
-										{AdFormats[item as AdFormat] || "Post"}
+				)}
+				{!!targeting?.preferred_price_types?.length && (
+					<div className="Section">
+						<div className="title">Preferred Price Types</div>
+						<div className="Items">
+							{targeting?.preferred_price_types.map((item) => (
+								<div className="Item" key={item}>
+									<div className="body">
+										<div className="title">
+											{PriceTypes[item as PriceType] || "Per hour"}
+										</div>
 									</div>
 								</div>
-							</div>
-						))}
+							))}
+						</div>
 					</div>
-				</div>
-				<div className="Section">
-					<div className="title">Preferred Price Types</div>
-					<div className="Items">
-						{targeting?.preferred_price_types.map((item) => (
-							<div className="Item" key={item}>
-								<div className="body">
-									<div className="title">
-										{PriceTypes[item as PriceType] || "Per hour"}
+				)}
+				{!!creative?.call_to_action_buttons?.length && (
+					<div className="Section">
+						<div className="title">Call To Action Buttons</div>
+						<div className="Items">
+							{creative.call_to_action_buttons.map((button) => (
+								<div className="Item" key={button.text}>
+									<div className="body">
+										<div className="title">{button.text}</div>
+										<div className="meta">{button.url}</div>
 									</div>
 								</div>
-							</div>
-						))}
+							))}
+						</div>
 					</div>
-				</div>
+				)}
 			</div>
 		</div>
 	);
 }
+
+const LoadingSkeleton = memo(() => (
+	<div className="Skeleton">
+		<div className="Section">
+			<div className="title Shimmer"></div>
+			<div className="Items">
+				{Array.from({ length: 2 }).map(() => (
+					<div className="Item" key={Math.random()}>
+						<div className="body">
+							<div className="title Shimmer"></div>
+						</div>
+						<div className="meta Shimmer" style={{ width: "4rem" }}></div>
+					</div>
+				))}
+			</div>
+		</div>
+	</div>
+));
 
 export default memo(CampaignPage);

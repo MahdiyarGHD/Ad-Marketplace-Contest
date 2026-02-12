@@ -18,10 +18,11 @@ import { requestAPI } from "../utils/api";
 import useUIStore from "../stores/useUIStore";
 import useCampaignStore, { type Campaign } from "../stores/useCampaignStore";
 import DatePicker from "../components/DatePicker";
+import RLottie from "../components/RLottie";
 
 const AdFormats = ["Post"];
 
-function AddCampaign() {
+function AddCampaign({ success = false }: { success?: boolean }) {
 	const [showDatePicker, setShowDatePicker] = useState(false);
 
 	const {
@@ -61,6 +62,11 @@ function AddCampaign() {
 			}
 			if (!draftCampaign.budget_ton) {
 				throw new Error("Please enter a budget");
+			}
+			if (draftCampaign.max_price_per_placement > draftCampaign.budget_ton) {
+				throw new Error(
+					"Max price per placement cannot be greater than budget",
+				);
 			}
 			if (
 				draftCampaign.targeting.min_subscribers >
@@ -126,6 +132,26 @@ function AddCampaign() {
 		});
 	}, [draftCampaign]);
 
+	const renderSuccess = () => {
+		return (
+			<div className="Placeholder">
+				<div className="Emoji">
+					<RLottie sticker="congrats" autoplay width={120} height={120} />
+				</div>
+				<h2 className="Title">Your Campaign Successfully Added</h2>
+				<div className="Instructions">
+					this campaign is saved as draft, you can edit or publish it from My
+					Campaigns page.
+					<br />
+				</div>
+			</div>
+		);
+	};
+
+	if (success) {
+		return renderSuccess();
+	}
+
 	return (
 		<div className="SetChannelData scrollable">
 			<PageHeader>
@@ -144,6 +170,16 @@ function AddCampaign() {
 								placeholder="Campaign Title"
 								value={draftCampaign.title}
 								onChange={(e) => setDraftCampaign({ title: e.target.value })}
+							/>
+						</div>
+					</div>
+					<div className="Item">
+						<div className="icon"></div>
+						<div className="body">
+							<textarea
+								placeholder="Campaign Brief"
+								value={draftCampaign.brief}
+								onChange={(e) => setDraftCampaign({ brief: e.target.value })}
 							/>
 						</div>
 					</div>

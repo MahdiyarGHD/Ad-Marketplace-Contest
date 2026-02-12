@@ -152,6 +152,7 @@ body {
     height: 32px;
     font-size: 16px;
     text-align: center;
+    flex: none;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -311,7 +312,10 @@ body {
             flex-direction: column;
             gap: 0.33rem;
             flex: 1 auto;
+            text-align: left;
             margin-left: 1rem;
+            white-space: nowrap;
+            overflow: hidden;
 
             &.row {
                 flex-direction: row;
@@ -329,11 +333,18 @@ body {
 
             .title {
                 line-height: 1.2;
+
+                &.preWrap {
+                    white-space: pre-wrap;
+                    line-height: 1.7;
+                }
             }
 
             .subtitle {
                 font-size: 0.75rem;
                 color: var(--secondary-text);
+                text-overflow: ellipsis;
+                overflow: hidden;
             }
         }
 
@@ -344,6 +355,7 @@ body {
         .meta {
             color: var(--secondary-text);
             font-size: 0.9rem;
+            font-weight: 500;
             display: flex;
             align-items: center;
             gap: 0.5rem;
@@ -441,6 +453,7 @@ body {
                 display: flex;
                 align-items: center;
                 line-height: 1.2;
+                margin: 0 1rem;
             }
         }
     }
@@ -501,6 +514,9 @@ body {
             font-weight: bold;
             margin: 0;
             flex: 1;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            white-space: nowrap;
         }
 
         .meta {
@@ -597,6 +613,7 @@ input, textarea {
 }
 
 input[type=number] {
+    appearance: textfield;
     -moz-appearance:textfield;
 
     &::-webkit-outer-spin-button,

@@ -21,6 +21,8 @@ import { useNavigate } from "react-router-dom";
 import useAppStore from "../stores/useAppStore";
 import Menu, { DropdownMenu, MenuItem } from "../components/Menu";
 import RLottie from "../components/RLottie";
+import type { Campaign } from "../stores/useCampaignStore";
+import useCampaignStore from "../stores/useCampaignStore";
 
 const renderCategory = (
 	category: Category,
@@ -46,11 +48,33 @@ export const renderChannel = (
 	<div className="ChatItem" key={channel.id} onClick={() => onClick(channel)}>
 		<Avatar id={channel.chat_id} title={channel.title} photo="" />
 		<div className="body">
-			<div className="title">{channel.title}</div>
+			<div className="title" dir="auto">
+				{channel.title}
+			</div>
 			<div className="subtitle">{channel.subscriber_count} subscribers</div>
 		</div>
 		<div className="meta">
 			{/* <div className="count">12</div> */}
+			<ChevronRight />
+		</div>
+	</div>
+);
+
+export const renderCampaign = (
+	campaign: Campaign,
+	onClick: (campaign: Campaign) => void,
+) => (
+	<div className="ChatItem" key={campaign.id} onClick={() => onClick(campaign)}>
+		<Avatar id={campaign.id ?? ""} title={campaign.title} isCampaign />
+		<div className="body">
+			<div className="title" dir="auto">
+				{campaign.title}
+			</div>
+			<div className="subtitle" dir="auto">
+				{campaign.brief || campaign.description}
+			</div>
+		</div>
+		<div className="meta">
 			<ChevronRight />
 		</div>
 	</div>
@@ -61,7 +85,7 @@ function Home() {
 
 	const { isAuth } = useAppStore();
 
-	const { getCategories, getCategoryByName } = useCategoryStore();
+	const { getCategories } = useCategoryStore();
 	const {
 		influencers,
 		getInfluencers,
@@ -69,6 +93,7 @@ function Home() {
 		getCampaigns,
 		setActiveChannel,
 	} = useChannelStore();
+	const { setActiveCampaign } = useCampaignStore();
 
 	const navigate = useNavigate();
 
@@ -78,14 +103,21 @@ function Home() {
 		navigate(`/channel/${channel.id}`);
 	};
 
-	const showCategoryPageByName = (categoryName: string) => {
-		const category = getCategoryByName(categoryName);
-		if (category) {
-			navigate(`/category/${category.id}`);
-		}
+	const showCampaignPage = (campaign: Campaign) => {
+		setActiveCampaign(campaign);
+
+		navigate(`/campaign/${campaign.id}`);
 	};
-	const showCategoryPageById = (categoryId: string) => {
-		navigate(`/category/${categoryId}`);
+
+	// const showCategoryPageByName = (categoryName: string) => {
+	// 	const category = getCategoryByName(categoryName);
+	// 	if (category) {
+	// 		navigate(`/category/${category.id}`);
+	// 	}
+	// };
+
+	const showCategoryPageById = (categoryId: string, type: string) => {
+		navigate(`/category/${categoryId}?type=${type}`);
 	};
 
 	useEffect(() => {
@@ -96,20 +128,26 @@ function Home() {
 		getCampaigns();
 	}, [isAuth]);
 
-	const renderSection = (element: {
-		$type: string;
-		icon: string;
-		label: string;
-		items: Channel[] | Category[];
-	}) => {
+	const renderSection = (
+		element: {
+			$type: string;
+			icon: string;
+			label: string;
+			items: Channel[] | Category[] | Campaign[];
+		},
+		type: "channel" | "campaign",
+	) => {
 		return (
 			<div className="Section" key={element.label}>
 				<div
 					className="flex pointer"
 					onClick={() => {
-						element.$type === "channel" &&
-							showCategoryPageByName(element.label);
-						element.$type === "category" && navigate("/categories");
+						(element.$type === "channel" || element.$type === "campaign") &&
+							showCategoryPageById(
+								(element.items[0] as Channel | Campaign).category?.id || "",
+								type,
+							);
+						element.$type === "category" && navigate(`/categories/${type}`);
 					}}
 				>
 					{/* <div className="icon">{element.icon}</div> */}
@@ -128,7 +166,11 @@ function Home() {
 						{element.items.map((item) =>
 							element.$type === "channel"
 								? renderChannel(item as Channel, showChannelProfile)
-								: renderCategory(item as Category, showCategoryPageById),
+								: element.$type === "campaign"
+									? renderCampaign(item as Campaign, showCampaignPage)
+									: renderCategory(item as Category, (categoryId) =>
+											showCategoryPageById(categoryId, type),
+										),
 						)}
 					</Transition>
 				</div>
@@ -193,11 +235,15 @@ function Home() {
 				}
 			>
 				<TabContent state={true} className="scrollable">
-					{influencers.elements.map((element) => renderSection(element))}
+					{influencers.elements.map((element) =>
+						renderSection(element, "channel"),
+					)}
 					{influencers.elements.length === 0 && <LoadingSkeleton />}
 				</TabContent>
 				<TabContent state={true}>
-					{campaigns.elements.map((element) => renderSection(element))}
+					{campaigns.elements.map((element) =>
+						renderSection(element, "campaign"),
+					)}
 					{campaigns.elements.length === 0 && <NoCampaignPlaceholder />}
 				</TabContent>
 			</Tabs>
@@ -234,7 +280,7 @@ const NoCampaignPlaceholder = memo(() => (
 			<RLottie sticker="pepe" autoplay width={120} height={120} />
 		</div>
 		<h2 className="Title">No Campaigns Yet</h2>
-		<p className="Subtitle">There is no campaign yet. Gerye kon</p>
+		<p className="Subtitle">There is no campaign yet.</p>
 	</div>
 ));
 
