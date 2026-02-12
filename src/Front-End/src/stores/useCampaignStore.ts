@@ -4,7 +4,7 @@ import type { Category } from "./useCategoryStore";
 
 export type Campaign = {
 	id?: string;
-	category_id: number;
+	category_id: string;
 	category?: {
 		id: string;
 		name: string;

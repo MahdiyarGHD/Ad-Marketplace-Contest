@@ -31,7 +31,7 @@ function Avatar({
 		>
 			{isCampaign ? (
 				<div className="campaign-icon">
-					<MegaphoneIcon />
+					<MegaphoneIcon size={size / 2} />
 				</div>
 			) : (
 				<span>

@@ -320,6 +320,11 @@ body {
 
             &.multiline {
                 padding-top: .5rem;
+                overflow: hidden;
+
+                input {
+                    flex: 1;
+                }
             }
 
             .title {
@@ -378,9 +383,9 @@ body {
             overflow: hidden;
             scroll-snap-align: center;
             
-            
             .body {
                 width: 6rem;
+                gap: .125rem;
                 text-overflow: ellipsis;
                 overflow: hidden;
 
@@ -410,7 +415,7 @@ body {
 }
 
 .Profile {
-    .User, .Chat {
+    .User, .Chat, .Campaign {
         display: flex;
         justify-content: center;
         align-items: center;
@@ -445,10 +450,16 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
     margin: 0 2rem;
     gap: 1rem;
+    height: 100%;
 
     .Title {
+        text-align: center;
+    }
+
+    .Subtitle {
         text-align: center;
     }
 }
@@ -577,6 +588,7 @@ input, textarea {
     border: none;
     font-size: 1rem;
     font-family: inherit;
+    min-width: 4rem;
     min-height: 2rem;
     // border: 1px solid var(--border-color);
     // border-radius: 8px;

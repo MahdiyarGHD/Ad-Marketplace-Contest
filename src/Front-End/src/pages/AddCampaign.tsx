@@ -11,7 +11,7 @@ import {
 	MegaphoneIcon,
 	TagIcon,
 } from "lucide-react";
-import { PriceTypes } from "../stores/useChannelStore";
+import { PriceTypes, type PriceType } from "../stores/useChannelStore";
 import Menu, { DropdownMenu, MenuItem } from "../components/Menu";
 import TextTransition from "../components/TextTransition";
 import { requestAPI } from "../utils/api";
@@ -53,8 +53,22 @@ function AddCampaign() {
 			if (!draftCampaign.title) {
 				throw new Error("Please enter a campaign title");
 			}
+			if (!draftCampaign.description) {
+				throw new Error("Please enter a campaign description");
+			}
 			if (!draftCampaign.category_id) {
 				throw new Error("Please select a category");
+			}
+			if (!draftCampaign.budget_ton) {
+				throw new Error("Please enter a budget");
+			}
+			if (
+				draftCampaign.targeting.min_subscribers >
+				draftCampaign.targeting.max_subscribers
+			) {
+				throw new Error(
+					"Min subscribers cannot be greater than max subscribers",
+				);
 			}
 		} catch (error) {
 			showToast({ title: (error as Error).message });
@@ -282,6 +296,7 @@ function AddCampaign() {
 						</div>
 					</div>
 					<Menu
+						closeManually
 						custom={({ onClick }) => {
 							const adFormats =
 								draftCampaign.targeting?.preferred_ad_formats || [];
@@ -320,6 +335,7 @@ function AddCampaign() {
 						</DropdownMenu>
 					</Menu>
 					<Menu
+						closeManually
 						custom={({ onClick }) => {
 							const priceTypes =
 								draftCampaign.targeting?.preferred_price_types || [];
@@ -331,8 +347,8 @@ function AddCampaign() {
 											text={
 												priceTypes.length > 0
 													? priceTypes.length === 1
-														? PriceTypes[priceTypes[0]]
-														: `${priceTypes.length} items`
+														? PriceTypes[priceTypes[0] as PriceType]
+														: `${priceTypes.length} Selected`
 													: "None"
 											}
 										/>
@@ -343,16 +359,18 @@ function AddCampaign() {
 						}}
 					>
 						<DropdownMenu className="right">
-							{PriceTypes.map((type, i) => (
+							{Object.entries(PriceTypes).map(([key, type]) => (
 								<MenuItem
-									key={type}
+									key={key}
 									title={type}
 									icon={
-										draftCampaign.targeting?.preferred_price_types?.includes(i)
+										draftCampaign.targeting?.preferred_price_types?.includes(
+											Number(key),
+										)
 											? "✓"
 											: ""
 									}
-									onClick={() => setDraftCampaignPriceType(i)}
+									onClick={() => setDraftCampaignPriceType(Number(key))}
 								/>
 							))}
 						</DropdownMenu>

@@ -9,7 +9,9 @@ import { requestAPI } from "../../utils/api";
 import useChannelStore, {
 	AdFormats,
 	PriceTypes,
+	type AdFormat,
 	type Channel,
+	type PriceType,
 } from "../../stores/useChannelStore";
 import { useShallow } from "zustand/shallow";
 import { backButton, openTelegramLink } from "@tma.js/sdk-react";
@@ -67,11 +69,7 @@ function ChannelProfile() {
 			title,
 			category_id,
 			category,
-			pricings: pricings!.map((item) => ({
-				ad_format: item.ad_format - 1,
-				price_type: item.price_type - 1,
-				price_ton: item.price_ton,
-			})),
+			pricings,
 		} as Channel);
 
 		navigate(`/set-channel-data`);
@@ -184,13 +182,13 @@ function ChannelProfile() {
 									</div>
 									<div className="flex-1">
 										<Shimmer className="title" state={!!price?.price_type}>
-											{PriceTypes[price?.price_type - 1]}
+											{PriceTypes[price?.price_type as PriceType]}
 										</Shimmer>
 										<div className="subtitle">Price type</div>
 									</div>
 									<div>
 										<Shimmer className="title" state={!!price?.ad_format}>
-											{AdFormats[price?.ad_format - 1]}
+											{AdFormats[price?.ad_format as AdFormat]}
 										</Shimmer>
 										<div className="subtitle">Ad format</div>
 									</div>

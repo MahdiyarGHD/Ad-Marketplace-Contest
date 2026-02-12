@@ -13,6 +13,9 @@
         padding: .75rem;
         border-radius: 0.75rem;
         background: var(--secondary-bg-color);
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
 
         .title {
             font-size: 1.25rem;
@@ -28,6 +31,8 @@
         .subtitle {
             font-size: 0.875rem;
             color: var(--secondary-text);
+            text-overflow: ellipsis;
+            overflow: hidden;
         }
     }
 }

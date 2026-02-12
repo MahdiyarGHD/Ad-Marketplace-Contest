@@ -20,6 +20,7 @@ import Avatar from "../components/Avatar";
 import { useNavigate } from "react-router-dom";
 import useAppStore from "../stores/useAppStore";
 import Menu, { DropdownMenu, MenuItem } from "../components/Menu";
+import RLottie from "../components/RLottie";
 
 const renderCategory = (
 	category: Category,
@@ -61,7 +62,13 @@ function Home() {
 	const { isAuth } = useAppStore();
 
 	const { getCategories, getCategoryByName } = useCategoryStore();
-	const { influencers, getInfluencers, setActiveChannel } = useChannelStore();
+	const {
+		influencers,
+		getInfluencers,
+		campaigns,
+		getCampaigns,
+		setActiveChannel,
+	} = useChannelStore();
 
 	const navigate = useNavigate();
 
@@ -86,7 +93,48 @@ function Home() {
 
 		getCategories();
 		getInfluencers();
+		getCampaigns();
 	}, [isAuth]);
+
+	const renderSection = (element: {
+		$type: string;
+		icon: string;
+		label: string;
+		items: Channel[] | Category[];
+	}) => {
+		return (
+			<div className="Section" key={element.label}>
+				<div
+					className="flex pointer"
+					onClick={() => {
+						element.$type === "channel" &&
+							showCategoryPageByName(element.label);
+						element.$type === "category" && navigate("/categories");
+					}}
+				>
+					{/* <div className="icon">{element.icon}</div> */}
+					<h2 className="title">{element.label}</h2>
+					<div className="meta">
+						Show All <ChevronRight size={18} />
+					</div>
+				</div>
+				<div
+					className={buildClassName(
+						"Items",
+						element.label === "Top Picks" && "row scrollable x",
+					)}
+				>
+					<Transition state eachElement eachElementDelay={40}>
+						{element.items.map((item) =>
+							element.$type === "channel"
+								? renderChannel(item as Channel, showChannelProfile)
+								: renderCategory(item as Category, showCategoryPageById),
+						)}
+					</Transition>
+				</div>
+			</div>
+		);
+	};
 
 	return (
 		<div className="Home">
@@ -145,59 +193,12 @@ function Home() {
 				}
 			>
 				<TabContent state={true} className="scrollable">
-					{influencers.elements.map((element) => (
-						<div className="Section" key={element.label}>
-							<div
-								className="flex pointer"
-								onClick={() => {
-									element.$type === "channel" &&
-										showCategoryPageByName(element.label);
-									element.$type === "category" && navigate("/categories");
-								}}
-							>
-								{/* <div className="icon">{element.icon}</div> */}
-								<h2 className="title">{element.label}</h2>
-								<div className="meta">
-									Show All <ChevronRight size={18} />
-								</div>
-							</div>
-							<div
-								className={buildClassName(
-									"Items",
-									element.label === "Top Picks" && "row scrollable x",
-								)}
-							>
-								<Transition state eachElement eachElementDelay={40}>
-									{element.items.map((item) =>
-										element.$type === "channel"
-											? renderChannel(item as Channel, showChannelProfile)
-											: renderCategory(item as Category, showCategoryPageById),
-									)}
-								</Transition>
-							</div>
-						</div>
-					))}
+					{influencers.elements.map((element) => renderSection(element))}
 					{influencers.elements.length === 0 && <LoadingSkeleton />}
 				</TabContent>
 				<TabContent state={true}>
-					<div className="Categories Section">
-						<div className="title">Categories</div>
-						<div className="Items">
-							<Transition state eachElement eachElementDelay={20}>
-								<div className="Item">
-									<div className="icon">😂</div>
-									<div className="body">
-										<div className="title">Ads 1</div>
-										<div className="subtitle">Description</div>
-									</div>
-									<div className="meta">
-										{/* <div className="count">12</div> */}
-										<ChevronRight />
-									</div>
-								</div>
-							</Transition>
-						</div>
-					</div>
+					{campaigns.elements.map((element) => renderSection(element))}
+					{campaigns.elements.length === 0 && <NoCampaignPlaceholder />}
 				</TabContent>
 			</Tabs>
 		</div>
@@ -224,6 +225,16 @@ const LoadingSkeleton = memo(() => (
 				</div>
 			</div>
 		))}
+	</div>
+));
+
+const NoCampaignPlaceholder = memo(() => (
+	<div className="Placeholder">
+		<div className="Emoji">
+			<RLottie sticker="pepe" autoplay width={120} height={120} />
+		</div>
+		<h2 className="Title">No Campaigns Yet</h2>
+		<p className="Subtitle">There is no campaign yet. Gerye kon</p>
 	</div>
 ));
 

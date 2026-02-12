@@ -17,7 +17,9 @@ import {
 import useChannelStore, {
 	AdFormats,
 	PriceTypes,
+	type AdFormat,
 	type Channel,
+	type PriceType,
 } from "../stores/useChannelStore";
 import Menu, { DropdownMenu, MenuItem } from "../components/Menu";
 import TextTransition from "../components/TextTransition";
@@ -42,7 +44,7 @@ function SetChannelData() {
 	const navigate = useNavigate();
 
 	const onBackButton = () => {
-		navigate("/my-channels");
+		window.history.back();
 	};
 
 	const onSelectChannel = () => {
@@ -74,8 +76,8 @@ function SetChannelData() {
 				chat_id: draftChannel.chat_id,
 				category_id: draftChannel.category_id,
 				pricings: draftChannel.pricings.map((item) => ({
-					ad_format: item.ad_format + 1,
-					price_type: item.price_type + 1,
+					ad_format: item.ad_format,
+					price_type: item.price_type,
 					price_ton: item.price_ton,
 				})),
 			} as Partial<Channel>,
@@ -174,10 +176,10 @@ function SetChannelData() {
 			<div className="Section Pricing">
 				<div className="title">Pricing</div>
 				{draftChannel.pricings?.map((item, index) => {
-					const availablePriceType = PriceTypes.filter(
-						(type, i) =>
-							!allPriceTypes!.includes(i) ||
-							type === PriceTypes[item.price_type],
+					const availablePriceType = Object.entries(PriceTypes).filter(
+						([key]) =>
+							!allPriceTypes!.includes(Number(key)) ||
+							Number(key) === item.price_type,
 					);
 
 					return (
@@ -210,7 +212,9 @@ function SetChannelData() {
 										<div className="body">Price type</div>
 										<div className="meta">
 											<TextTransition
-												text={PriceTypes[item.price_type] || "Per hour"}
+												text={
+													PriceTypes[item.price_type as PriceType] || "Per hour"
+												}
 											/>
 											<ChevronDown />
 										</div>
@@ -218,15 +222,12 @@ function SetChannelData() {
 								)}
 							>
 								<DropdownMenu className="right">
-									{availablePriceType.map((type) => (
+									{availablePriceType.map(([key, type]) => (
 										<MenuItem
-											key={type}
+											key={key}
 											title={type}
 											onClick={() =>
-												setDraftChannelPriceType(
-													PriceTypes.indexOf(type),
-													index,
-												)
+												setDraftChannelPriceType(Number(key), index)
 											}
 										/>
 									))}
@@ -241,7 +242,7 @@ function SetChannelData() {
 										<div className="body">Ad format</div>
 										<div className="meta">
 											<TextTransition
-												text={AdFormats[item.ad_format] || "Post"}
+												text={AdFormats[item.ad_format as AdFormat] || "Post"}
 											/>
 											<ChevronDown />
 										</div>
@@ -249,11 +250,13 @@ function SetChannelData() {
 								)}
 							>
 								<DropdownMenu className="right">
-									{AdFormats.map((format, i) => (
+									{Object.entries(AdFormats).map(([key, format]) => (
 										<MenuItem
 											key={format}
 											title={format}
-											onClick={() => setDraftChannelAdFormat(i, index)}
+											onClick={() =>
+												setDraftChannelAdFormat(Number(key), index)
+											}
 										/>
 									))}
 								</DropdownMenu>
@@ -274,7 +277,8 @@ function SetChannelData() {
 				})}
 			</div>
 			<div className="Section">
-				{(draftChannel.pricings?.length ?? 0) < PriceTypes.length && (
+				{(draftChannel.pricings?.length ?? 0) <
+					Object.keys(PriceTypes).length && (
 					<div className="Items">
 						<div
 							className="Item primary"
