@@ -13,6 +13,7 @@ public class Endpoint(
     public override void Configure()
     {
         Post("/api/deals/{Id}/approve");
+        Description(d => d.ClearDefaultAccepts());
     }
 
     public override async Task<ErrorOr<Response>> ExecuteAsync(Request req, CancellationToken ct)
