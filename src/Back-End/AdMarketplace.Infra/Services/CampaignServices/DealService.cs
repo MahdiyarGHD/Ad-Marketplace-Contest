@@ -113,6 +113,11 @@ public class DealService(
                 return Error.Validation("Deal.ChannelMismatch", "Channel ID does not match the channel application's channel");
         }
 
+        var channelPricing = await dbContext.ChannelPricings
+            .FirstOrDefaultAsync(p => p.ChannelId == channelId && p.AdFormat == adFormat && p.PriceType == priceType);
+
+        var channelUnitPrice = channelPricing?.PriceTon ?? 0m;
+
         var deal = Deal.Create(
             campaignId: campaignId,
             applicationId: applicationId,
@@ -123,6 +128,7 @@ public class DealService(
             amountTon: amountTon,
             adFormat: adFormat,
             priceType: priceType,
+            channelUnitPrice: channelUnitPrice,
             scheduledPostTime: scheduledPostTime,
             escrowWalletAddress: escrowWalletAddress);
 
