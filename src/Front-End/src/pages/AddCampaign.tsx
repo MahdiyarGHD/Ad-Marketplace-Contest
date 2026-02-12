@@ -66,7 +66,14 @@ function AddCampaign() {
 			{
 				title: draftCampaign.title,
 				category_id: draftCampaign.category_id,
-				targeting: {},
+				targeting: draftCampaign.targeting,
+				budget_ton: draftCampaign.budget_ton,
+				max_price_per_placement: draftCampaign.max_price_per_placement,
+				description: draftCampaign.description,
+				starts_at: draftCampaign.starts_at,
+				ends_at: draftCampaign.ends_at,
+				creative: draftCampaign.creative,
+				brief: draftCampaign.brief,
 			} as Partial<Campaign>,
 			"POST",
 		);
@@ -358,8 +365,11 @@ function AddCampaign() {
 								<div className="title">Select Date</div>
 							</div>
 							<div className="meta">
-								{new Date(draftCampaign.starts_at).toLocaleDateString()} -{" "}
-								{new Date(draftCampaign.ends_at).toLocaleDateString()}
+								{draftCampaign.starts_at &&
+									new Date(draftCampaign.starts_at).toLocaleDateString() +
+										" - " +
+										new Date(draftCampaign.ends_at).toLocaleDateString()}
+								<ChevronRight />
 							</div>
 						</div>
 						<DatePicker

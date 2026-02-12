@@ -20,7 +20,7 @@ function Avatar({
 		<div
 			className={buildClassName(
 				"Avatar",
-				`peer-color-${getPeerColorIndexById(getPeerIdFromChatId(id))}`,
+				`peer-color-${getPeerColorIndexById(getPeerIdFromChatId(isCampaign ? uuidToInt(id.toString()) : id))}`,
 				isCampaign && "campaign",
 			)}
 			style={{
@@ -49,6 +49,8 @@ function Avatar({
 		</div>
 	);
 }
+
+const uuidToInt = (uuid: string): number => parseInt(uuid.split("-")[4], 16);
 
 export function getPeerIdFromChatId(chatId: string | number): string | number {
 	return Number(chatId) < 0 ? Number(String(chatId).slice(4)) : chatId;

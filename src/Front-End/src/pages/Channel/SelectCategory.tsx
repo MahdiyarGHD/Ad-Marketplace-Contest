@@ -11,7 +11,7 @@ import useCampaignStore from "../../stores/useCampaignStore";
 import { useShallow } from "zustand/shallow";
 import useUIStore from "../../stores/useUIStore";
 
-function SelectCategory() {
+function SelectCategory({ title }: { title?: string }) {
 	const { categories, getCategories } = useCategoryStore();
 	const { setDraftChannelCategory } = useChannelStore();
 	const { setDraftCampaignCategory, setDraftCampaignPreferredCategory } =
@@ -45,6 +45,9 @@ function SelectCategory() {
 			case "campaign-preferred":
 				setDraftCampaignPreferredCategory(category);
 				break;
+			default:
+				navigate(`/category/${category.id}`);
+				break;
 		}
 	};
 
@@ -76,21 +79,22 @@ function SelectCategory() {
 	}, [set, navigate, invokeHapticFeedbackImpact]);
 
 	useEffect(() => {
-		useUIStore.setState({
-			mainButton: {
-				text:
-					preferredCategoryIds.length > 0
-						? `Select ${preferredCategoryIds.length} Categories`
-						: "Done",
-				onClick: onBackButton,
-			},
-		});
+		if (set === "campaign-preferred")
+			useUIStore.setState({
+				mainButton: {
+					text:
+						preferredCategoryIds.length > 0
+							? `Select ${preferredCategoryIds.length} Categories`
+							: "Done",
+					onClick: onBackButton,
+				},
+			});
 	}, [preferredCategoryIds]);
 
 	return (
 		<div className="SelectCategory scrollable">
 			<PageHeader>
-				<PageHeaderTitle>Select Category</PageHeaderTitle>
+				<PageHeaderTitle>{title || "Select Category"}</PageHeaderTitle>
 			</PageHeader>
 
 			<div className="CategoryList Items">

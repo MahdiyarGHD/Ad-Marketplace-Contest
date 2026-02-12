@@ -47,7 +47,7 @@ function ChannelProfile() {
 	};
 
 	const onBackButton = () => {
-		navigate("/");
+		window.history.back();
 	};
 
 	useEffect(() => {

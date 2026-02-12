@@ -21,12 +21,46 @@ import { useNavigate } from "react-router-dom";
 import useAppStore from "../stores/useAppStore";
 import Menu, { DropdownMenu, MenuItem } from "../components/Menu";
 
+const renderCategory = (
+	category: Category,
+	onClick: (categoryId: string) => void,
+) => (
+	<div className="Item" key={category.id} onClick={() => onClick(category.id)}>
+		<div className="icon">{category.icon}</div>
+		<div className="body">
+			<div className="title">{category.name}</div>
+			{/* <div className="subtitle">Description</div> */}
+		</div>
+		<div className="meta">
+			{/* <div className="count">12</div> */}
+			<ChevronRight />
+		</div>
+	</div>
+);
+
+export const renderChannel = (
+	channel: Channel,
+	onClick: (channel: Channel) => void,
+) => (
+	<div className="ChatItem" key={channel.id} onClick={() => onClick(channel)}>
+		<Avatar id={channel.chat_id} title={channel.title} photo="" />
+		<div className="body">
+			<div className="title">{channel.title}</div>
+			<div className="subtitle">{channel.subscriber_count} subscribers</div>
+		</div>
+		<div className="meta">
+			{/* <div className="count">12</div> */}
+			<ChevronRight />
+		</div>
+	</div>
+);
+
 function Home() {
 	const [tabIndex, setTabIndex] = useState(0);
 
 	const { isAuth } = useAppStore();
 
-	const { getCategories } = useCategoryStore();
+	const { getCategories, getCategory, getCategoryByName } = useCategoryStore();
 	const { influencers, getInfluencers, setActiveChannel } = useChannelStore();
 
 	const navigate = useNavigate();
@@ -37,44 +71,22 @@ function Home() {
 		navigate(`/channel/${channel.id}`);
 	};
 
+	const showCategoryPageByName = (categoryName: string) => {
+		const category = getCategoryByName(categoryName);
+		if (category) {
+			navigate(`/category/${category.id}`);
+		}
+	};
+	const showCategoryPageById = (categoryId: string) => {
+		navigate(`/category/${categoryId}`);
+	};
+
 	useEffect(() => {
 		if (!isAuth) return;
 
 		getCategories();
 		getInfluencers();
 	}, [isAuth]);
-
-	const renderCategory = (category: Category) => (
-		<div className="Item" key={category.id}>
-			<div className="icon">{category.icon}</div>
-			<div className="body">
-				<div className="title">{category.name}</div>
-				{/* <div className="subtitle">Description</div> */}
-			</div>
-			<div className="meta">
-				{/* <div className="count">12</div> */}
-				<ChevronRight />
-			</div>
-		</div>
-	);
-
-	const renderChannel = (channel: Channel) => (
-		<div
-			className="ChatItem"
-			key={channel.id}
-			onClick={() => showChannelProfile(channel)}
-		>
-			<Avatar id={channel.chat_id} title={channel.title} photo="" />
-			<div className="body">
-				<div className="title">{channel.title}</div>
-				<div className="subtitle">{channel.subscriber_count} subscribers</div>
-			</div>
-			<div className="meta">
-				{/* <div className="count">12</div> */}
-				<ChevronRight />
-			</div>
-		</div>
-	);
 
 	return (
 		<div className="Home">
@@ -135,7 +147,14 @@ function Home() {
 				<TabContent state={true} className="scrollable">
 					{influencers.elements.map((element) => (
 						<div className="Section" key={element.label}>
-							<div className="flex">
+							<div
+								className="flex pointer"
+								onClick={() => {
+									element.$type === "channel" &&
+										showCategoryPageByName(element.label);
+									element.$type === "category" && navigate("/categories");
+								}}
+							>
 								<div className="icon">{element.icon}</div>
 								<h2 className="title">{element.label}</h2>
 								<div className="meta">
@@ -151,8 +170,8 @@ function Home() {
 								<Transition state eachElement eachElementDelay={40}>
 									{element.items.map((item) =>
 										element.$type === "channel"
-											? renderChannel(item as Channel)
-											: renderCategory(item as Category),
+											? renderChannel(item as Channel, showChannelProfile)
+											: renderCategory(item as Category, showCategoryPageById),
 									)}
 								</Transition>
 							</div>

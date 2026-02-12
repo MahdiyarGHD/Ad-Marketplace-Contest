@@ -153,6 +153,11 @@ body {
     background-color: var(--active-bg);
     background-image: linear-gradient(var(--color-white) -300%, var(--color-user));
     border-radius: 50%;
+
+    .campaign-icon {
+        display: flex;
+        align-items: center;
+    }
 }
 
 @keyframes ItemLoading {
@@ -938,7 +943,7 @@ textarea {
         }
     }
     .Items {
-        .Item {
+        .Item, .ChatItem {
             gap: .5rem;
 
             .Avatar {
@@ -947,6 +952,7 @@ textarea {
                 background-color: var(--shimmer-color-1);
                 animation: OpacityShimmer calc(5s / 3) linear infinite;
             }
+
             .body {
                 &.row {
                     flex-direction: row;
@@ -965,6 +971,13 @@ textarea {
                     background-color: var(--hover-bg);
                     border-radius: 8px;
                 }
+            }
+        }
+
+        .ChatItem {
+            .Avatar {
+                width: 48px;
+                height: 48px;
             }
         }
     }
