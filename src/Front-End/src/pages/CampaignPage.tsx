@@ -26,8 +26,8 @@ function CampaignPage() {
 		budget_ton,
 		max_price_per_placement,
 		targeting,
-		starts_at,
-		ends_at,
+		// starts_at,
+		// ends_at,
 	} = useCampaignStore(useShallow((state) => state.activeCampaign)) || {};
 	const { setActiveCampaign } = useCampaignStore();
 
