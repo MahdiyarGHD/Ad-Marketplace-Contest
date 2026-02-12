@@ -2,12 +2,20 @@ import { create } from "zustand";
 import { requestAPI } from "../utils/api";
 import type { Category } from "./useCategoryStore";
 
-export const AdFormats = ["Post"];
-export const PriceTypes = ["Per hour", "Per day", "Per 1000 views"];
+export const AdFormats = { 1: "Post" };
+export const PriceTypes = {
+	1: "Per hour",
+	2: "Per day",
+	3: "Per 1000 views",
+};
+
+export type AdFormat = keyof typeof AdFormats;
+export type PriceType = keyof typeof PriceTypes;
 
 export type Channel = {
 	id?: string;
 	chat_id: number;
+	owner_id?: string;
 	category_id: string;
 	category?: {
 		id: string;
@@ -45,6 +53,7 @@ type ChannelState = {
 	setDraftChannel: (channel: Channel) => void;
 	clearDraftChannel: () => void;
 	addDraftChannelPrice: () => void;
+	removeDraftChannelPrice: (index: number) => void;
 	setDraftChannelCategory: (category: any) => void;
 	setDraftChannelPriceType: (priceType: number, index: number) => void;
 	setDraftChannelAdFormat: (adFormat: number, index: number) => void;
@@ -60,6 +69,16 @@ type ChannelState = {
 	};
 	getInfluencers: () => Promise<void>;
 
+	campaigns: {
+		elements: {
+			$type: string;
+			icon: string;
+			label: string;
+			items: Channel[] | Category[];
+		}[];
+	};
+	getCampaigns: () => Promise<void>;
+
 	activeChannel?: Channel;
 	setActiveChannel: (channel: Channel) => void;
 };
@@ -69,14 +88,17 @@ const useChannelStore = create<ChannelState>((set, get) => ({
 	draftChannel: {
 		pricings: [
 			{
-				ad_format: 0,
-				price_type: 0,
+				ad_format: 1,
+				price_type: 1,
 				price_ton: 0,
 			},
 		],
 	},
 	unVerifiedChannels: [],
 	influencers: {
+		elements: [],
+	},
+	campaigns: {
 		elements: [],
 	},
 	async getMyChannels() {
@@ -102,8 +124,9 @@ const useChannelStore = create<ChannelState>((set, get) => ({
 		set((state) => ({
 			draftChannel: {
 				...state.draftChannel,
-				chat_id: channel.chat_id,
-				title: channel.title,
+				// chat_id: channel.chat_id,
+				// title: channel.title,
+				...channel,
 			},
 		}));
 	},
@@ -112,8 +135,8 @@ const useChannelStore = create<ChannelState>((set, get) => ({
 			draftChannel: {
 				pricings: [
 					{
-						ad_format: 0,
-						price_type: 0,
+						ad_format: 1,
+						price_type: 1,
 						price_ton: 0,
 					},
 				],
@@ -134,8 +157,8 @@ const useChannelStore = create<ChannelState>((set, get) => ({
 			(item) => item.price_type,
 		);
 
-		const availablePriceType = PriceTypes.filter(
-			(_, i) => !allPriceTypes!.includes(i),
+		const availablePriceType = Object.keys(PriceTypes).filter(
+			(item) => !allPriceTypes!.includes(Number(item)),
 		);
 
 		set((state) => ({
@@ -144,11 +167,19 @@ const useChannelStore = create<ChannelState>((set, get) => ({
 				pricings: [
 					...(state.draftChannel.pricings ?? []),
 					{
-						ad_format: 0,
-						price_type: PriceTypes.indexOf(availablePriceType[0]),
+						ad_format: 1,
+						price_type: Number(availablePriceType[0]),
 						price_ton: 0,
 					},
 				],
+			},
+		}));
+	},
+	removeDraftChannelPrice(index: number) {
+		set((state) => ({
+			draftChannel: {
+				...state.draftChannel,
+				pricings: state.draftChannel.pricings?.filter((_, i) => i !== index),
 			},
 		}));
 	},
@@ -193,6 +224,17 @@ const useChannelStore = create<ChannelState>((set, get) => ({
 		if (response.value) {
 			set({
 				influencers: response.value,
+			});
+		}
+	},
+	getCampaigns: async () => {
+		const response = await requestAPI("/api/campaigns/home", {}, "GET");
+
+		console.log(response);
+
+		if (response.value) {
+			set({
+				campaigns: response.value,
 			});
 		}
 	},

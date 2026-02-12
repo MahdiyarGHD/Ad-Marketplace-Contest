@@ -63,14 +63,19 @@ body {
         overflow: hidden;
     }
 
-    .Buttons>.Transition {
+    .Buttons {
         display: flex;
         align-items: center;
-        gap: 1rem;
+        gap: 2rem;
 
         & > div {
             display: flex;
+            align-items: center;
             cursor: pointer;
+
+            .Menu {
+                display: flex;
+            }
         }
     }
 }
@@ -115,6 +120,33 @@ body {
     }
 }
 
+.MainButton {
+    display: flex;
+    margin: 0.75rem;
+    min-height: 42px;
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+    align-self: normal;
+    color: var(--tg-theme-button-text-color);
+    background-color: var(--tg-theme-button-color);
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+
+    &:active {
+        transform: scale(.98);
+    }
+}
+
+.Mobile .MainButton {
+    margin: .5rem;
+    min-height: 44px;
+    border-radius: 10px;
+    font-weight: bold;
+}
+
 .Avatar {
     width: 32px;
     height: 32px;
@@ -126,6 +158,11 @@ body {
     background-color: var(--active-bg);
     background-image: linear-gradient(var(--color-white) -300%, var(--color-user));
     border-radius: 50%;
+
+    .campaign-icon {
+        display: flex;
+        align-items: center;
+    }
 }
 
 @keyframes ItemLoading {
@@ -203,6 +240,18 @@ body {
     }
 }
 
+.destructive {
+    color: var(--tg-theme-destructive-text-color);
+
+    &:hover {
+        background-color: color-mix(
+            in srgb,
+            var(--tg-theme-destructive-text-color) 10%,
+            transparent
+        ) !important;
+    }
+}
+
 .Items,
 .ChatList {
     // flex: 1;
@@ -271,6 +320,11 @@ body {
 
             &.multiline {
                 padding-top: .5rem;
+                overflow: hidden;
+
+                input {
+                    flex: 1;
+                }
             }
 
             .title {
@@ -301,13 +355,52 @@ body {
 
             input {
                 text-align: right;
-                width: 8rem;
+                width: 4rem;
             }
         }
     }
 
     .ChatItem {
         gap: 1rem;
+    }
+
+    &.row {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        // scrollbar-width: none;
+
+        .ChatItem {
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            flex: none;
+            gap: .5rem;
+            padding: .5rem;
+            overflow: hidden;
+            scroll-snap-align: center;
+            
+            .body {
+                width: 6rem;
+                gap: .125rem;
+                text-overflow: ellipsis;
+                overflow: hidden;
+
+                .title {
+                    text-overflow: ellipsis;
+                    overflow: hidden;
+                    text-align: center;
+                    white-space: nowrap;
+                }
+            }
+
+            .meta {
+                display: none;
+            }
+        }
     }
 }
 
@@ -317,8 +410,12 @@ body {
     }
 }
 
+.CategoryList {
+    margin-top: 0;
+}
+
 .Profile {
-    .User, .Chat {
+    .User, .Chat, .Campaign {
         display: flex;
         justify-content: center;
         align-items: center;
@@ -341,6 +438,9 @@ body {
             .subtitle {
                 font-size: 1rem;
                 color: var(--secondary-text);
+                display: flex;
+                align-items: center;
+                line-height: 1.2;
             }
         }
     }
@@ -350,10 +450,16 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin: 4rem 2rem;
+    justify-content: center;
+    margin: 0 2rem;
     gap: 1rem;
+    height: 100%;
 
     .Title {
+        text-align: center;
+    }
+
+    .Subtitle {
         text-align: center;
     }
 }
@@ -481,11 +587,24 @@ input, textarea {
     outline: none;
     border: none;
     font-size: 1rem;
+    font-family: inherit;
+    min-width: 4rem;
     min-height: 2rem;
     // border: 1px solid var(--border-color);
     // border-radius: 8px;
     background-color: transparent;
     color: var(--text-color);
+}
+
+input[type=number] {
+    -moz-appearance:textfield;
+
+    &::-webkit-outer-spin-button,
+    &::-webkit-inner-spin-button {
+        /* display: none; <- Crashes Chrome on hover */
+        -webkit-appearance: none;
+        margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
+    }
 }
 
 textarea {
@@ -501,6 +620,47 @@ textarea {
 
 .scrollable {
     overflow-y: auto;
+
+    &.x {
+        overflow-x: auto;
+        overflow-y: hidden;
+    }
+}
+
+@-moz-document url-prefix() {
+  .scrollable {
+    /* Firefix supports */
+    scrollbar-width: thin;
+    scrollbar-color: var(--active-bg) #0000;
+  }
+}
+
+body:not(.Mobile) {
+    .scrollable::-webkit-scrollbar {
+      width: 10px !important;
+      height: 10px !important;
+    }
+    
+    .scrollable::-webkit-scrollbar-thumb {
+      border-radius: 10px !important;
+      -webkit-box-shadow: inset 0 0 6px var(--active-bg) !important;
+      background-color: var(--active-bg) !important;
+      border: 3px solid transparent;
+      background-clip: content-box;
+    }
+    
+    .scrollable::-webkit-scrollbar-thumb:hover {
+      background-color: var(--active-bg) !important;
+    }
+    
+    .scrollable::-webkit-scrollbar-track {
+      -webkit-box-shadow: inset 0 0 6px rgb(0 0 0 / 0%) !important;
+      border-radius: 10px !important;
+    }
+}
+
+.pointer {
+    cursor: pointer;
 }
 
 .Menu {
@@ -525,7 +685,11 @@ textarea {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    background-color: #0002;
+    background-color: color-mix(
+            in srgb,
+            var(--dropdown-bg) 25%,
+            transparent
+        ) !important;
     position: fixed;
     min-width: 13.5rem;
     border-radius: 10px;
@@ -585,6 +749,13 @@ textarea {
     &.withoutTitle {
         top: 36px !important;
     }
+}
+
+@supports not ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+  .DropdownMenu {
+    --blur-filter: none;
+    background-color: #000;
+  }
 }
 
 .MenuItem {
@@ -657,7 +828,7 @@ textarea {
     border: 1px solid transparent;
     background-size: 400%;
     /* border: 1px solid #fff1; */
-    // animation: OpacityShimmer 5s linear infinite;
+    animation: Shimmer 5s linear infinite;
 }
 
 @keyframes Shimmer {
@@ -686,7 +857,17 @@ textarea {
     position: absolute;
     top: 0;
     left: 0;
+    background-color: #00000080;
     z-index: 9;
+    transition: opacity 0.3s ease;
+
+    &.transparent {
+        background-color: transparent;
+    }
+
+    &.animate {
+        opacity: 0;
+    }
 }
 
 .Toasts {
@@ -743,6 +924,33 @@ textarea {
     margin: 0;
 }
 
+.rdp-root {
+    --rdp-accent-color: var(--tg-theme-button-color);
+    --rdp-accent-background-color: var(--active-bg);
+}
+
+.DatePickerWrapper {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    display: flex;
+    color: var(--tg-theme-text-color);
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 1rem 0;
+    border-radius: 1rem 1rem 0 0;
+    background-color: var(--secondary-bg-color);
+    z-index: 30;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+
+    &.animate {
+        transform: translateY(100%);
+        // opacity: 0;
+    }
+}
+
 .Skeleton {
     .Section {
         .flex {
@@ -758,7 +966,7 @@ textarea {
         }
     }
     .Items {
-        .Item {
+        .Item, .ChatItem {
             gap: .5rem;
 
             .Avatar {
@@ -767,6 +975,7 @@ textarea {
                 background-color: var(--shimmer-color-1);
                 animation: OpacityShimmer calc(5s / 3) linear infinite;
             }
+
             .body {
                 &.row {
                     flex-direction: row;
@@ -785,6 +994,13 @@ textarea {
                     background-color: var(--hover-bg);
                     border-radius: 8px;
                 }
+            }
+        }
+
+        .ChatItem {
+            .Avatar {
+                width: 48px;
+                height: 48px;
             }
         }
     }

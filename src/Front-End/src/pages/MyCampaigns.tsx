@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 import Transition from "../components/Transition";
 import { backButton } from "@tma.js/sdk-react";
 import { invokeHapticFeedbackImpact } from "../utils/common";
-import useCampaignStore from "../stores/useCampaignStore";
+import useCampaignStore, { type Campaign } from "../stores/useCampaignStore";
 
 const CampaignStatus: { [key: number]: string } = {
 	0: "Pending",
@@ -17,12 +17,18 @@ const CampaignStatus: { [key: number]: string } = {
 };
 
 function MyCampaigns() {
-	const { myCampaigns, getMyCampaigns } = useCampaignStore();
+	const { myCampaigns, getMyCampaigns, setActiveCampaign } = useCampaignStore();
 
 	const navigate = useNavigate();
 
 	const onBackButton = () => {
 		navigate("/profile");
+	};
+
+	const onCampaignClick = (campaign: Campaign) => {
+		setActiveCampaign(campaign);
+
+		navigate(`/campaign/${campaign.id}`);
 	};
 
 	useEffect(() => {
@@ -62,7 +68,7 @@ function MyCampaigns() {
 						<div
 							key={campaign.id}
 							className="ChatItem"
-							onClick={() => navigate("/set-campaign-data")}
+							onClick={() => onCampaignClick(campaign)}
 						>
 							<Avatar id={campaign.id!} isCampaign />
 							<div className="body">

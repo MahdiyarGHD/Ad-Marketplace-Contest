@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 import Transition from "../components/Transition";
 import { backButton } from "@tma.js/sdk-react";
 import { invokeHapticFeedbackImpact } from "../utils/common";
-import useChannelStore from "../stores/useChannelStore";
+import useChannelStore, { type Channel } from "../stores/useChannelStore";
 
 const ChannelStatus: { [key: number]: string } = {
 	0: "Pending",
@@ -17,12 +17,18 @@ const ChannelStatus: { [key: number]: string } = {
 };
 
 function MyChannels() {
-	const { myChannels, getMyChannels } = useChannelStore();
+	const { myChannels, getMyChannels, setActiveChannel } = useChannelStore();
 
 	const navigate = useNavigate();
 
 	const onBackButton = () => {
 		navigate("/profile");
+	};
+
+	const onChannelClick = (channel: Channel) => {
+		setActiveChannel(channel);
+
+		navigate(`/channel/${channel.id}`);
 	};
 
 	useEffect(() => {
@@ -64,7 +70,7 @@ function MyChannels() {
 						<div
 							key={channel.chat_id}
 							className="ChatItem"
-							onClick={() => navigate("/set-channel-data")}
+							onClick={() => onChannelClick(channel)}
 						>
 							<Avatar id={channel.chat_id} title={channel.title} photo="" />
 							<div className="body">

@@ -1,5 +1,5 @@
 import { memo, useEffect } from "react";
-import { backButton, mainButton } from "@tma.js/sdk-react";
+import { backButton } from "@tma.js/sdk-react";
 import { invokeHapticFeedbackImpact } from "../utils/common";
 import { useNavigate } from "react-router";
 import "./SetChannelData.scss";
@@ -17,7 +17,9 @@ import {
 import useChannelStore, {
 	AdFormats,
 	PriceTypes,
+	type AdFormat,
 	type Channel,
+	type PriceType,
 } from "../stores/useChannelStore";
 import Menu, { DropdownMenu, MenuItem } from "../components/Menu";
 import TextTransition from "../components/TextTransition";
@@ -29,6 +31,7 @@ function SetChannelData() {
 		draftChannel,
 		clearDraftChannel,
 		addDraftChannelPrice,
+		removeDraftChannelPrice,
 		setDraftChannelPrice,
 		setDraftChannelPriceType,
 		setDraftChannelAdFormat,
@@ -36,14 +39,16 @@ function SetChannelData() {
 
 	const { showToast } = useUIStore();
 
+	const isUpdating = Boolean(draftChannel.id);
+
 	const navigate = useNavigate();
 
 	const onBackButton = () => {
-		navigate("/my-channels");
+		window.history.back();
 	};
 
 	const onSelectChannel = () => {
-		navigate("/select-channel");
+		if (!isUpdating) navigate("/select-channel");
 	};
 
 	const onSelectCategory = () => {
@@ -66,21 +71,21 @@ function SetChannelData() {
 		}
 
 		const response = await requestAPI(
-			"/api/channels/",
+			isUpdating ? `/api/channels/${draftChannel.id}` : "/api/channels/",
 			{
 				chat_id: draftChannel.chat_id,
 				category_id: draftChannel.category_id,
 				pricings: draftChannel.pricings.map((item) => ({
-					ad_format: item.ad_format + 1,
-					price_type: item.price_type + 1,
+					ad_format: item.ad_format,
+					price_type: item.price_type,
 					price_ton: item.price_ton,
 				})),
 			} as Partial<Channel>,
-			"POST",
+			isUpdating ? "PUT" : "POST",
 		);
 
 		if (!response.isError && response.value) {
-			navigate("/add-channel/success");
+			navigate(isUpdating ? `/my-channels` : "/add-channel/success");
 			invokeHapticFeedbackImpact("medium");
 			setTimeout(() => invokeHapticFeedbackImpact("soft"), 200);
 			setTimeout(() => invokeHapticFeedbackImpact("soft"), 300);
@@ -91,9 +96,12 @@ function SetChannelData() {
 	};
 
 	useEffect(() => {
-		mainButton.setText("Save");
-
-		mainButton.show();
+		useUIStore.setState({
+			mainButton: {
+				text: "Save",
+				onClick: handleSave,
+			},
+		});
 
 		backButton.show();
 
@@ -102,18 +110,25 @@ function SetChannelData() {
 		invokeHapticFeedbackImpact("medium");
 
 		return () => {
-			mainButton.hide();
-
 			backButton.hide();
 
 			backButton.offClick(onBackButton);
+
+			if (isUpdating) {
+				clearDraftChannel();
+			}
 		};
 	}, []);
 
-	useEffect(() => {
-		mainButton.onClick(handleSave);
+	console.log(draftChannel);
 
-		return () => mainButton.offClick(handleSave);
+	useEffect(() => {
+		useUIStore.setState({
+			mainButton: {
+				text: "Save",
+				onClick: handleSave,
+			},
+		});
 	}, [draftChannel]);
 
 	const allPriceTypes = draftChannel.pricings?.map((item) => item.price_type);
@@ -121,7 +136,9 @@ function SetChannelData() {
 	return (
 		<div className="SetChannelData scrollable">
 			<PageHeader>
-				<PageHeaderTitle>Create your influence channel</PageHeaderTitle>
+				<PageHeaderTitle>
+					{isUpdating ? "Update your channel" : "Create your influence channel"}
+				</PageHeaderTitle>
 			</PageHeader>
 
 			<div className="Section">
@@ -139,9 +156,7 @@ function SetChannelData() {
 								<div className="subtitle">{draftChannel.chat_id ?? ""}</div>
 							)}
 						</div>
-						<div className="meta">
-							<ChevronRight />
-						</div>
+						<div className="meta">{!isUpdating && <ChevronRight />}</div>
 					</div>
 					<div className="Item" onClick={onSelectCategory}>
 						<div className="icon">
@@ -161,10 +176,10 @@ function SetChannelData() {
 			<div className="Section Pricing">
 				<div className="title">Pricing</div>
 				{draftChannel.pricings?.map((item, index) => {
-					const availablePriceType = PriceTypes.filter(
-						(type, i) =>
-							!allPriceTypes!.includes(i) ||
-							type === PriceTypes[item.price_type],
+					const availablePriceType = Object.entries(PriceTypes).filter(
+						([key]) =>
+							!allPriceTypes!.includes(Number(key)) ||
+							Number(key) === item.price_type,
 					);
 
 					return (
@@ -197,7 +212,9 @@ function SetChannelData() {
 										<div className="body">Price type</div>
 										<div className="meta">
 											<TextTransition
-												text={PriceTypes[item.price_type] || "Per hour"}
+												text={
+													PriceTypes[item.price_type as PriceType] || "Per hour"
+												}
 											/>
 											<ChevronDown />
 										</div>
@@ -205,15 +222,12 @@ function SetChannelData() {
 								)}
 							>
 								<DropdownMenu className="right">
-									{availablePriceType.map((type) => (
+									{availablePriceType.map(([key, type]) => (
 										<MenuItem
-											key={type}
+											key={key}
 											title={type}
 											onClick={() =>
-												setDraftChannelPriceType(
-													PriceTypes.indexOf(type),
-													index,
-												)
+												setDraftChannelPriceType(Number(key), index)
 											}
 										/>
 									))}
@@ -228,7 +242,7 @@ function SetChannelData() {
 										<div className="body">Ad format</div>
 										<div className="meta">
 											<TextTransition
-												text={AdFormats[item.ad_format] || "Post"}
+												text={AdFormats[item.ad_format as AdFormat] || "Post"}
 											/>
 											<ChevronDown />
 										</div>
@@ -236,21 +250,35 @@ function SetChannelData() {
 								)}
 							>
 								<DropdownMenu className="right">
-									{AdFormats.map((format, i) => (
+									{Object.entries(AdFormats).map(([key, format]) => (
 										<MenuItem
 											key={format}
 											title={format}
-											onClick={() => setDraftChannelAdFormat(i, index)}
+											onClick={() =>
+												setDraftChannelAdFormat(Number(key), index)
+											}
 										/>
 									))}
 								</DropdownMenu>
 							</Menu>
+							{index !== 0 && (
+								<div
+									className="Item destructive"
+									onClick={() => removeDraftChannelPrice(index)}
+								>
+									<div className="icon"></div>
+									<div className="body">
+										<div className="title">Remove Price...</div>
+									</div>
+								</div>
+							)}
 						</div>
 					);
 				})}
 			</div>
 			<div className="Section">
-				{(draftChannel.pricings?.length ?? 0) < PriceTypes.length && (
+				{(draftChannel.pricings?.length ?? 0) <
+					Object.keys(PriceTypes).length && (
 					<div className="Items">
 						<div
 							className="Item primary"

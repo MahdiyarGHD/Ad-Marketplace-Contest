@@ -5,13 +5,14 @@ import useCategoryStore from "../../stores/useCategoryStore";
 import { memo, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { invokeHapticFeedbackImpact } from "../../utils/common";
-import { backButton, mainButton } from "@tma.js/sdk-react";
+import { backButton } from "@tma.js/sdk-react";
 import useChannelStore from "../../stores/useChannelStore";
 import useCampaignStore from "../../stores/useCampaignStore";
 import { useShallow } from "zustand/shallow";
+import useUIStore from "../../stores/useUIStore";
 
-function SelectCategory() {
-	const { categories } = useCategoryStore();
+function SelectCategory({ title }: { title?: string }) {
+	const { categories, getCategories } = useCategoryStore();
 	const { setDraftChannelCategory } = useChannelStore();
 	const { setDraftCampaignCategory, setDraftCampaignPreferredCategory } =
 		useCampaignStore();
@@ -44,19 +45,29 @@ function SelectCategory() {
 			case "campaign-preferred":
 				setDraftCampaignPreferredCategory(category);
 				break;
+			default:
+				navigate(`/category/${category.id}`);
+				break;
 		}
 	};
+
+	useEffect(() => {
+		if (!categories?.length) {
+			getCategories();
+		}
+	}, []);
 
 	useEffect(() => {
 		backButton.show();
 		backButton.onClick(onBackButton);
 
 		if (set === "campaign-preferred") {
-			mainButton.show();
-
-			mainButton.setText("Done");
-
-			mainButton.onClick(onBackButton);
+			useUIStore.setState({
+				mainButton: {
+					text: "Retry",
+					onClick: onBackButton,
+				},
+			});
 		}
 
 		invokeHapticFeedbackImpact("medium");
@@ -64,26 +75,26 @@ function SelectCategory() {
 		return () => {
 			backButton.hide();
 			backButton.offClick(onBackButton);
-
-			if (set === "campaign-preferred") {
-				mainButton.hide();
-				mainButton.offClick(onBackButton);
-			}
 		};
 	}, [set, navigate, invokeHapticFeedbackImpact]);
 
 	useEffect(() => {
-		mainButton.setText(
-			preferredCategoryIds.length > 0
-				? `Select ${preferredCategoryIds.length} Categories`
-				: "Done",
-		);
+		if (set === "campaign-preferred")
+			useUIStore.setState({
+				mainButton: {
+					text:
+						preferredCategoryIds.length > 0
+							? `Select ${preferredCategoryIds.length} Categories`
+							: "Done",
+					onClick: onBackButton,
+				},
+			});
 	}, [preferredCategoryIds]);
 
 	return (
 		<div className="SelectCategory scrollable">
 			<PageHeader>
-				<PageHeaderTitle>Select Category</PageHeaderTitle>
+				<PageHeaderTitle>{title || "Select Category"}</PageHeaderTitle>
 			</PageHeader>
 
 			<div className="CategoryList Items">

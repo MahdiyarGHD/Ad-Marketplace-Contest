@@ -1,10 +1,10 @@
 import { useEffect } from "react";
+import "react-day-picker/style.css";
 import "./App.scss";
 import {
 	backButton,
 	init,
 	isTMA,
-	mainButton,
 	miniApp,
 	retrieveLaunchParams,
 	retrieveRawInitData,
@@ -15,7 +15,7 @@ import Routes from "./Routes";
 import useAppStore from "./stores/useAppStore";
 
 function App() {
-	const { authenticate } = useAppStore();
+	const { authenticate, getMe } = useAppStore();
 
 	const rawInitData = retrieveRawInitData();
 
@@ -64,16 +64,18 @@ function App() {
 				if (!themeParams.isCssVarsBound()) themeParams.bindCssVars();
 			}
 
-			if (!mainButton.isMounted() && mainButton.mount.isAvailable()) {
-				mainButton.mount();
-			}
+			// if (!mainButton.isMounted() && mainButton.mount.isAvailable()) {
+			// 	mainButton.mount();
+			// }
 
 			if (backButton.mount.isAvailable()) backButton.mount();
 		}
 	};
 
-	const handleAuth = () => {
-		authenticate(rawInitData);
+	const handleAuth = async () => {
+		await authenticate(rawInitData);
+
+		getMe();
 	};
 
 	useEffect(() => {

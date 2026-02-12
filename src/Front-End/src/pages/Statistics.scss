@@ -13,6 +13,9 @@
         padding: .75rem;
         border-radius: 0.75rem;
         background: var(--secondary-bg-color);
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
 
         .title {
             font-size: 1.25rem;
@@ -28,6 +31,8 @@
         .subtitle {
             font-size: 0.875rem;
             color: var(--secondary-text);
+            text-overflow: ellipsis;
+            overflow: hidden;
         }
     }
 }
@@ -49,6 +54,10 @@
         display: flex;
         align-items: stretch;
         gap: .5rem;
+        padding: .75rem;
+        border-radius: .75rem;
+        background-color: var(--secondary-bg-color);
+        overflow: hidden;
         transition: opacity 0.3s ease, transform 0.3s ease;
 
         .flex-1 {
@@ -58,9 +67,9 @@
         > div {
             display: flex;
             flex-direction: column;
-            background-color: var(--secondary-bg-color);
-            border-radius: .75rem;
-            padding: .75rem;
+            
+            // border-radius: .75rem;
+            // padding: .75rem;
             gap: .25rem;
 
             .title {

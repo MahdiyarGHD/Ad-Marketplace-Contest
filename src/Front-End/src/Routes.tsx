@@ -17,6 +17,8 @@ import SelectChannel from "./pages/Channel/SelectChannel";
 import ChannelProfile from "./pages/Channel/ChannelProfile";
 import AddCampaign from "./pages/AddCampaign";
 import MyCampaigns from "./pages/MyCampaigns";
+import CategoryPage from "./pages/CategoryPage";
+import CampaignPage from "./pages/CampaignPage";
 
 const Loading = () => {
 	return <div className="LoadingBar">Loading...</div>;
@@ -80,8 +82,16 @@ const router = createBrowserRouter(
 							element: <SelectCategory />,
 						},
 						{
+							path: "/categories",
+							element: <SelectCategory title="Browse Categories" />,
+						},
+						{
 							path: "channel/:id",
 							element: <ChannelProfile />,
+						},
+						{
+							path: "category/:categoryId",
+							element: <CategoryPage />,
 						},
 						{
 							path: "add-campaign",
@@ -90,6 +100,10 @@ const router = createBrowserRouter(
 						{
 							path: "my-campaigns",
 							element: <MyCampaigns />,
+						},
+						{
+							path: "campaign/:id",
+							element: <CampaignPage />,
 						},
 					],
 				},

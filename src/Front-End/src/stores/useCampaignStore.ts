@@ -4,7 +4,7 @@ import type { Category } from "./useCategoryStore";
 
 export type Campaign = {
 	id?: string;
-	category_id: number;
+	category_id: string;
 	category?: {
 		id: string;
 		name: string;
@@ -44,7 +44,7 @@ type CampaignState = {
 	myCampaigns: Campaign[];
 	draftCampaign: Campaign;
 	getMyCampaigns: () => Promise<void>;
-	setDraftCampaign: (campaign: Campaign) => void;
+	setDraftCampaign: (campaign: Partial<Campaign>) => void;
 	clearDraftCampaign: () => void;
 	setDraftCampaignCategory: (category: any) => void;
 	setDraftCampaignPreferredCategory: (category: any) => void;

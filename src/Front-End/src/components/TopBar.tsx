@@ -1,7 +1,6 @@
 import { memo, useEffect, useState } from "react";
 import TextTransition from "./TextTransition";
 import useUIStore from "../stores/useUIStore";
-import Transition from "./Transition";
 
 function TopBar() {
 	const [fetched, setFetched] = useState(false);
@@ -23,9 +22,7 @@ function TopBar() {
 					/>
 				</div>
 			</div>
-			<div className="Buttons">
-				<Transition state={!!topBarButtons}>{topBarButtons}</Transition>
-			</div>
+			<div className="Buttons">{topBarButtons}</div>
 		</div>
 	);
 }

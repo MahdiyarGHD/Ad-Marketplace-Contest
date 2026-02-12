@@ -13,6 +13,7 @@ type CategoryState = {
 	categories: Category[];
 	getCategories: () => Promise<void>;
 	getCategory: (id: string) => Category | undefined;
+	getCategoryByName: (name: string) => Category | undefined;
 };
 
 const useCategoryStore = create<CategoryState>((set, get) => ({
@@ -24,6 +25,11 @@ const useCategoryStore = create<CategoryState>((set, get) => ({
 	},
 	getCategory(id: string) {
 		const category = get().categories.find((cat) => cat.id === id);
+
+		return category;
+	},
+	getCategoryByName(name: string) {
+		const category = get().categories.find((cat) => cat.name === name);
 
 		return category;
 	},

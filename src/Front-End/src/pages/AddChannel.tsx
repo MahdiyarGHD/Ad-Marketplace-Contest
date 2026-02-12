@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
-import { backButton, mainButton, openTelegramLink } from "@tma.js/sdk-react";
+import { backButton, openTelegramLink } from "@tma.js/sdk-react";
 import "./AddChannel.scss";
 import { invokeHapticFeedbackImpact } from "../utils/common";
 import { useNavigate, useParams } from "react-router-dom";
 import PageHeader, { PageHeaderTitle } from "../components/PageHeader";
 import RLottie from "../components/RLottie";
 import useChannelStore from "../stores/useChannelStore";
+import useUIStore from "../stores/useUIStore";
 
 function AddChannel() {
 	const { status } = useParams();
@@ -30,13 +31,25 @@ function AddChannel() {
 
 		invokeHapticFeedbackImpact("medium");
 
-		mainButton.setText("Retry");
+		useUIStore.setState({
+			mainButton: {
+				text: "Retry",
+				onClick: onSelectChannel,
+			},
+		});
+	};
+
+	const onDone = () => {
+		navigate("/my-channels");
 	};
 
 	useEffect(() => {
-		mainButton.setText("Select Channel");
-		mainButton.onClick(onSelectChannel);
-		mainButton.show();
+		useUIStore.setState({
+			mainButton: {
+				text: "Select Channel",
+				onClick: onSelectChannel,
+			},
+		});
 
 		backButton.show();
 
@@ -45,10 +58,6 @@ function AddChannel() {
 		invokeHapticFeedbackImpact("medium");
 
 		return () => {
-			mainButton.hide();
-
-			mainButton.offClick(onSelectChannel);
-
 			backButton.hide();
 
 			backButton.offClick(onBackButton);
@@ -62,6 +71,13 @@ function AddChannel() {
 			}, 5000);
 
 			return () => clearInterval(interval);
+		} else if (currentStatus === "success") {
+			useUIStore.setState({
+				mainButton: {
+					text: "Done",
+					onClick: onDone,
+				},
+			});
 		}
 	}, [currentStatus]);
 
