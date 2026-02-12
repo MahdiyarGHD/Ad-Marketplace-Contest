@@ -164,7 +164,7 @@ function AddCampaign() {
 						</div>
 						<div className="body">
 							<input
-								type="text"
+								type="number"
 								placeholder="Budget"
 								value={draftCampaign.budget_ton || ""}
 								onChange={(e) =>
@@ -200,9 +200,9 @@ function AddCampaign() {
 							<div className="title">Subscribers Count</div>
 							<div className="flex">
 								<input
-									type="text"
+									type="number"
 									placeholder="Min"
-									value={draftCampaign.targeting?.min_subscribers}
+									value={draftCampaign.targeting?.min_subscribers || ""}
 									onChange={(e) =>
 										setDraftCampaign({
 											targeting: {
@@ -213,9 +213,9 @@ function AddCampaign() {
 									}
 								/>
 								<input
-									type="text"
+									type="number"
 									placeholder="Max"
-									value={draftCampaign.targeting?.max_subscribers}
+									value={draftCampaign.targeting?.max_subscribers || ""}
 									onChange={(e) =>
 										setDraftCampaign({
 											targeting: {
@@ -234,9 +234,9 @@ function AddCampaign() {
 						</div>
 						<div className="meta">
 							<input
-								type="text"
+								type="number"
 								placeholder="0"
-								value={draftCampaign.targeting?.min_average_views}
+								value={draftCampaign.targeting?.min_average_views || ""}
 								onChange={(e) =>
 									setDraftCampaign({
 										targeting: {
@@ -255,9 +255,9 @@ function AddCampaign() {
 						</div>
 						<div className="meta">
 							<input
-								type="text"
+								type="number"
 								placeholder="0"
-								value={draftCampaign.targeting?.min_premium_count}
+								value={draftCampaign.targeting?.min_premium_count || ""}
 								onChange={(e) =>
 									setDraftCampaign({
 										targeting: {

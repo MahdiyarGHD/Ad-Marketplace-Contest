@@ -9,6 +9,7 @@ import { requestAPI } from "../../utils/api";
 import useChannelStore, {
 	AdFormats,
 	PriceTypes,
+	type Channel,
 } from "../../stores/useChannelStore";
 import { useShallow } from "zustand/shallow";
 import { backButton, openTelegramLink } from "@tma.js/sdk-react";
@@ -16,14 +17,21 @@ import { buildClassName, invokeHapticFeedbackImpact } from "../../utils/common";
 import "../Statistics.scss";
 import { Shimmer } from "../../components/Shimmer";
 import Transition from "../../components/Transition";
-import { ChevronRightIcon, TagIcon } from "lucide-react";
+import {
+	ChevronRightIcon,
+	EllipsisVerticalIcon,
+	PencilIcon,
+	TagIcon,
+} from "lucide-react";
 import useCategoryStore from "../../stores/useCategoryStore";
+import useAppStore from "../../stores/useAppStore";
 
 function ChannelProfile() {
 	const { id } = useParams();
 
 	const {
 		chat_id,
+		owner_id,
 		title,
 		username,
 		category_id,
@@ -31,7 +39,9 @@ function ChannelProfile() {
 		average_views,
 		pricings,
 	} = useChannelStore(useShallow((state) => state.activeChannel)) || {};
-	const { setActiveChannel } = useChannelStore();
+	const { setActiveChannel, setDraftChannel } = useChannelStore();
+
+	const { userId } = useAppStore();
 
 	const { getCategory } = useCategoryStore();
 
@@ -48,6 +58,23 @@ function ChannelProfile() {
 
 	const onBackButton = () => {
 		window.history.back();
+	};
+
+	const onEdit = () => {
+		setDraftChannel({
+			id,
+			chat_id,
+			title,
+			category_id,
+			category,
+			pricings: pricings!.map((item) => ({
+				ad_format: item.ad_format - 1,
+				price_type: item.price_type - 1,
+				price_ton: item.price_ton,
+			})),
+		} as Channel);
+
+		navigate(`/set-channel-data`);
 	};
 
 	useEffect(() => {
@@ -74,8 +101,17 @@ function ChannelProfile() {
 		<div className="scrollable">
 			<div className="ChannelProfile Profile">
 				<PageHeader>
-					<PageHeaderTitle>Profile</PageHeaderTitle>
-					<PageHeaderButtons />
+					<PageHeaderTitle> </PageHeaderTitle>
+					<PageHeaderButtons>
+						{owner_id === userId && (
+							<div className="Edit" onClick={onEdit}>
+								<PencilIcon size={22} />
+							</div>
+						)}
+						<div className="More">
+							<EllipsisVerticalIcon />
+						</div>
+					</PageHeaderButtons>
 				</PageHeader>
 
 				<div className="Chat">
@@ -110,7 +146,7 @@ function ChannelProfile() {
 
 				<div className="Statistics">
 					<div className="Item">
-						<Shimmer className="title">
+						<Shimmer className="title" state={!!subscriber_count}>
 							<span>{subscriber_count}</span>
 						</Shimmer>
 						<div className="subtitle">Subscribers</div>

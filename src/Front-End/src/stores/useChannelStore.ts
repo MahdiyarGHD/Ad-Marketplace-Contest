@@ -8,6 +8,7 @@ export const PriceTypes = ["Per hour", "Per day", "Per 1000 views"];
 export type Channel = {
 	id?: string;
 	chat_id: number;
+	owner_id?: string;
 	category_id: string;
 	category?: {
 		id: string;
@@ -103,8 +104,9 @@ const useChannelStore = create<ChannelState>((set, get) => ({
 		set((state) => ({
 			draftChannel: {
 				...state.draftChannel,
-				chat_id: channel.chat_id,
-				title: channel.title,
+				// chat_id: channel.chat_id,
+				// title: channel.title,
+				...channel,
 			},
 		}));
 	},

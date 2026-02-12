@@ -37,6 +37,8 @@ function SetChannelData() {
 
 	const { showToast } = useUIStore();
 
+	const isUpdating = Boolean(draftChannel.id);
+
 	const navigate = useNavigate();
 
 	const onBackButton = () => {
@@ -44,7 +46,7 @@ function SetChannelData() {
 	};
 
 	const onSelectChannel = () => {
-		navigate("/select-channel");
+		if (!isUpdating) navigate("/select-channel");
 	};
 
 	const onSelectCategory = () => {
@@ -67,7 +69,7 @@ function SetChannelData() {
 		}
 
 		const response = await requestAPI(
-			"/api/channels/",
+			isUpdating ? `/api/channels/${draftChannel.id}` : "/api/channels/",
 			{
 				chat_id: draftChannel.chat_id,
 				category_id: draftChannel.category_id,
@@ -77,11 +79,11 @@ function SetChannelData() {
 					price_ton: item.price_ton,
 				})),
 			} as Partial<Channel>,
-			"POST",
+			isUpdating ? "PUT" : "POST",
 		);
 
 		if (!response.isError && response.value) {
-			navigate("/add-channel/success");
+			navigate(isUpdating ? `/my-channels` : "/add-channel/success");
 			invokeHapticFeedbackImpact("medium");
 			setTimeout(() => invokeHapticFeedbackImpact("soft"), 200);
 			setTimeout(() => invokeHapticFeedbackImpact("soft"), 300);
@@ -109,8 +111,14 @@ function SetChannelData() {
 			backButton.hide();
 
 			backButton.offClick(onBackButton);
+
+			if (isUpdating) {
+				clearDraftChannel();
+			}
 		};
 	}, []);
+
+	console.log(draftChannel);
 
 	useEffect(() => {
 		useUIStore.setState({
@@ -126,7 +134,9 @@ function SetChannelData() {
 	return (
 		<div className="SetChannelData scrollable">
 			<PageHeader>
-				<PageHeaderTitle>Create your influence channel</PageHeaderTitle>
+				<PageHeaderTitle>
+					{isUpdating ? "Update your channel" : "Create your influence channel"}
+				</PageHeaderTitle>
 			</PageHeader>
 
 			<div className="Section">
@@ -144,9 +154,7 @@ function SetChannelData() {
 								<div className="subtitle">{draftChannel.chat_id ?? ""}</div>
 							)}
 						</div>
-						<div className="meta">
-							<ChevronRight />
-						</div>
+						<div className="meta">{!isUpdating && <ChevronRight />}</div>
 					</div>
 					<div className="Item" onClick={onSelectCategory}>
 						<div className="icon">

@@ -63,14 +63,19 @@ body {
         overflow: hidden;
     }
 
-    .Buttons>.Transition {
+    .Buttons {
         display: flex;
         align-items: center;
-        gap: 1rem;
+        gap: 2rem;
 
         & > div {
             display: flex;
+            align-items: center;
             cursor: pointer;
+
+            .Menu {
+                display: flex;
+            }
         }
     }
 }
@@ -400,6 +405,10 @@ body {
     }
 }
 
+.CategoryList {
+    margin-top: 0;
+}
+
 .Profile {
     .User, .Chat {
         display: flex;
@@ -614,26 +623,28 @@ textarea {
   }
 }
 
-.scrollable::-webkit-scrollbar {
-  width: 10px !important;
-  height: 10px !important;
-}
-
-.scrollable::-webkit-scrollbar-thumb {
-  border-radius: 10px !important;
-  -webkit-box-shadow: inset 0 0 6px var(--active-bg) !important;
-  background-color: var(--active-bg) !important;
-  border: 3px solid transparent;
-  background-clip: content-box;
-}
-
-.scrollable::-webkit-scrollbar-thumb:hover {
-  background-color: var(--active-primary) !important;
-}
-
-.scrollable::-webkit-scrollbar-track {
-  -webkit-box-shadow: inset 0 0 6px rgb(0 0 0 / 0%) !important;
-  border-radius: 10px !important;
+body:not(.Mobile) {
+    .scrollable::-webkit-scrollbar {
+      width: 10px !important;
+      height: 10px !important;
+    }
+    
+    .scrollable::-webkit-scrollbar-thumb {
+      border-radius: 10px !important;
+      -webkit-box-shadow: inset 0 0 6px var(--active-bg) !important;
+      background-color: var(--active-bg) !important;
+      border: 3px solid transparent;
+      background-clip: content-box;
+    }
+    
+    .scrollable::-webkit-scrollbar-thumb:hover {
+      background-color: var(--active-bg) !important;
+    }
+    
+    .scrollable::-webkit-scrollbar-track {
+      -webkit-box-shadow: inset 0 0 6px rgb(0 0 0 / 0%) !important;
+      border-radius: 10px !important;
+    }
 }
 
 .pointer {

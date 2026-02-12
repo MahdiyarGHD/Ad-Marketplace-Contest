@@ -155,7 +155,7 @@ function Home() {
 									element.$type === "category" && navigate("/categories");
 								}}
 							>
-								<div className="icon">{element.icon}</div>
+								{/* <div className="icon">{element.icon}</div> */}
 								<h2 className="title">{element.label}</h2>
 								<div className="meta">
 									Show All <ChevronRight size={18} />

@@ -15,7 +15,7 @@ import Routes from "./Routes";
 import useAppStore from "./stores/useAppStore";
 
 function App() {
-	const { authenticate } = useAppStore();
+	const { authenticate, getMe } = useAppStore();
 
 	const rawInitData = retrieveRawInitData();
 
@@ -72,8 +72,10 @@ function App() {
 		}
 	};
 
-	const handleAuth = () => {
-		authenticate(rawInitData);
+	const handleAuth = async () => {
+		await authenticate(rawInitData);
+
+		getMe();
 	};
 
 	useEffect(() => {
