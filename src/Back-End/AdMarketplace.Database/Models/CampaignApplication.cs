@@ -18,6 +18,13 @@ public class CampaignApplication : IDateTimeSchema
     public ApplicationStatusType Status { get; private set; }
     public string? RejectionReason { get; private set; }
     
+    public AdFormatType? CounterAdFormat { get; private set; }
+    public PriceType? CounterPriceType { get; private set; }
+    public decimal? CounterPriceTon { get; private set; }
+    public DateTimeOffset? CounterPostingTime { get; private set; }
+    public string? CounterMessage { get; private set; }
+    public Guid? LastCounterByUserId { get; private set; }
+    
     public DateTimeOffset CreatedAt { get; private init; }
     public DateTimeOffset? UpdatedAt { get; private set; }
     
@@ -65,6 +72,39 @@ public class CampaignApplication : IDateTimeSchema
     public void Withdraw()
     {
         Status = ApplicationStatusType.Withdrawn;
+        UpdatedAt = DateTimeOffset.UtcNow;
+    }
+
+    public void CounterOffer(
+        Guid byUserId,
+        AdFormatType adFormat,
+        PriceType priceType,
+        decimal priceTon,
+        DateTimeOffset? postingTime = null,
+        string? message = null)
+    {
+        CounterAdFormat = adFormat;
+        CounterPriceType = priceType;
+        CounterPriceTon = priceTon;
+        CounterPostingTime = postingTime?.ToUniversalTime();
+        CounterMessage = message;
+        LastCounterByUserId = byUserId;
+        Status = ApplicationStatusType.CounterOffer;
+        UpdatedAt = DateTimeOffset.UtcNow;
+    }
+
+    public void AcceptCounterOffer()
+    {
+        if (CounterPriceTon.HasValue)
+            ProposedPriceTon = CounterPriceTon.Value;
+        if (CounterAdFormat.HasValue)
+            ProposedAdFormat = CounterAdFormat.Value;
+        if (CounterPriceType.HasValue)
+            ProposedPriceType = CounterPriceType.Value;
+        if (CounterPostingTime.HasValue)
+            ProposedPostingTime = CounterPostingTime;
+
+        Status = ApplicationStatusType.Accepted;
         UpdatedAt = DateTimeOffset.UtcNow;
     }
 }
