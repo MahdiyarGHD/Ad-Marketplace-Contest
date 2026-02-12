@@ -45,7 +45,12 @@ public class DealEfConfiguration : IEntityTypeConfiguration<Deal>
         builder
             .Property(x => x.AdvertiserFeedback)
             .HasMaxLength(1024);
-        
+
+        builder
+            .Property(x => x.ChannelUnitPrice)
+            .IsRequired()
+            .HasPrecision(18, 9);
+
         builder
             .Property(x => x.CreatedAt)
             .IsRequired();

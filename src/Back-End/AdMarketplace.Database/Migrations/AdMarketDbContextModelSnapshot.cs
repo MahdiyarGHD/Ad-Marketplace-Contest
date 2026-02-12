@@ -147,8 +147,28 @@ namespace AdMarketplace.Database.Migrations
                     b.Property<Guid>("ChannelId")
                         .HasColumnType("uuid");
 
+                    b.Property<byte?>("CounterAdFormat")
+                        .HasColumnType("smallint");
+
+                    b.Property<string>("CounterMessage")
+                        .HasMaxLength(1024)
+                        .HasColumnType("character varying(1024)");
+
+                    b.Property<DateTimeOffset?>("CounterPostingTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<decimal?>("CounterPriceTon")
+                        .HasPrecision(18, 9)
+                        .HasColumnType("numeric(18,9)");
+
+                    b.Property<byte?>("CounterPriceType")
+                        .HasColumnType("smallint");
+
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("LastCounterByUserId")
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Message")
                         .HasMaxLength(1024)
@@ -182,7 +202,8 @@ namespace AdMarketplace.Database.Migrations
                     b.HasIndex("ChannelId");
 
                     b.HasIndex("CampaignId", "ChannelId")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("\"Status\" NOT IN (1, 2, 3)");
 
                     b.ToTable("CampaignApplications", "AdMarketplace");
                 });
@@ -353,8 +374,28 @@ namespace AdMarketplace.Database.Migrations
                     b.Property<Guid>("ChannelId")
                         .HasColumnType("uuid");
 
+                    b.Property<byte?>("CounterAdFormat")
+                        .HasColumnType("smallint");
+
+                    b.Property<string>("CounterMessage")
+                        .HasMaxLength(1024)
+                        .HasColumnType("character varying(1024)");
+
+                    b.Property<DateTimeOffset?>("CounterPostingTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<decimal?>("CounterPriceTon")
+                        .HasPrecision(18, 9)
+                        .HasColumnType("numeric(18,9)");
+
+                    b.Property<byte?>("CounterPriceType")
+                        .HasColumnType("smallint");
+
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("LastCounterByUserId")
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Message")
                         .HasMaxLength(1024)
@@ -388,7 +429,8 @@ namespace AdMarketplace.Database.Migrations
                     b.HasIndex("AdvertiserId");
 
                     b.HasIndex("ChannelId", "AdvertiserId")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("\"Status\" NOT IN (1, 2, 3)");
 
                     b.ToTable("ChannelApplications", "AdMarketplace");
                 });
@@ -462,6 +504,10 @@ namespace AdMarketplace.Database.Migrations
                     b.Property<Guid>("ChannelId")
                         .HasColumnType("uuid");
 
+                    b.Property<decimal>("ChannelUnitPrice")
+                        .HasPrecision(18, 9)
+                        .HasColumnType("numeric(18,9)");
+
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -484,6 +530,12 @@ namespace AdMarketplace.Database.Migrations
                     b.Property<DateTimeOffset?>("LastActivityAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<DateTimeOffset?>("PostDeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset?>("PostVerifyAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<long?>("PostedMessageId")
                         .HasColumnType("bigint");
 
@@ -492,6 +544,12 @@ namespace AdMarketplace.Database.Migrations
 
                     b.Property<byte>("PriceType")
                         .HasColumnType("smallint");
+
+                    b.Property<double?>("RequiredPostDurationHours")
+                        .HasColumnType("double precision");
+
+                    b.Property<int?>("RequiredViewCount")
+                        .HasColumnType("integer");
 
                     b.Property<DateTimeOffset?>("ScheduledPostTime")
                         .HasColumnType("timestamp with time zone");
