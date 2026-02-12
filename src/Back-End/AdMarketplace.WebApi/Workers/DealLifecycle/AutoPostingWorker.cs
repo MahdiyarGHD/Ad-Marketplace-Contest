@@ -49,7 +49,7 @@ public class AutoPostingWorker(
             .AsTracking()
             .Include(d => d.Channel)
                 .ThenInclude(c => c.Owner)
-            .Where(d => d.Status == DealStatusType.DraftApproved &&
+            .Where(d => (d.Status == DealStatusType.DraftApproved || d.Status == DealStatusType.Scheduled) &&
                         d.DraftMessageId != null &&
                         (d.ScheduledPostTime == null || d.ScheduledPostTime <= now))
             .ToListAsync(ct);

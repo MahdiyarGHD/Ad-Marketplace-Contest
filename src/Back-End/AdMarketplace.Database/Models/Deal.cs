@@ -108,7 +108,9 @@ public class Deal : IDateTimeSchema
     public void ApproveDraft()
     {
         DraftStatus = DraftStatusType.Approved;
-        Status = DealStatusType.DraftApproved;
+        Status = ScheduledPostTime.HasValue && ScheduledPostTime.Value > DateTimeOffset.UtcNow
+            ? DealStatusType.Scheduled
+            : DealStatusType.DraftApproved;
         LastActivityAt = DateTimeOffset.UtcNow;
         UpdatedAt = DateTimeOffset.UtcNow;
     }
@@ -127,7 +129,7 @@ public class Deal : IDateTimeSchema
         PostedMessageId = messageId;
         PostedTextHash = textHash;
         ActualPostTime = DateTimeOffset.UtcNow;
-        Status = DealStatusType.Posted;
+        Status = DealStatusType.Verifying;
         LastActivityAt = DateTimeOffset.UtcNow;
         UpdatedAt = DateTimeOffset.UtcNow;
     }
@@ -149,6 +151,20 @@ public class Deal : IDateTimeSchema
     public void Cancel()
     {
         Status = DealStatusType.Cancelled;
+        UpdatedAt = DateTimeOffset.UtcNow;
+    }
+
+    public void ResolveDisputeWithRefund()
+    {
+        Status = DealStatusType.Refunded;
+        FundsReleasedAt = DateTimeOffset.UtcNow;
+        UpdatedAt = DateTimeOffset.UtcNow;
+    }
+
+    public void ResolveDisputeWithRelease()
+    {
+        Status = DealStatusType.Completed;
+        FundsReleasedAt = DateTimeOffset.UtcNow;
         UpdatedAt = DateTimeOffset.UtcNow;
     }
 

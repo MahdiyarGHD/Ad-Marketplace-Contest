@@ -46,7 +46,7 @@ public class PostVerificationWorker(
         var postedDeals = await dbContext.Deals
             .AsTracking()
             .Include(d => d.Channel)
-            .Where(d => d.Status == DealStatusType.Posted &&
+            .Where(d => d.Status == DealStatusType.Verifying &&
                         d.PostedMessageId != null &&
                         d.Channel.AgentId != null &&
                         d.Channel.Username != null)

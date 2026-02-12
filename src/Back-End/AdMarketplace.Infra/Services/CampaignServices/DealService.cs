@@ -359,7 +359,7 @@ public class DealService(
         if (deal is null)
             return Error.NotFound("Deal.NotFound", "Deal not found");
 
-        if (deal.Status != DealStatusType.Verifying && deal.Status != DealStatusType.Posted)
+        if (deal.Status != DealStatusType.Verifying)
             return Error.Validation("Deal.InvalidStatus", "Deal is not ready for fund release");
 
         deal.ReleaseFunds();
@@ -404,6 +404,35 @@ public class DealService(
 
         deal.UpdateStatus(status);
         await dbContext.SaveChangesAsync();
+
+        return deal;
+    }
+
+    public async Task<ErrorOr<Deal>> ResolveDisputeAsync(Guid id, DisputeResolutionType resolution)
+    {
+        var deal = await dbContext.Deals
+            .AsTracking()
+            .FirstOrDefaultAsync(d => d.Id == id);
+        if (deal is null)
+            return Error.NotFound("Deal.NotFound", "Deal not found");
+
+        if (deal.Status != DealStatusType.Disputed)
+            return Error.Validation("Deal.NotDisputed", "Deal is not in disputed status");
+
+        switch (resolution)
+        {
+            case DisputeResolutionType.RefundAdvertiser:
+                deal.ResolveDisputeWithRefund();
+                break;
+            case DisputeResolutionType.ReleaseToOwner:
+                deal.ResolveDisputeWithRelease();
+                break;
+            default:
+                return Error.Validation("Deal.InvalidResolution", "Invalid dispute resolution type");
+        }
+
+        await dbContext.SaveChangesAsync();
+        await notificationService.NotifyDisputeResolvedAsync(deal.Id, resolution);
 
         return deal;
     }

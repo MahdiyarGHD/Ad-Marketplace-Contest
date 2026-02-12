@@ -1,4 +1,5 @@
 using AdMarketplace.Database;
+using AdMarketplace.Domain.Types;
 using AdMarketplace.Infra.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -158,6 +159,27 @@ public class NotificationService(
         await SendSafeAsync(advertiserChatId,
             $"⚠️ Deal disputed on \"{deal.Channel.Title}\"\n" +
             $"The post may have been deleted or edited.\nDeal ID: {deal.Id}", ct);
+    }
+
+    public async Task NotifyDisputeResolvedAsync(Guid dealId, DisputeResolutionType resolution, CancellationToken ct = default)
+    {
+        var deal = await LoadDealAsync(dealId, ct);
+        if (deal is null) return;
+
+        var ownerChatId = deal.Channel.Owner.UserId;
+        var advertiserChatId = deal.Advertiser.UserId;
+
+        var resolutionText = resolution == DisputeResolutionType.RefundAdvertiser
+            ? "Funds have been refunded to the advertiser."
+            : "Funds have been released to the channel owner.";
+
+        await SendSafeAsync(ownerChatId,
+            $"⚖️ Dispute resolved for \"{deal.Channel.Title}\"\n" +
+            $"{resolutionText}\nDeal ID: {deal.Id}", ct);
+
+        await SendSafeAsync(advertiserChatId,
+            $"⚖️ Dispute resolved on \"{deal.Channel.Title}\"\n" +
+            $"{resolutionText}\nDeal ID: {deal.Id}", ct);
     }
 
     private async Task<Database.Models.Deal?> LoadDealAsync(Guid dealId, CancellationToken ct)

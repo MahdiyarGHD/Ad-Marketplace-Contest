@@ -1,3 +1,5 @@
+using AdMarketplace.Domain.Types;
+
 namespace AdMarketplace.Infra.Interfaces;
 
 public interface INotificationService
@@ -12,4 +14,5 @@ public interface INotificationService
     Task NotifyDealRefundedAsync(Guid dealId, CancellationToken ct = default);
     Task NotifyDealCancelledAsync(Guid dealId, CancellationToken ct = default);
     Task NotifyDealDisputedAsync(Guid dealId, CancellationToken ct = default);
+    Task NotifyDisputeResolvedAsync(Guid dealId, DisputeResolutionType resolution, CancellationToken ct = default);
 }
