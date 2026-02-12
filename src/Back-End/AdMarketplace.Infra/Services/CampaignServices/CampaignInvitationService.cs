@@ -7,7 +7,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace AdMarketplace.Infra.Services.CampaignServices;
 
-public class CampaignInvitationService(AdMarketDbContext dbContext) : ICampaignInvitationService
+public class CampaignInvitationService(
+    AdMarketDbContext dbContext,
+    INotificationService notificationService) : ICampaignInvitationService
 {
     public async Task<ErrorOr<CampaignInvitation>> CreateAsync(
         Guid campaignId,
@@ -60,6 +62,8 @@ public class CampaignInvitationService(AdMarketDbContext dbContext) : ICampaignI
 
         dbContext.CampaignInvitations.Add(invitation);
         await dbContext.SaveChangesAsync();
+
+        await notificationService.NotifyCampaignInvitationReceivedAsync(invitation.Id);
 
         return invitation;
     }
@@ -146,6 +150,8 @@ public class CampaignInvitationService(AdMarketDbContext dbContext) : ICampaignI
         invitation.Accept();
         await dbContext.SaveChangesAsync();
 
+        await notificationService.NotifyCampaignInvitationAcceptedAsync(invitation.Id);
+
         return invitation;
     }
 
@@ -168,6 +174,8 @@ public class CampaignInvitationService(AdMarketDbContext dbContext) : ICampaignI
         invitation.Reject(reason);
         await dbContext.SaveChangesAsync();
 
+        await notificationService.NotifyCampaignInvitationRejectedAsync(invitation.Id, reason);
+
         return invitation;
     }
 
@@ -189,6 +197,8 @@ public class CampaignInvitationService(AdMarketDbContext dbContext) : ICampaignI
 
         invitation.Withdraw();
         await dbContext.SaveChangesAsync();
+
+        await notificationService.NotifyCampaignInvitationWithdrawnAsync(invitation.Id);
 
         return invitation;
     }
