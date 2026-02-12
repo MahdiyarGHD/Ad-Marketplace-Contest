@@ -60,7 +60,7 @@ function Home() {
 
 	const { isAuth } = useAppStore();
 
-	const { getCategories, getCategory, getCategoryByName } = useCategoryStore();
+	const { getCategories, getCategoryByName } = useCategoryStore();
 	const { influencers, getInfluencers, setActiveChannel } = useChannelStore();
 
 	const navigate = useNavigate();
