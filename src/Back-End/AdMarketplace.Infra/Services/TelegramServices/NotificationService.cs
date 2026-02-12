@@ -1,4 +1,5 @@
 using AdMarketplace.Database;
+using AdMarketplace.Domain.Types;
 using AdMarketplace.Infra.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -160,6 +161,218 @@ public class NotificationService(
             $"The post may have been deleted or edited.\nDeal ID: {deal.Id}", ct);
     }
 
+    public async Task NotifyDisputeResolvedAsync(Guid dealId, DisputeResolutionType resolution, CancellationToken ct = default)
+    {
+        var deal = await LoadDealAsync(dealId, ct);
+        if (deal is null) return;
+
+        var ownerChatId = deal.Channel.Owner.UserId;
+        var advertiserChatId = deal.Advertiser.UserId;
+
+        var resolutionText = resolution == DisputeResolutionType.RefundAdvertiser
+            ? "Funds have been refunded to the advertiser."
+            : "Funds have been released to the channel owner.";
+
+        await SendSafeAsync(ownerChatId,
+            $"⚖️ Dispute resolved for \"{deal.Channel.Title}\"\n" +
+            $"{resolutionText}\nDeal ID: {deal.Id}", ct);
+
+        await SendSafeAsync(advertiserChatId,
+            $"⚖️ Dispute resolved on \"{deal.Channel.Title}\"\n" +
+            $"{resolutionText}\nDeal ID: {deal.Id}", ct);
+    }
+
+    public async Task NotifyChannelApplicationReceivedAsync(Guid applicationId, CancellationToken ct = default)
+    {
+        var app = await LoadChannelApplicationAsync(applicationId, ct);
+        if (app is null) return;
+
+        var ownerChatId = app.Channel.Owner.UserId;
+        await SendSafeAsync(ownerChatId,
+            $"📩 New application for your channel \"{app.Channel.Title}\"\n" +
+            $"From: {app.Advertiser.FirstName}\n" +
+            $"Format: {app.ProposedAdFormat}, Price: {app.ProposedPriceTon} TON ({app.ProposedPriceType})\n" +
+            (app.Message is not null ? $"Message: {app.Message}\n" : "") +
+            $"Application ID: {app.Id}", ct);
+    }
+
+    public async Task NotifyChannelApplicationAcceptedAsync(Guid applicationId, CancellationToken ct = default)
+    {
+        var app = await LoadChannelApplicationAsync(applicationId, ct);
+        if (app is null) return;
+
+        var advertiserChatId = app.Advertiser.UserId;
+        await SendSafeAsync(advertiserChatId,
+            $"✅ Your application for \"{app.Channel.Title}\" has been accepted!\n" +
+            $"Format: {app.ProposedAdFormat}, Price: {app.ProposedPriceTon} TON\n" +
+            $"A deal has been created automatically. Please fund the escrow.\n" +
+            $"Application ID: {app.Id}", ct);
+    }
+
+    public async Task NotifyChannelApplicationRejectedAsync(Guid applicationId, string? reason, CancellationToken ct = default)
+    {
+        var app = await LoadChannelApplicationAsync(applicationId, ct);
+        if (app is null) return;
+
+        var advertiserChatId = app.Advertiser.UserId;
+        await SendSafeAsync(advertiserChatId,
+            $"❌ Your application for \"{app.Channel.Title}\" has been rejected.\n" +
+            (reason is not null ? $"Reason: {reason}\n" : "") +
+            $"Application ID: {app.Id}", ct);
+    }
+
+    public async Task NotifyChannelApplicationCounterOfferAsync(Guid applicationId, CancellationToken ct = default)
+    {
+        var app = await LoadChannelApplicationAsync(applicationId, ct);
+        if (app is null) return;
+
+        var recipientChatId = app.LastCounterByUserId == app.AdvertiserId
+            ? app.Channel.Owner.UserId
+            : app.Advertiser.UserId;
+
+        await SendSafeAsync(recipientChatId,
+            $"🔄 Counter-offer on \"{app.Channel.Title}\"\n" +
+            $"New terms: {app.CounterAdFormat}, {app.CounterPriceTon} TON ({app.CounterPriceType})\n" +
+            (app.CounterMessage is not null ? $"Message: {app.CounterMessage}\n" : "") +
+            $"You can accept, reject, or counter.\n" +
+            $"Application ID: {app.Id}", ct);
+    }
+
+    public async Task NotifyCampaignApplicationReceivedAsync(Guid applicationId, CancellationToken ct = default)
+    {
+        var app = await LoadCampaignApplicationAsync(applicationId, ct);
+        if (app is null) return;
+
+        var advertiserChatId = app.Campaign.Advertiser.UserId;
+        await SendSafeAsync(advertiserChatId,
+            $"📩 New application for your campaign \"{app.Campaign.Title}\"\n" +
+            $"Channel: {app.Channel.Title}\n" +
+            $"Format: {app.ProposedAdFormat}, Price: {app.ProposedPriceTon} TON ({app.ProposedPriceType})\n" +
+            (app.Message is not null ? $"Message: {app.Message}\n" : "") +
+            $"Application ID: {app.Id}", ct);
+    }
+
+    public async Task NotifyCampaignApplicationAcceptedAsync(Guid applicationId, CancellationToken ct = default)
+    {
+        var app = await LoadCampaignApplicationAsync(applicationId, ct);
+        if (app is null) return;
+
+        var ownerChatId = app.Channel.Owner.UserId;
+        await SendSafeAsync(ownerChatId,
+            $"✅ Your application for campaign \"{app.Campaign.Title}\" has been accepted!\n" +
+            $"Channel: {app.Channel.Title}\n" +
+            $"Format: {app.ProposedAdFormat}, Price: {app.ProposedPriceTon} TON\n" +
+            $"A deal has been created automatically.\n" +
+            $"Application ID: {app.Id}", ct);
+    }
+
+    public async Task NotifyCampaignApplicationRejectedAsync(Guid applicationId, string? reason, CancellationToken ct = default)
+    {
+        var app = await LoadCampaignApplicationAsync(applicationId, ct);
+        if (app is null) return;
+
+        var ownerChatId = app.Channel.Owner.UserId;
+        await SendSafeAsync(ownerChatId,
+            $"❌ Your application for campaign \"{app.Campaign.Title}\" has been rejected.\n" +
+            (reason is not null ? $"Reason: {reason}\n" : "") +
+            $"Application ID: {app.Id}", ct);
+    }
+
+    public async Task NotifyCampaignApplicationCounterOfferAsync(Guid applicationId, CancellationToken ct = default)
+    {
+        var app = await LoadCampaignApplicationAsync(applicationId, ct);
+        if (app is null) return;
+
+        var lastCounterByAdvertiser = app.LastCounterByUserId == app.Campaign.AdvertiserId;
+        var recipientChatId = lastCounterByAdvertiser
+            ? app.Channel.Owner.UserId
+            : app.Campaign.Advertiser.UserId;
+
+        await SendSafeAsync(recipientChatId,
+            $"🔄 Counter-offer on campaign \"{app.Campaign.Title}\"\n" +
+            $"Channel: {app.Channel.Title}\n" +
+            $"New terms: {app.CounterAdFormat}, {app.CounterPriceTon} TON ({app.CounterPriceType})\n" +
+            (app.CounterMessage is not null ? $"Message: {app.CounterMessage}\n" : "") +
+            $"You can accept, reject, or counter.\n" +
+            $"Application ID: {app.Id}", ct);
+    }
+
+    public async Task NotifyCampaignInvitationReceivedAsync(Guid invitationId, CancellationToken ct = default)
+    {
+        var invitation = await LoadCampaignInvitationAsync(invitationId, ct);
+        if (invitation is null) return;
+
+        var ownerChatId = invitation.Channel.Owner.UserId;
+        await SendSafeAsync(ownerChatId,
+            $"📨 You've been invited to campaign \"{invitation.Campaign.Title}\"\n" +
+            $"Channel: {invitation.Channel.Title}\n" +
+            $"Format: {invitation.ProposedAdFormat}, Price: {invitation.ProposedPriceTon} TON ({invitation.ProposedPriceType})\n" +
+            (invitation.Message is not null ? $"Message: {invitation.Message}\n" : "") +
+            $"Invitation ID: {invitation.Id}", ct);
+    }
+
+    public async Task NotifyCampaignInvitationAcceptedAsync(Guid invitationId, CancellationToken ct = default)
+    {
+        var invitation = await LoadCampaignInvitationAsync(invitationId, ct);
+        if (invitation is null) return;
+
+        var advertiserChatId = invitation.Campaign.Advertiser.UserId;
+        await SendSafeAsync(advertiserChatId,
+            $"✅ Your invitation for \"{invitation.Channel.Title}\" has been accepted!\n" +
+            $"Campaign: {invitation.Campaign.Title}\n" +
+            $"Format: {invitation.ProposedAdFormat}, Price: {invitation.ProposedPriceTon} TON\n" +
+            $"A deal has been created automatically. Please fund the escrow.\n" +
+            $"Invitation ID: {invitation.Id}", ct);
+    }
+
+    public async Task NotifyCampaignInvitationRejectedAsync(Guid invitationId, string? reason, CancellationToken ct = default)
+    {
+        var invitation = await LoadCampaignInvitationAsync(invitationId, ct);
+        if (invitation is null) return;
+
+        var advertiserChatId = invitation.Campaign.Advertiser.UserId;
+        await SendSafeAsync(advertiserChatId,
+            $"❌ Your invitation to \"{invitation.Channel.Title}\" has been rejected.\n" +
+            $"Campaign: {invitation.Campaign.Title}\n" +
+            (reason is not null ? $"Reason: {reason}\n" : "") +
+            $"Invitation ID: {invitation.Id}", ct);
+    }
+
+    public async Task NotifyCampaignInvitationWithdrawnAsync(Guid invitationId, CancellationToken ct = default)
+    {
+        var invitation = await LoadCampaignInvitationAsync(invitationId, ct);
+        if (invitation is null) return;
+
+        var ownerChatId = invitation.Channel.Owner.UserId;
+        await SendSafeAsync(ownerChatId,
+            $"🔙 Invitation withdrawn for campaign \"{invitation.Campaign.Title}\"\n" +
+            $"Channel: {invitation.Channel.Title}\n" +
+            $"Invitation ID: {invitation.Id}", ct);
+    }
+
+    public async Task NotifyPostDeletedAsync(Guid dealId, CancellationToken ct = default)
+    {
+        var deal = await LoadDealAsync(dealId, ct);
+        if (deal is null) return;
+
+        var ownerChatId = deal.Channel.Owner.UserId;
+        var advertiserChatId = deal.Advertiser.UserId;
+
+        var durationText = deal.RequiredPostDurationHours.HasValue
+            ? $"{deal.RequiredPostDurationHours.Value:F1} hours"
+            : "the agreed duration";
+
+        await SendSafeAsync(ownerChatId,
+            $"🗑️ Ad post removed from \"{deal.Channel.Title}\"\n" +
+            $"The post duration of {durationText} has ended.\n" +
+            $"Deal ID: {deal.Id}", ct);
+
+        await SendSafeAsync(advertiserChatId,
+            $"🗑️ Your ad has been removed from \"{deal.Channel.Title}\"\n" +
+            $"The post duration of {durationText} has ended.\n" +
+            $"Deal ID: {deal.Id}", ct);
+    }
+
     private async Task<Database.Models.Deal?> LoadDealAsync(Guid dealId, CancellationToken ct)
     {
         var deal = await dbContext.Deals
@@ -172,6 +385,50 @@ public class NotificationService(
             logger.LogWarning("Notification skipped: deal {DealId} not found", dealId);
 
         return deal;
+    }
+
+    private async Task<Database.Models.ChannelApplication?> LoadChannelApplicationAsync(Guid applicationId, CancellationToken ct)
+    {
+        var app = await dbContext.ChannelApplications
+            .Include(a => a.Channel)
+                .ThenInclude(c => c.Owner)
+            .Include(a => a.Advertiser)
+            .FirstOrDefaultAsync(a => a.Id == applicationId, ct);
+
+        if (app is null)
+            logger.LogWarning("Notification skipped: channel application {AppId} not found", applicationId);
+
+        return app;
+    }
+
+    private async Task<Database.Models.CampaignApplication?> LoadCampaignApplicationAsync(Guid applicationId, CancellationToken ct)
+    {
+        var app = await dbContext.CampaignApplications
+            .Include(a => a.Campaign)
+                .ThenInclude(c => c.Advertiser)
+            .Include(a => a.Channel)
+                .ThenInclude(c => c.Owner)
+            .FirstOrDefaultAsync(a => a.Id == applicationId, ct);
+
+        if (app is null)
+            logger.LogWarning("Notification skipped: campaign application {AppId} not found", applicationId);
+
+        return app;
+    }
+
+    private async Task<Database.Models.CampaignInvitation?> LoadCampaignInvitationAsync(Guid invitationId, CancellationToken ct)
+    {
+        var invitation = await dbContext.CampaignInvitations
+            .Include(i => i.Campaign)
+                .ThenInclude(c => c.Advertiser)
+            .Include(i => i.Channel)
+                .ThenInclude(c => c.Owner)
+            .FirstOrDefaultAsync(i => i.Id == invitationId, ct);
+
+        if (invitation is null)
+            logger.LogWarning("Notification skipped: campaign invitation {InvitationId} not found", invitationId);
+
+        return invitation;
     }
 
     private async Task SendSafeAsync(long chatId, string text, CancellationToken ct)

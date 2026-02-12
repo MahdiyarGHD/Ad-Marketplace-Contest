@@ -34,5 +34,6 @@ public interface IDealService
     Task<ErrorOr<Deal>> MarkAsPostedAsync(Guid id, long messageId);
     Task<ErrorOr<Deal>> ReleaseFundsAsync(Guid id);
     Task<ErrorOr<Deal>> RefundAsync(Guid id);
+    Task<ErrorOr<Deal>> ResolveDisputeAsync(Guid id, DisputeResolutionType resolution);
     Task<ErrorOr<Deal>> UpdateStatusAsync(Guid id, DealStatusType status);
 }

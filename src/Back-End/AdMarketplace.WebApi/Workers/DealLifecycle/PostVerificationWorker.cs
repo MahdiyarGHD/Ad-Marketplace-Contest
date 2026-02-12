@@ -13,7 +13,7 @@ public class PostVerificationWorker(
     ILogger<PostVerificationWorker> logger) : BackgroundService
 {
     private static readonly TimeSpan PollInterval = TimeSpan.FromMinutes(5);
-    private static readonly TimeSpan VerificationWindow = TimeSpan.FromHours(24);
+    private static readonly TimeSpan FallbackVerificationWindow = TimeSpan.FromHours(24);
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
@@ -46,7 +46,7 @@ public class PostVerificationWorker(
         var postedDeals = await dbContext.Deals
             .AsTracking()
             .Include(d => d.Channel)
-            .Where(d => d.Status == DealStatusType.Posted &&
+            .Where(d => d.Status == DealStatusType.Verifying &&
                         d.PostedMessageId != null &&
                         d.Channel.AgentId != null &&
                         d.Channel.Username != null)
@@ -97,14 +97,35 @@ public class PostVerificationWorker(
                     continue;
                 }
 
-                if (deal.ActualPostTime.HasValue &&
-                    now - deal.ActualPostTime.Value >= VerificationWindow)
+                if (ShouldReleaseFunds(deal, verification.ViewCount, now))
                 {
                     logger.LogInformation(
-                        "Deal {DealId} passed verification window, releasing funds", deal.Id);
+                        "Deal {DealId} passed verification (PriceType={PriceType}), releasing funds",
+                        deal.Id, deal.PriceType);
                     deal.ReleaseFunds();
                     await notificationService.NotifyDealCompletedAsync(deal.Id, ct);
                     modified = true;
+
+                    // Delete the post from the channel after verification passes
+                    var deleteResult = await postingService.DeletePostAsync(
+                        deal.Channel.ChatId,
+                        deal.PostedMessageId!.Value,
+                        ct);
+
+                    if (deleteResult.IsError)
+                    {
+                        logger.LogWarning(
+                            "Failed to delete post for deal {DealId}: {Error}",
+                            deal.Id, deleteResult.FirstError.Description);
+                    }
+                    else
+                    {
+                        deal.MarkPostAsDeleted();
+                        await notificationService.NotifyPostDeletedAsync(deal.Id, ct);
+                        logger.LogInformation(
+                            "Deleted expired post for deal {DealId}, both parties notified",
+                            deal.Id);
+                    }
                 }
             }
             catch (Exception ex)
@@ -115,5 +136,24 @@ public class PostVerificationWorker(
 
         if (modified)
             await dbContext.SaveChangesAsync(ct);
+    }
+
+    private static bool ShouldReleaseFunds(Database.Models.Deal deal, int currentViewCount, DateTimeOffset now)
+    {
+        if (!deal.ActualPostTime.HasValue)
+            return false;
+
+        if (deal.PriceType == PriceType.PerThousandViews)
+        {
+            if (!deal.RequiredViewCount.HasValue)
+                return false;
+
+            return currentViewCount >= deal.RequiredViewCount.Value;
+        }
+
+        if (deal.PostVerifyAt.HasValue)
+            return now >= deal.PostVerifyAt.Value;
+
+        return now - deal.ActualPostTime.Value >= FallbackVerificationWindow;
     }
 }

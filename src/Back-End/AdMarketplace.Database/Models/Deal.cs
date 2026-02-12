@@ -30,9 +30,15 @@ public class Deal : IDateTimeSchema
     public DraftStatusType DraftStatus { get; private set; }
     public string? AdvertiserFeedback { get; private set; }
     
+    public decimal ChannelUnitPrice { get; private set; }
+    public double? RequiredPostDurationHours { get; private set; }
+    public int? RequiredViewCount { get; private set; }
+    public DateTimeOffset? PostVerifyAt { get; private set; }
+    
     public DateTimeOffset? LastActivityAt { get; private set; }
     public DateTimeOffset? AutoCancelAt { get; private set; }
     public DateTimeOffset? FundsReleasedAt { get; private set; }
+    public DateTimeOffset? PostDeletedAt { get; private set; }
     
     public DateTimeOffset CreatedAt { get; private init; }
     public DateTimeOffset? UpdatedAt { get; private set; }
@@ -54,10 +60,32 @@ public class Deal : IDateTimeSchema
         decimal amountTon,
         AdFormatType adFormat,
         PriceType priceType,
+        decimal channelUnitPrice,
         DateTimeOffset? scheduledPostTime = null,
         string? escrowWalletAddress = null)
     {
         var now = DateTimeOffset.UtcNow;
+
+        double? requiredHours = null;
+        int? requiredViews = null;
+
+        if (channelUnitPrice > 0)
+        {
+            var units = amountTon / channelUnitPrice;
+            switch (priceType)
+            {
+                case PriceType.PerHour:
+                    requiredHours = (double)units;
+                    break;
+                case PriceType.PerDay:
+                    requiredHours = (double)(units * 24);
+                    break;
+                case PriceType.PerThousandViews:
+                    requiredViews = (int)(units * 1000);
+                    break;
+            }
+        }
+
         return new Deal
         {
             Id = Guid.CreateVersion7(),
@@ -70,6 +98,9 @@ public class Deal : IDateTimeSchema
             AmountTon = amountTon,
             AdFormat = adFormat,
             PriceType = priceType,
+            ChannelUnitPrice = channelUnitPrice,
+            RequiredPostDurationHours = requiredHours,
+            RequiredViewCount = requiredViews,
             ScheduledPostTime = scheduledPostTime,
             EscrowWalletAddress = escrowWalletAddress,
             Status = DealStatusType.AwaitingPayment,
@@ -108,7 +139,9 @@ public class Deal : IDateTimeSchema
     public void ApproveDraft()
     {
         DraftStatus = DraftStatusType.Approved;
-        Status = DealStatusType.DraftApproved;
+        Status = ScheduledPostTime.HasValue && ScheduledPostTime.Value > DateTimeOffset.UtcNow
+            ? DealStatusType.Scheduled
+            : DealStatusType.DraftApproved;
         LastActivityAt = DateTimeOffset.UtcNow;
         UpdatedAt = DateTimeOffset.UtcNow;
     }
@@ -127,7 +160,11 @@ public class Deal : IDateTimeSchema
         PostedMessageId = messageId;
         PostedTextHash = textHash;
         ActualPostTime = DateTimeOffset.UtcNow;
-        Status = DealStatusType.Posted;
+        Status = DealStatusType.Verifying;
+
+        if (RequiredPostDurationHours.HasValue)
+            PostVerifyAt = ActualPostTime.Value.AddHours(RequiredPostDurationHours.Value);
+
         LastActivityAt = DateTimeOffset.UtcNow;
         UpdatedAt = DateTimeOffset.UtcNow;
     }
@@ -149,6 +186,26 @@ public class Deal : IDateTimeSchema
     public void Cancel()
     {
         Status = DealStatusType.Cancelled;
+        UpdatedAt = DateTimeOffset.UtcNow;
+    }
+
+    public void ResolveDisputeWithRefund()
+    {
+        Status = DealStatusType.Refunded;
+        FundsReleasedAt = DateTimeOffset.UtcNow;
+        UpdatedAt = DateTimeOffset.UtcNow;
+    }
+
+    public void ResolveDisputeWithRelease()
+    {
+        Status = DealStatusType.Completed;
+        FundsReleasedAt = DateTimeOffset.UtcNow;
+        UpdatedAt = DateTimeOffset.UtcNow;
+    }
+
+    public void MarkPostAsDeleted()
+    {
+        PostDeletedAt = DateTimeOffset.UtcNow;
         UpdatedAt = DateTimeOffset.UtcNow;
     }
 

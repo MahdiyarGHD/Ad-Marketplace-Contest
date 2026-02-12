@@ -113,6 +113,11 @@ public class DealService(
                 return Error.Validation("Deal.ChannelMismatch", "Channel ID does not match the channel application's channel");
         }
 
+        var channelPricing = await dbContext.ChannelPricings
+            .FirstOrDefaultAsync(p => p.ChannelId == channelId && p.AdFormat == adFormat && p.PriceType == priceType);
+
+        var channelUnitPrice = channelPricing?.PriceTon ?? 0m;
+
         var deal = Deal.Create(
             campaignId: campaignId,
             applicationId: applicationId,
@@ -123,6 +128,7 @@ public class DealService(
             amountTon: amountTon,
             adFormat: adFormat,
             priceType: priceType,
+            channelUnitPrice: channelUnitPrice,
             scheduledPostTime: scheduledPostTime,
             escrowWalletAddress: escrowWalletAddress);
 
@@ -359,7 +365,7 @@ public class DealService(
         if (deal is null)
             return Error.NotFound("Deal.NotFound", "Deal not found");
 
-        if (deal.Status != DealStatusType.Verifying && deal.Status != DealStatusType.Posted)
+        if (deal.Status != DealStatusType.Verifying)
             return Error.Validation("Deal.InvalidStatus", "Deal is not ready for fund release");
 
         deal.ReleaseFunds();
@@ -404,6 +410,35 @@ public class DealService(
 
         deal.UpdateStatus(status);
         await dbContext.SaveChangesAsync();
+
+        return deal;
+    }
+
+    public async Task<ErrorOr<Deal>> ResolveDisputeAsync(Guid id, DisputeResolutionType resolution)
+    {
+        var deal = await dbContext.Deals
+            .AsTracking()
+            .FirstOrDefaultAsync(d => d.Id == id);
+        if (deal is null)
+            return Error.NotFound("Deal.NotFound", "Deal not found");
+
+        if (deal.Status != DealStatusType.Disputed)
+            return Error.Validation("Deal.NotDisputed", "Deal is not in disputed status");
+
+        switch (resolution)
+        {
+            case DisputeResolutionType.RefundAdvertiser:
+                deal.ResolveDisputeWithRefund();
+                break;
+            case DisputeResolutionType.ReleaseToOwner:
+                deal.ResolveDisputeWithRelease();
+                break;
+            default:
+                return Error.Validation("Deal.InvalidResolution", "Invalid dispute resolution type");
+        }
+
+        await dbContext.SaveChangesAsync();
+        await notificationService.NotifyDisputeResolvedAsync(deal.Id, resolution);
 
         return deal;
     }

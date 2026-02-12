@@ -27,4 +27,13 @@ public interface ICampaignApplicationService
     Task<ErrorOr<CampaignApplication>> AcceptAsync(Guid id, Guid advertiserId);
     Task<ErrorOr<CampaignApplication>> RejectAsync(Guid id, Guid advertiserId, string? reason = null);
     Task<ErrorOr<CampaignApplication>> WithdrawAsync(Guid id, Guid channelOwnerId);
+    Task<ErrorOr<CampaignApplication>> CounterOfferAsync(
+        Guid id,
+        Guid userId,
+        AdFormatType adFormat,
+        PriceType priceType,
+        decimal priceTon,
+        DateTimeOffset? postingTime = null,
+        string? message = null);
+    Task<ErrorOr<CampaignApplication>> AcceptCounterOfferAsync(Guid id, Guid userId);
 }

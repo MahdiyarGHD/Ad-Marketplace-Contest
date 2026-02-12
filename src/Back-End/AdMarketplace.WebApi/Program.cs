@@ -52,6 +52,10 @@ app.UseCustomExceptionHandler();
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseCors(CorsOptions.PolicyName);
-app.UseFastEndpoints();
+app.UseFastEndpoints(c =>
+{
+    c.Serializer.Options.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.SnakeCaseLower;
+    c.Serializer.Options.DefaultIgnoreCondition = JsonIgnoreCondition.Never;
+});
 app.ConfigureAppStart();
 app.Run();

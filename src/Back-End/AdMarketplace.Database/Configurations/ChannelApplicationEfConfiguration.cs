@@ -41,7 +41,23 @@ public class ChannelApplicationEfConfiguration : IEntityTypeConfiguration<Channe
         builder
             .Property(x => x.RejectionReason)
             .HasMaxLength(512);
-        
+
+        builder
+            .Property(x => x.CounterAdFormat)
+            .HasConversion<byte?>();
+
+        builder
+            .Property(x => x.CounterPriceType)
+            .HasConversion<byte?>();
+
+        builder
+            .Property(x => x.CounterPriceTon)
+            .HasPrecision(18, 9);
+
+        builder
+            .Property(x => x.CounterMessage)
+            .HasMaxLength(1024);
+
         builder
             .Property(x => x.CreatedAt)
             .IsRequired();
@@ -60,6 +76,7 @@ public class ChannelApplicationEfConfiguration : IEntityTypeConfiguration<Channe
         
         builder
             .HasIndex(x => new { x.ChannelId, x.AdvertiserId })
-            .IsUnique();
+            .IsUnique()
+            .HasFilter("\"Status\" NOT IN (1, 2, 3)");
     }
 }

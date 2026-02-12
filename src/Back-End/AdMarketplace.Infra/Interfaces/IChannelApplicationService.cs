@@ -27,4 +27,13 @@ public interface IChannelApplicationService
     Task<ErrorOr<ChannelApplication>> AcceptAsync(Guid id, Guid channelOwnerId);
     Task<ErrorOr<ChannelApplication>> RejectAsync(Guid id, Guid channelOwnerId, string? reason = null);
     Task<ErrorOr<ChannelApplication>> WithdrawAsync(Guid id, Guid advertiserId);
+    Task<ErrorOr<ChannelApplication>> CounterOfferAsync(
+        Guid id,
+        Guid userId,
+        AdFormatType adFormat,
+        PriceType priceType,
+        decimal priceTon,
+        DateTimeOffset? postingTime = null,
+        string? message = null);
+    Task<ErrorOr<ChannelApplication>> AcceptCounterOfferAsync(Guid id, Guid userId);
 }
