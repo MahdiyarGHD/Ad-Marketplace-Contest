@@ -21,6 +21,7 @@ import DatePicker from "../components/DatePicker";
 import RLottie from "../components/RLottie";
 import { useShallow } from "zustand/shallow";
 import type { DateRange } from "react-day-picker";
+import { Textarea } from "../components/Textarea";
 
 const AdFormats = ["Post"];
 
@@ -113,6 +114,10 @@ function AddCampaign({ success = false }: { success?: boolean }) {
 		}
 	};
 
+	const onDone = () => {
+		navigate("/my-campaigns");
+	};
+
 	useEffect(() => {
 		backButton.show();
 
@@ -132,12 +137,21 @@ function AddCampaign({ success = false }: { success?: boolean }) {
 	}, []);
 
 	useEffect(() => {
-		useUIStore.setState({
-			mainButton: {
-				text: "Save",
-				onClick: handleSave,
-			},
-		});
+		if (success) {
+			useUIStore.setState({
+				mainButton: {
+					text: "Done",
+					onClick: onDone,
+				},
+			});
+		} else {
+			useUIStore.setState({
+				mainButton: {
+					text: "Save",
+					onClick: handleSave,
+				},
+			});
+		}
 	}, [draftCampaign]);
 
 	const renderSuccess = () => {
@@ -147,7 +161,7 @@ function AddCampaign({ success = false }: { success?: boolean }) {
 					<RLottie sticker="congrats" autoplay width={120} height={120} />
 				</div>
 				<h2 className="Title">Your Campaign Successfully Added</h2>
-				<div className="Instructions">
+				<div className="Subtitle">
 					this campaign is saved as draft, you can edit or publish it from My
 					Campaigns page.
 					<br />
@@ -186,7 +200,7 @@ function AddCampaign({ success = false }: { success?: boolean }) {
 					<div className="Item">
 						<div className="icon"></div>
 						<div className="body">
-							<textarea
+							<Textarea
 								placeholder="Campaign Brief"
 								value={draftCampaign.brief}
 								onChange={(e) => setDraftCampaign({ brief: e.target.value })}
@@ -196,7 +210,7 @@ function AddCampaign({ success = false }: { success?: boolean }) {
 					<div className="Item">
 						<div className="icon"></div>
 						<div className="body">
-							<textarea
+							<Textarea
 								placeholder="Campaign Description"
 								value={draftCampaign.description}
 								onChange={(e) =>
@@ -229,12 +243,13 @@ function AddCampaign({ success = false }: { success?: boolean }) {
 						<div className="body">
 							<input
 								type="number"
-								placeholder="Budget"
+								placeholder="0"
 								value={draftCampaign.budget_ton || ""}
 								onChange={(e) =>
 									setDraftCampaign({ budget_ton: Number(e.target.value) })
 								}
 							/>
+							<div className="subtitle">Budget</div>
 						</div>
 						<div className="meta">TON</div>
 					</div>
@@ -243,7 +258,7 @@ function AddCampaign({ success = false }: { success?: boolean }) {
 						<div className="body">
 							<input
 								type="number"
-								placeholder="Max Price Per Placement"
+								placeholder="0"
 								value={draftCampaign.max_price_per_placement || ""}
 								onChange={(e) =>
 									setDraftCampaign({
@@ -251,6 +266,7 @@ function AddCampaign({ success = false }: { success?: boolean }) {
 									})
 								}
 							/>
+							<div className="subtitle">Max Price Per Placement</div>
 						</div>
 						<div className="meta">TON</div>
 					</div>

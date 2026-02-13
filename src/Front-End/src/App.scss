@@ -489,16 +489,21 @@ body {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    margin: 0 2rem;
     gap: 1rem;
     height: 100%;
+    padding: 0 1rem;
 
     .Title {
         text-align: center;
     }
 
-    .Subtitle {
+    .Subtitle { 
         text-align: center;
+        color: var(--secondary-text);
+    }
+
+    .Instructions {
+        margin: 0 1rem;
     }
 }
 
@@ -651,8 +656,9 @@ input[type=number] {
 
 textarea {
     resize: vertical;
-    max-height: 12rem;
+    max-height: 6rem;
     padding-top: .25rem;
+    resize: none;
 }
 
 .flex {

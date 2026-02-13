@@ -17,11 +17,24 @@ import {
 import { useShallow } from "zustand/shallow";
 import MainButton from "./MainButton";
 import DatePicker from "./DatePicker";
+import { Textarea } from "./Textarea";
 
-export const PriceTypesUnit = {
-	1: "hours",
-	2: "days",
-	3: "views",
+export const PriceTypesInfo = {
+	1: {
+		title: "Per hour",
+		unit: "hours",
+		max: 10000,
+	},
+	2: {
+		title: "Per day",
+		unit: "days",
+		max: 365,
+	},
+	3: {
+		title: "Per 1000 views",
+		unit: "views",
+		max: 100000000,
+	},
 };
 
 function Application() {
@@ -38,6 +51,30 @@ function Application() {
 		application?.channel?.pricings?.find((p) => p.price_type === Number(key)),
 	);
 
+	const priceType =
+		PriceTypesInfo[application?.proposed_price_type as PriceType];
+
+	const calculateTotal = () => {
+		if (!application?.proposed_value || !application?.channel?.pricings)
+			return 0;
+
+		const pricing = application.channel.pricings.find(
+			(p) => p.price_type === application.proposed_price_type,
+		);
+		if (!pricing) return 0;
+
+		if (application.proposed_value > priceType?.max) {
+			setApplication({ proposed_value: priceType?.max });
+			return priceType?.max * pricing.price_ton;
+		}
+
+		if (application.proposed_price_type === 3) {
+			return (application.proposed_value * pricing.price_ton) / 1000;
+		}
+
+		return application.proposed_value * pricing.price_ton;
+	};
+
 	return (
 		<div className="Application">
 			<div className="Items">
@@ -49,12 +86,7 @@ function Application() {
 							</div>
 							<div className="body">Proposed Price type</div>
 							<div className="meta">
-								<TextTransition
-									text={
-										PriceTypes[application?.proposed_price_type as PriceType] ||
-										"Per hour"
-									}
-								/>
+								<TextTransition text={priceType?.title || "Per hour"} />
 								<ChevronDown />
 							</div>
 						</div>
@@ -111,19 +143,18 @@ function Application() {
 						<div className="flex">
 							<input
 								type="number"
-								value={application?.proposed_value || 0}
+								placeholder="0"
+								value={application?.proposed_value || ""}
 								onChange={(e) =>
 									setApplication({ proposed_value: Number(e.target.value) })
 								}
 							/>
 						</div>
-						<div className="subtitle">
-							{PriceTypesUnit[application?.proposed_price_type as PriceType]}
-						</div>
+						<div className="subtitle">{priceType?.unit || "hours"}</div>
 					</div>
 					<div className="meta">
 						{application?.proposed_value && application?.channel?.pricings
-							? `${application?.proposed_value * (application?.channel?.pricings.find((p) => p.price_type === application?.proposed_price_type)?.price_ton || 0) || 0} TON`
+							? `${calculateTotal()} TON`
 							: "0 TON"}
 					</div>
 				</div>
@@ -160,7 +191,7 @@ function Application() {
 				/>
 				<div className="Item">
 					<div className="body">
-						<textarea
+						<Textarea
 							placeholder="Message"
 							value={application?.message}
 							onChange={(e) => setApplication({ message: e.target.value })}
