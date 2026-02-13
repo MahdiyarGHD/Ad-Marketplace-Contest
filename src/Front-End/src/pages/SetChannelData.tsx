@@ -25,6 +25,7 @@ import Menu, { DropdownMenu, MenuItem } from "../components/Menu";
 import TextTransition from "../components/TextTransition";
 import { requestAPI } from "../utils/api";
 import useUIStore from "../stores/useUIStore";
+import { useShallow } from "zustand/shallow";
 
 function SetChannelData() {
 	const {
@@ -37,7 +38,7 @@ function SetChannelData() {
 		setDraftChannelAdFormat,
 	} = useChannelStore();
 
-	const { showToast } = useUIStore();
+	const showToast = useUIStore(useShallow((state) => state.showToast));
 
 	const isUpdating = Boolean(draftChannel.id);
 
@@ -192,11 +193,11 @@ function SetChannelData() {
 								<div className="body">
 									<div className="price">
 										<input
-											type="text"
+											type="number"
 											placeholder="Price"
-											value={item.price_ton}
+											value={item.price_ton || ""}
 											onChange={(e) =>
-												setDraftChannelPrice(Number(e.target.value) || 0, index)
+												setDraftChannelPrice(Number(e.target.value), index)
 											}
 										/>
 									</div>

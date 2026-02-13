@@ -4,9 +4,10 @@ import useUIStore from "../stores/useUIStore";
 import { createPortal } from "react-dom";
 import { CircleAlertIcon } from "lucide-react";
 import { invokeHapticFeedbackImpact } from "../utils/common";
+import { useShallow } from "zustand/shallow";
 
 function Toasts() {
-	const { toasts } = useUIStore();
+	const toasts = useUIStore(useShallow((state) => state.toasts));
 
 	return createPortal(
 		<div className="Toasts">
@@ -35,7 +36,7 @@ export function Toast({
 	title: string;
 }) {
 	const [show, setShow] = useState(true);
-	const { removeToast } = useUIStore();
+	const removeToast = useUIStore(useShallow((state) => state.removeToast));
 
 	useEffect(() => {
 		invokeHapticFeedbackImpact("medium");

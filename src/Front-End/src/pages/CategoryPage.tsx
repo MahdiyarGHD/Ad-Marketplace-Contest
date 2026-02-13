@@ -10,12 +10,18 @@ import useChannelStore from "../stores/useChannelStore";
 import useCategoryStore from "../stores/useCategoryStore";
 import type { Campaign } from "../stores/useCampaignStore";
 import useCampaignStore from "../stores/useCampaignStore";
+import { useShallow } from "zustand/shallow";
+import { invokeHapticFeedbackImpact } from "../utils/common";
 
 function CategoryPage() {
 	const [list, setList] = useState<Channel[] | Campaign[]>([]);
 
-	const { setActiveChannel } = useChannelStore();
-	const { setActiveCampaign } = useCampaignStore();
+	const setActiveChannel = useChannelStore(
+		useShallow((state) => state.setActiveChannel),
+	);
+	const setActiveCampaign = useCampaignStore(
+		useShallow((state) => state.setActiveCampaign),
+	);
 
 	const { getCategory } = useCategoryStore();
 
@@ -76,6 +82,8 @@ function CategoryPage() {
 		backButton.show();
 		backButton.onClick(onBackButton);
 
+		invokeHapticFeedbackImpact("medium");
+
 		return () => {
 			backButton.hide();
 			backButton.offClick(onBackButton);
@@ -87,7 +95,7 @@ function CategoryPage() {
 
 		if (type === "channel") getChannels();
 		else if (type === "campaign") getCampaigns();
-	}, [categoryId]);
+	}, [categoryId, type]);
 
 	return (
 		<div className="CategoryPage">

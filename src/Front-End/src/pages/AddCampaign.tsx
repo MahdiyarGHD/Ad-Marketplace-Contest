@@ -19,6 +19,7 @@ import useUIStore from "../stores/useUIStore";
 import useCampaignStore, { type Campaign } from "../stores/useCampaignStore";
 import DatePicker from "../components/DatePicker";
 import RLottie from "../components/RLottie";
+import { useShallow } from "zustand/shallow";
 
 const AdFormats = ["Post"];
 
@@ -33,7 +34,7 @@ function AddCampaign({ success = false }: { success?: boolean }) {
 		setDraftCampaignPriceType,
 	} = useCampaignStore();
 
-	const { showToast } = useUIStore();
+	const showToast = useUIStore(useShallow((state) => state.showToast));
 
 	const navigate = useNavigate();
 
@@ -195,6 +196,8 @@ function AddCampaign({ success = false }: { success?: boolean }) {
 							/>
 						</div>
 					</div>
+				</div>
+				<div className="Items">
 					<div className="Item" onClick={onSelectCategory}>
 						<div className="icon">
 							<TagIcon />
@@ -208,6 +211,8 @@ function AddCampaign({ success = false }: { success?: boolean }) {
 							<ChevronRight />
 						</div>
 					</div>
+				</div>
+				<div className="Items">
 					<div className="Item">
 						<div className="icon">
 							<DollarSignIcon />

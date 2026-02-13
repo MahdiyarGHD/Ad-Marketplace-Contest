@@ -23,6 +23,7 @@ import Menu, { DropdownMenu, MenuItem } from "../components/Menu";
 import RLottie from "../components/RLottie";
 import type { Campaign } from "../stores/useCampaignStore";
 import useCampaignStore from "../stores/useCampaignStore";
+import { useShallow } from "zustand/shallow";
 
 const renderCategory = (
 	category: Category,
@@ -93,7 +94,9 @@ function Home() {
 		getCampaigns,
 		setActiveChannel,
 	} = useChannelStore();
-	const { setActiveCampaign } = useCampaignStore();
+	const setActiveCampaign = useCampaignStore(
+		useShallow((state) => state.setActiveCampaign),
+	);
 
 	const navigate = useNavigate();
 
@@ -150,7 +153,7 @@ function Home() {
 						element.$type === "category" && navigate(`/categories/${type}`);
 					}}
 				>
-					{/* <div className="icon">{element.icon}</div> */}
+					<div className="icon">{element.icon}</div>
 					<h2 className="title">{element.label}</h2>
 					<div className="meta">
 						Show All <ChevronRight size={18} />
@@ -240,7 +243,7 @@ function Home() {
 					)}
 					{influencers.elements.length === 0 && <LoadingSkeleton />}
 				</TabContent>
-				<TabContent state={true}>
+				<TabContent state={true} className="scrollable">
 					{campaigns.elements.map((element) =>
 						renderSection(element, "campaign"),
 					)}

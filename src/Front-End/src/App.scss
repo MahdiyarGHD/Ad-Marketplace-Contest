@@ -138,6 +138,12 @@ body {
     &:active {
         transform: scale(.98);
     }
+
+    &.disabled {
+        background-color: var(--secondary-bg-color);
+        color: var(--secondary-text);
+        cursor: default;
+    }
 }
 
 .Mobile .MainButton {
@@ -382,6 +388,8 @@ body {
         align-items: center;
         overflow-x: auto;
         scroll-snap-type: x mandatory;
+        background-color: var(--secondary-bg-color);
+        // padding: 0 .25rem;
         // scrollbar-width: none;
 
         .ChatItem {
@@ -392,16 +400,29 @@ body {
             flex: none;
             gap: .5rem;
             padding: .5rem;
+            // border-radius: 1rem;
             overflow: hidden;
             scroll-snap-align: center;
+
+            &::after {
+                display: none;
+            }
+
+            .Avatar {
+                width: 54px !important;
+                height: 54px !important;
+                font-size: 27px !important;
+            }
             
             .body {
                 width: 6rem;
                 gap: .125rem;
                 text-overflow: ellipsis;
                 overflow: hidden;
+                text-align: center;
 
                 .title {
+                    font-size: 14px;
                     text-overflow: ellipsis;
                     overflow: hidden;
                     text-align: center;
@@ -627,6 +648,7 @@ input[type=number] {
 textarea {
     resize: vertical;
     max-height: 12rem;
+    padding-top: .25rem;
 }
 
 .flex {
@@ -704,7 +726,7 @@ body:not(.Mobile) {
     align-items: flex-start;
     background-color: color-mix(
             in srgb,
-            var(--dropdown-bg) 25%,
+            var(--dropdown-bg) 50%,
             transparent
         ) !important;
     position: fixed;

@@ -41,9 +41,14 @@ function ChannelProfile() {
 		average_views,
 		pricings,
 	} = useChannelStore(useShallow((state) => state.activeChannel)) || {};
-	const { setActiveChannel, setDraftChannel } = useChannelStore();
+	const { setActiveChannel, setDraftChannel } = useChannelStore(
+		useShallow((state) => ({
+			setActiveChannel: state.setActiveChannel,
+			setDraftChannel: state.setDraftChannel,
+		})),
+	);
 
-	const { userId } = useAppStore();
+	const userId = useAppStore(useShallow((state) => state.userId));
 
 	const { getCategory } = useCategoryStore();
 
