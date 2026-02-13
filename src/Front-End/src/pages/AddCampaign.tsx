@@ -36,6 +36,8 @@ function AddCampaign({ success = false }: { success?: boolean }) {
 
 	const showToast = useUIStore(useShallow((state) => state.showToast));
 
+	const isUpdating = Boolean(draftCampaign.id);
+
 	const navigate = useNavigate();
 
 	const onBackButton = () => {
@@ -83,7 +85,7 @@ function AddCampaign({ success = false }: { success?: boolean }) {
 		}
 
 		const response = await requestAPI(
-			"/api/campaigns/",
+			isUpdating ? `/api/campaigns/${draftCampaign.id}` : "/api/campaigns/",
 			{
 				title: draftCampaign.title,
 				category_id: draftCampaign.category_id,
@@ -96,11 +98,11 @@ function AddCampaign({ success = false }: { success?: boolean }) {
 				creative: draftCampaign.creative,
 				brief: draftCampaign.brief,
 			} as Partial<Campaign>,
-			"POST",
+			isUpdating ? "PUT" : "POST",
 		);
 
 		if (!response.isError && response.value) {
-			navigate("/add-campaign/success");
+			navigate(isUpdating ? `/my-campaigns` : "/add-campaign/success");
 			invokeHapticFeedbackImpact("medium");
 			setTimeout(() => invokeHapticFeedbackImpact("soft"), 200);
 			setTimeout(() => invokeHapticFeedbackImpact("soft"), 300);
@@ -121,6 +123,10 @@ function AddCampaign({ success = false }: { success?: boolean }) {
 			backButton.hide();
 
 			backButton.offClick(onBackButton);
+
+			if (isUpdating) {
+				clearDraftCampaign();
+			}
 		};
 	}, []);
 
@@ -156,7 +162,9 @@ function AddCampaign({ success = false }: { success?: boolean }) {
 	return (
 		<div className="SetChannelData scrollable">
 			<PageHeader>
-				<PageHeaderTitle>Create your campaign</PageHeaderTitle>
+				<PageHeaderTitle>
+					{isUpdating ? "Update your campaign" : "Create your campaign"}
+				</PageHeaderTitle>
 			</PageHeader>
 
 			<div className="Section">

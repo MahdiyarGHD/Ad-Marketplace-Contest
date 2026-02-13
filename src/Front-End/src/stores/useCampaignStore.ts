@@ -4,6 +4,7 @@ import type { Category } from "./useCategoryStore";
 
 export type Campaign = {
 	id?: string;
+	advertiser_id?: string;
 	category_id: string;
 	category?: {
 		id: string;

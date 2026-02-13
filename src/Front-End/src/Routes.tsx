@@ -102,6 +102,10 @@ const router = createBrowserRouter(
 							element: <AddCampaign success />,
 						},
 						{
+							path: "edit-campaign/:id",
+							element: <AddCampaign />,
+						},
+						{
 							path: "my-campaigns",
 							element: <MyCampaigns />,
 						},

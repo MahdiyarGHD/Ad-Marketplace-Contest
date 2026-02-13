@@ -36,6 +36,8 @@ function DatePicker({
 				<div className="bg" onClick={onClose}></div>
 				<div className="DatePickerWrapper">
 					<DayPicker
+						disabled={{ before: new Date() }}
+						animate
 						mode="range"
 						selected={selected}
 						onSelect={(date) => onSelect(date)}

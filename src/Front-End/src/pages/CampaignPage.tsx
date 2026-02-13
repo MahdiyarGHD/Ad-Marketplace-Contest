@@ -6,13 +6,13 @@ import PageHeader, {
 	PageHeaderTitle,
 } from "../components/PageHeader";
 import { Shimmer } from "../components/Shimmer";
-import useCampaignStore from "../stores/useCampaignStore";
+import useCampaignStore, { type Campaign } from "../stores/useCampaignStore";
 import { requestAPI } from "../utils/api";
 import { backButton, popup } from "@tma.js/sdk-react";
 import { invokeHapticFeedbackImpact } from "../utils/common";
 import { useNavigate } from "react-router-dom";
 import useCategoryStore from "../stores/useCategoryStore";
-import { BanIcon, MoreVerticalIcon, TagIcon } from "lucide-react";
+import { BanIcon, MoreVerticalIcon, PencilIcon, TagIcon } from "lucide-react";
 import {
 	AdFormats,
 	PriceTypes,
@@ -22,10 +22,12 @@ import {
 import useUIStore from "../stores/useUIStore";
 import Menu, { DropdownMenu, MenuItem } from "../components/Menu";
 import Transition from "../components/Transition";
+import useAppStore from "../stores/useAppStore";
 
 function CampaignPage() {
 	const {
 		id,
+		advertiser_id,
 		title,
 		category_id,
 		brief,
@@ -35,12 +37,17 @@ function CampaignPage() {
 		targeting,
 		creative,
 		status,
-		// starts_at,
-		// ends_at,
+		starts_at,
+		ends_at,
 	} = useCampaignStore(useShallow((state) => state.activeCampaign)) || {};
-	const setActiveCampaign = useCampaignStore(
-		useShallow((state) => state.setActiveCampaign),
+	const { setActiveCampaign, setDraftCampaign } = useCampaignStore(
+		useShallow((state) => ({
+			setActiveCampaign: state.setActiveCampaign,
+			setDraftCampaign: state.setDraftCampaign,
+		})),
 	);
+
+	const userId = useAppStore(useShallow((state) => state.userId));
 
 	const { getCategory } = useCategoryStore();
 
@@ -58,6 +65,25 @@ function CampaignPage() {
 
 	const onBackButton = () => {
 		window.history.back();
+	};
+
+	const onEdit = () => {
+		setDraftCampaign({
+			id,
+			advertiser_id,
+			title,
+			category_id,
+			brief,
+			description,
+			budget_ton,
+			max_price_per_placement,
+			targeting,
+			creative,
+			starts_at,
+			ends_at,
+		} as Campaign);
+
+		navigate(`/edit-campaign/${id}`);
 	};
 
 	const handlePublish = async () => {
@@ -109,6 +135,11 @@ function CampaignPage() {
 				<PageHeader>
 					<PageHeaderTitle>Campaign</PageHeaderTitle>
 					<PageHeaderButtons>
+						{advertiser_id === userId && (
+							<div className="Edit" onClick={onEdit}>
+								<PencilIcon size={22} />
+							</div>
+						)}
 						<div className="More">
 							<Menu
 								custom={({ onClick }) => (
