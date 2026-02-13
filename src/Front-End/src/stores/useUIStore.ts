@@ -7,11 +7,51 @@ type Toast = {
 	title: string;
 };
 
+type BaseFilter = {
+	key: string;
+	title: string;
+	onClick?: () => void;
+};
+
+type NumberFilter = BaseFilter & {
+	type: "number";
+	unit?: string;
+	range: [number, number];
+};
+
+type RangeFilter = BaseFilter & {
+	type: "range";
+	range: [number, number];
+};
+
+export type OptionsFilter = BaseFilter & {
+	type: "options";
+	options: Record<string | number, string>;
+};
+
+export type Filter =
+	| (BaseFilter & {
+			type: "text";
+	  })
+	| NumberFilter
+	| RangeFilter
+	| OptionsFilter;
+
+export type FilterValues = {
+	[key: string]: string | number | [number, number];
+};
+
 type UIState = {
 	topBarTitle?: string;
 	topBarButtons?: ReactNode;
 	mainButton?: { text: string; onClick?: () => void };
 	toasts: Toast[];
+	search?: {
+		query: string;
+		filters: FilterValues;
+		setQuery: (value: string) => void;
+		setFilter: (key: string, value: string | number | [number, number]) => void;
+	};
 	setTopBarTitle: (value: string) => void;
 	setTopBarButtons: (value: ReactNode) => void;
 	// setMainButton: (value: {text: string; onClick: () => void}) => void;
@@ -21,6 +61,32 @@ type UIState = {
 
 const useUIStore = create<UIState>((set) => ({
 	toasts: [],
+	search: {
+		query: "",
+		filters: {},
+		setQuery(value) {
+			set((state) => ({
+				search: {
+					...state.search!,
+					query: value,
+					filters: state.search!.filters,
+					setQuery: state.search!.setQuery,
+					setFilter: state.search!.setFilter,
+				},
+			}));
+		},
+		setFilter(key, value) {
+			set((state) => ({
+				search: {
+					...state.search!,
+					filters: {
+						...state.search!.filters,
+						[key]: value,
+					},
+				},
+			}));
+		},
+	},
 	setTopBarTitle(value) {
 		set({ topBarTitle: value });
 	},

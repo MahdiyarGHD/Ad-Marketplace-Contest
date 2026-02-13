@@ -5,6 +5,7 @@ import useChannelStore, {
 	AdFormats,
 	PriceTypes,
 	type AdFormat,
+	type ChannelApplication,
 	type PriceType,
 } from "../stores/useChannelStore";
 import {
@@ -18,6 +19,9 @@ import { useShallow } from "zustand/shallow";
 import MainButton from "./MainButton";
 import DatePicker from "./DatePicker";
 import { Textarea } from "./Textarea";
+import { requestAPI } from "../utils/api";
+import { invokeHapticFeedbackImpact } from "../utils/common";
+import useUIStore from "../stores/useUIStore";
 
 export const PriceTypesInfo = {
 	1: {
@@ -47,6 +51,8 @@ function Application() {
 		})),
 	);
 
+	const showToast = useUIStore(useShallow((state) => state.showToast));
+
 	const availablePriceType = Object.entries(PriceTypes).filter(([key]) =>
 		application?.channel?.pricings?.find((p) => p.price_type === Number(key)),
 	);
@@ -73,6 +79,49 @@ function Application() {
 		}
 
 		return application.proposed_value * pricing.price_ton;
+	};
+
+	const handleApply = async () => {
+		try {
+			if (!application?.channel_id) {
+				throw new Error("Please select a channel");
+			}
+			if (!application?.proposed_value) {
+				throw new Error("Please enter a proposed value");
+			}
+			if (!application?.proposed_price_type) {
+				throw new Error("Please select a proposed price type");
+			}
+			if (!application.proposed_posting_time) {
+				throw new Error("Please select a proposed posting time");
+			}
+		} catch (error) {
+			showToast({ title: (error as Error).message });
+			return;
+		}
+
+		const response = await requestAPI(
+			"/api/campaigns/",
+			{
+				channel_id: application?.channel_id,
+				message: application?.message,
+				proposed_ad_format: application?.proposed_ad_format,
+				proposed_price_type: application?.proposed_price_type,
+				proposed_price_ton: calculateTotal(),
+				proposed_posting_time: application?.proposed_posting_time,
+			} as Partial<ChannelApplication>,
+			"POST",
+		);
+
+		if (!response.isError && response.value) {
+			// navigate(isUpdating ? `/my-campaigns` : "/add-campaign/success");
+			invokeHapticFeedbackImpact("medium");
+			setTimeout(() => invokeHapticFeedbackImpact("soft"), 200);
+			setTimeout(() => invokeHapticFeedbackImpact("soft"), 300);
+			// clearDraftCampaign();
+		} else {
+			showToast({ title: response.first_error.description });
+		}
 	};
 
 	return (
@@ -199,7 +248,7 @@ function Application() {
 					</div>
 				</div>
 			</div>
-			<MainButton text="Submit" onClick={() => {}} />
+			<MainButton text="Submit" onClick={handleApply} />
 		</div>
 	);
 }

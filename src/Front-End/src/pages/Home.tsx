@@ -24,6 +24,7 @@ import RLottie from "../components/RLottie";
 import type { Campaign } from "../stores/useCampaignStore";
 import useCampaignStore from "../stores/useCampaignStore";
 import { useShallow } from "zustand/shallow";
+import Search from "../components/Search";
 
 const renderCategory = (
 	category: Category,
@@ -238,6 +239,7 @@ function Home() {
 				}
 			>
 				<TabContent state={true} className="scrollable">
+					<Search onSearch={() => {}} />
 					{influencers.elements.map((element) =>
 						renderSection(element, "channel"),
 					)}

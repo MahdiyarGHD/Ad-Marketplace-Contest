@@ -27,6 +27,10 @@ function SelectCategory({ title }: { title?: string }) {
 			})),
 		);
 
+	const setFilterCategory = useUIStore(
+		useShallow((state) => state.search?.setFilter),
+	);
+
 	const preferredCategoryIds =
 		useCampaignStore(
 			useShallow(
@@ -54,6 +58,10 @@ function SelectCategory({ title }: { title?: string }) {
 				break;
 			case "campaign-preferred":
 				setDraftCampaignPreferredCategory(category);
+				break;
+			case "filter":
+				setFilterCategory?.("category", category.id);
+				navigate("/");
 				break;
 			default:
 				navigate(`/category/${category.id}?type=${type}`);

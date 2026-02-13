@@ -334,6 +334,7 @@ body {
 
                 input {
                     flex: 1;
+                    min-height: 2rem;
                 }
             }
 
@@ -379,6 +380,22 @@ body {
                 text-align: right;
                 width: 4rem;
             }
+
+        }
+
+        &:has(.meta input) {
+            .body {
+                flex: none;
+            }
+
+            .meta {
+                flex: 1 auto;
+                justify-content: flex-end;
+
+                input {
+                    width: 100%;
+                }
+            }
         }
     }
 
@@ -392,7 +409,7 @@ body {
         align-items: center;
         overflow-x: auto;
         scroll-snap-type: x mandatory;
-        background-color: var(--secondary-bg-color);
+        // background-color: var(--secondary-bg-color);
         // padding: 0 .25rem;
         // scrollbar-width: none;
 
@@ -626,6 +643,36 @@ body {
     position: absolute;
     left: 100%;
     top: 51px;
+}
+
+.SearchBar {
+    display: flex;
+    margin: 0 .5rem;
+    gap: .5rem;
+
+    >div {
+        display: flex;
+        align-items: center;
+        background-color: var(--secondary-bg-color);
+        padding: .5rem;
+        border-radius: 1rem;
+        gap: .5rem;
+    }
+
+    .Input {
+        flex: 1 auto;
+    }
+
+    .icon {
+        width: 3rem;
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    input {
+        font-weight: 500;
+    }
 }
 
 input, textarea {
@@ -990,7 +1037,7 @@ body:not(.Mobile) {
     width: 100%;
     padding: 1rem 0;
     border-radius: 1rem 1rem 0 0;
-    background-color: var(--secondary-bg-color);
+    background-color: var(--bg-color);
     z-index: 30;
     transition: transform 0.3s ease, opacity 0.3s ease;
 
@@ -1000,9 +1047,17 @@ body:not(.Mobile) {
     }
 
     .Header {
-        margin-bottom: .25rem;
+        margin-bottom: .5rem;
         font-size: 18px;
         font-weight: 500;
+    }
+
+    .Content {
+        width: 100%;
+    }
+
+    .MainButton {
+        margin-top: 1rem;
     }
 }
 
