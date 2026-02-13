@@ -138,6 +138,12 @@ body {
     &:active {
         transform: scale(.98);
     }
+
+    &.disabled {
+        background-color: var(--secondary-bg-color);
+        color: var(--secondary-text);
+        cursor: default;
+    }
 }
 
 .Mobile .MainButton {
@@ -152,6 +158,7 @@ body {
     height: 32px;
     font-size: 16px;
     text-align: center;
+    flex: none;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -311,7 +318,10 @@ body {
             flex-direction: column;
             gap: 0.33rem;
             flex: 1 auto;
+            text-align: left;
             margin-left: 1rem;
+            white-space: nowrap;
+            overflow: hidden;
 
             &.row {
                 flex-direction: row;
@@ -329,11 +339,22 @@ body {
 
             .title {
                 line-height: 1.2;
+
+                &.preWrap {
+                    white-space: pre-wrap;
+                    line-height: 1.7;
+                }
             }
 
             .subtitle {
                 font-size: 0.75rem;
                 color: var(--secondary-text);
+                text-overflow: ellipsis;
+                overflow: hidden;
+            }
+
+            input {
+                min-height: 0;
             }
         }
 
@@ -344,6 +365,7 @@ body {
         .meta {
             color: var(--secondary-text);
             font-size: 0.9rem;
+            font-weight: 500;
             display: flex;
             align-items: center;
             gap: 0.5rem;
@@ -370,6 +392,8 @@ body {
         align-items: center;
         overflow-x: auto;
         scroll-snap-type: x mandatory;
+        background-color: var(--secondary-bg-color);
+        // padding: 0 .25rem;
         // scrollbar-width: none;
 
         .ChatItem {
@@ -380,16 +404,29 @@ body {
             flex: none;
             gap: .5rem;
             padding: .5rem;
+            // border-radius: 1rem;
             overflow: hidden;
             scroll-snap-align: center;
+
+            &::after {
+                display: none;
+            }
+
+            .Avatar {
+                width: 54px !important;
+                height: 54px !important;
+                font-size: 27px !important;
+            }
             
             .body {
                 width: 6rem;
                 gap: .125rem;
                 text-overflow: ellipsis;
                 overflow: hidden;
+                text-align: center;
 
                 .title {
+                    font-size: 14px;
                     text-overflow: ellipsis;
                     overflow: hidden;
                     text-align: center;
@@ -441,6 +478,7 @@ body {
                 display: flex;
                 align-items: center;
                 line-height: 1.2;
+                margin: 0 1rem;
             }
         }
     }
@@ -451,16 +489,21 @@ body {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    margin: 0 2rem;
     gap: 1rem;
     height: 100%;
+    padding: 0 1rem;
 
     .Title {
         text-align: center;
     }
 
-    .Subtitle {
+    .Subtitle { 
         text-align: center;
+        color: var(--secondary-text);
+    }
+
+    .Instructions {
+        margin: 0 1rem;
     }
 }
 
@@ -501,6 +544,9 @@ body {
             font-weight: bold;
             margin: 0;
             flex: 1;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            white-space: nowrap;
         }
 
         .meta {
@@ -597,6 +643,7 @@ input, textarea {
 }
 
 input[type=number] {
+    appearance: textfield;
     -moz-appearance:textfield;
 
     &::-webkit-outer-spin-button,
@@ -609,7 +656,9 @@ input[type=number] {
 
 textarea {
     resize: vertical;
-    max-height: 12rem;
+    max-height: 6rem;
+    padding-top: .25rem;
+    resize: none;
 }
 
 .flex {
@@ -687,7 +736,7 @@ body:not(.Mobile) {
     align-items: flex-start;
     background-color: color-mix(
             in srgb,
-            var(--dropdown-bg) 25%,
+            var(--dropdown-bg) 50%,
             transparent
         ) !important;
     position: fixed;
@@ -929,7 +978,7 @@ body:not(.Mobile) {
     --rdp-accent-background-color: var(--active-bg);
 }
 
-.DatePickerWrapper {
+.Modal, .DatePickerWrapper {
     position: fixed;
     bottom: 0;
     left: 0;
@@ -948,6 +997,12 @@ body:not(.Mobile) {
     &.animate {
         transform: translateY(100%);
         // opacity: 0;
+    }
+
+    .Header {
+        margin-bottom: .25rem;
+        font-size: 18px;
+        font-weight: 500;
     }
 }
 

@@ -24,14 +24,10 @@ export async function requestAPI<
 		const res = await fetch(import.meta.env.VITE_BACKEND_BASE_URL + path, {
 			method,
 			headers: {
-				"Content-Type":
-					method === "POST" || method === "PUT" ? "application/json" : "",
+				"Content-Type": method !== "GET" ? "application/json" : "",
 				...headers,
 			},
-			body:
-				(method === "POST" || method === "PUT") && body
-					? JSON.stringify(body)
-					: undefined,
+			body: method !== "GET" && body ? JSON.stringify(body) : undefined,
 		});
 
 		if (!res.ok) {

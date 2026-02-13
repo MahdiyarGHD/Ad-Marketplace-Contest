@@ -10,10 +10,11 @@ import { invokeHapticFeedbackImpact } from "../utils/common";
 import useCampaignStore, { type Campaign } from "../stores/useCampaignStore";
 
 const CampaignStatus: { [key: number]: string } = {
-	0: "Pending",
-	1: "Pending",
-	2: "Active",
-	3: "Inactive",
+	0: "Draft",
+	1: "Active",
+	2: "Paused",
+	3: "Completed",
+	4: "Canceled",
 };
 
 function MyCampaigns() {
@@ -72,8 +73,12 @@ function MyCampaigns() {
 						>
 							<Avatar id={campaign.id!} isCampaign />
 							<div className="body">
-								<div className="title">{campaign.title}</div>
-								<div className="subtitle">{campaign.description}</div>
+								<div className="title" dir="auto">
+									{campaign.title}
+								</div>
+								<div className="subtitle" dir="auto">
+									{campaign.description}
+								</div>
 							</div>
 							<div className="meta">{CampaignStatus[campaign.status]}</div>
 						</div>

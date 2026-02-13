@@ -18,10 +18,14 @@ import { requestAPI } from "../utils/api";
 import useUIStore from "../stores/useUIStore";
 import useCampaignStore, { type Campaign } from "../stores/useCampaignStore";
 import DatePicker from "../components/DatePicker";
+import RLottie from "../components/RLottie";
+import { useShallow } from "zustand/shallow";
+import type { DateRange } from "react-day-picker";
+import { Textarea } from "../components/Textarea";
 
 const AdFormats = ["Post"];
 
-function AddCampaign() {
+function AddCampaign({ success = false }: { success?: boolean }) {
 	const [showDatePicker, setShowDatePicker] = useState(false);
 
 	const {
@@ -32,7 +36,9 @@ function AddCampaign() {
 		setDraftCampaignPriceType,
 	} = useCampaignStore();
 
-	const { showToast } = useUIStore();
+	const showToast = useUIStore(useShallow((state) => state.showToast));
+
+	const isUpdating = Boolean(draftCampaign.id);
 
 	const navigate = useNavigate();
 
@@ -62,6 +68,11 @@ function AddCampaign() {
 			if (!draftCampaign.budget_ton) {
 				throw new Error("Please enter a budget");
 			}
+			if (draftCampaign.max_price_per_placement > draftCampaign.budget_ton) {
+				throw new Error(
+					"Max price per placement cannot be greater than budget",
+				);
+			}
 			if (
 				draftCampaign.targeting.min_subscribers >
 				draftCampaign.targeting.max_subscribers
@@ -76,7 +87,7 @@ function AddCampaign() {
 		}
 
 		const response = await requestAPI(
-			"/api/campaigns/",
+			isUpdating ? `/api/campaigns/${draftCampaign.id}` : "/api/campaigns/",
 			{
 				title: draftCampaign.title,
 				category_id: draftCampaign.category_id,
@@ -89,11 +100,11 @@ function AddCampaign() {
 				creative: draftCampaign.creative,
 				brief: draftCampaign.brief,
 			} as Partial<Campaign>,
-			"POST",
+			isUpdating ? "PUT" : "POST",
 		);
 
 		if (!response.isError && response.value) {
-			navigate("/add-campaign/success");
+			navigate(isUpdating ? `/my-campaigns` : "/add-campaign/success");
 			invokeHapticFeedbackImpact("medium");
 			setTimeout(() => invokeHapticFeedbackImpact("soft"), 200);
 			setTimeout(() => invokeHapticFeedbackImpact("soft"), 300);
@@ -101,6 +112,10 @@ function AddCampaign() {
 		} else {
 			showToast({ title: response.first_error.description });
 		}
+	};
+
+	const onDone = () => {
+		navigate("/my-campaigns");
 	};
 
 	useEffect(() => {
@@ -114,22 +129,57 @@ function AddCampaign() {
 			backButton.hide();
 
 			backButton.offClick(onBackButton);
+
+			if (isUpdating) {
+				clearDraftCampaign();
+			}
 		};
 	}, []);
 
 	useEffect(() => {
-		useUIStore.setState({
-			mainButton: {
-				text: "Save",
-				onClick: handleSave,
-			},
-		});
+		if (success) {
+			useUIStore.setState({
+				mainButton: {
+					text: "Done",
+					onClick: onDone,
+				},
+			});
+		} else {
+			useUIStore.setState({
+				mainButton: {
+					text: "Save",
+					onClick: handleSave,
+				},
+			});
+		}
 	}, [draftCampaign]);
+
+	const renderSuccess = () => {
+		return (
+			<div className="Placeholder">
+				<div className="Emoji">
+					<RLottie sticker="congrats" autoplay width={120} height={120} />
+				</div>
+				<h2 className="Title">Your Campaign Successfully Added</h2>
+				<div className="Subtitle">
+					this campaign is saved as draft, you can edit or publish it from My
+					Campaigns page.
+					<br />
+				</div>
+			</div>
+		);
+	};
+
+	if (success) {
+		return renderSuccess();
+	}
 
 	return (
 		<div className="SetChannelData scrollable">
 			<PageHeader>
-				<PageHeaderTitle>Create your campaign</PageHeaderTitle>
+				<PageHeaderTitle>
+					{isUpdating ? "Update your campaign" : "Create your campaign"}
+				</PageHeaderTitle>
 			</PageHeader>
 
 			<div className="Section">
@@ -150,7 +200,17 @@ function AddCampaign() {
 					<div className="Item">
 						<div className="icon"></div>
 						<div className="body">
-							<textarea
+							<Textarea
+								placeholder="Campaign Brief"
+								value={draftCampaign.brief}
+								onChange={(e) => setDraftCampaign({ brief: e.target.value })}
+							/>
+						</div>
+					</div>
+					<div className="Item">
+						<div className="icon"></div>
+						<div className="body">
+							<Textarea
 								placeholder="Campaign Description"
 								value={draftCampaign.description}
 								onChange={(e) =>
@@ -159,6 +219,8 @@ function AddCampaign() {
 							/>
 						</div>
 					</div>
+				</div>
+				<div className="Items">
 					<div className="Item" onClick={onSelectCategory}>
 						<div className="icon">
 							<TagIcon />
@@ -172,6 +234,8 @@ function AddCampaign() {
 							<ChevronRight />
 						</div>
 					</div>
+				</div>
+				<div className="Items">
 					<div className="Item">
 						<div className="icon">
 							<DollarSignIcon />
@@ -179,12 +243,13 @@ function AddCampaign() {
 						<div className="body">
 							<input
 								type="number"
-								placeholder="Budget"
+								placeholder="0"
 								value={draftCampaign.budget_ton || ""}
 								onChange={(e) =>
 									setDraftCampaign({ budget_ton: Number(e.target.value) })
 								}
 							/>
+							<div className="subtitle">Budget</div>
 						</div>
 						<div className="meta">TON</div>
 					</div>
@@ -193,7 +258,7 @@ function AddCampaign() {
 						<div className="body">
 							<input
 								type="number"
-								placeholder="Max Price Per Placement"
+								placeholder="0"
 								value={draftCampaign.max_price_per_placement || ""}
 								onChange={(e) =>
 									setDraftCampaign({
@@ -201,6 +266,7 @@ function AddCampaign() {
 									})
 								}
 							/>
+							<div className="subtitle">Max Price Per Placement</div>
 						</div>
 						<div className="meta">TON</div>
 					</div>
@@ -393,6 +459,7 @@ function AddCampaign() {
 						<DatePicker
 							show={showDatePicker}
 							title="Select Date"
+							mode="range"
 							selected={
 								draftCampaign.starts_at
 									? {
@@ -404,8 +471,8 @@ function AddCampaign() {
 							onSelect={(date) =>
 								setDraftCampaign({
 									...draftCampaign,
-									starts_at: date?.from?.toISOString(),
-									ends_at: date?.to?.toISOString(),
+									starts_at: (date as DateRange)?.from?.toISOString(),
+									ends_at: (date as DateRange)?.to?.toISOString(),
 								})
 							}
 							onClose={() => setShowDatePicker(false)}

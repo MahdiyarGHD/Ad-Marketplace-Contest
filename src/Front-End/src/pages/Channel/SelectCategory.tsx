@@ -13,9 +13,19 @@ import useUIStore from "../../stores/useUIStore";
 
 function SelectCategory({ title }: { title?: string }) {
 	const { categories, getCategories } = useCategoryStore();
-	const { setDraftChannelCategory } = useChannelStore();
+
+	const setDraftChannelCategory = useChannelStore(
+		useShallow((state) => state.setDraftChannelCategory),
+	);
+
 	const { setDraftCampaignCategory, setDraftCampaignPreferredCategory } =
-		useCampaignStore();
+		useCampaignStore(
+			useShallow((state) => ({
+				setDraftCampaignCategory: state.setDraftCampaignCategory,
+				setDraftCampaignPreferredCategory:
+					state.setDraftCampaignPreferredCategory,
+			})),
+		);
 
 	const preferredCategoryIds =
 		useCampaignStore(
@@ -24,7 +34,7 @@ function SelectCategory({ title }: { title?: string }) {
 			),
 		) || [];
 
-	const { set } = useParams();
+	const { set, type } = useParams();
 
 	const navigate = useNavigate();
 
@@ -46,7 +56,7 @@ function SelectCategory({ title }: { title?: string }) {
 				setDraftCampaignPreferredCategory(category);
 				break;
 			default:
-				navigate(`/category/${category.id}`);
+				navigate(`/category/${category.id}?type=${type}`);
 				break;
 		}
 	};

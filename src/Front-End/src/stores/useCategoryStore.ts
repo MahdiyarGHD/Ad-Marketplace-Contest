@@ -24,7 +24,7 @@ const useCategoryStore = create<CategoryState>((set, get) => ({
 		set({ categories: response.value });
 	},
 	getCategory(id: string) {
-		const category = get().categories.find((cat) => cat.id === id);
+		const category = get().categories?.find((cat) => cat.id === id);
 
 		return category;
 	},

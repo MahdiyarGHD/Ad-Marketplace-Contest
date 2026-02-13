@@ -6,6 +6,7 @@ import {
 	type ReactNode,
 } from "react";
 import useUIStore from "../stores/useUIStore";
+import { useShallow } from "zustand/shallow";
 
 function PageHeader({ children }: { children: ReactNode }) {
 	const hasButtons = Children.toArray(children).some(
@@ -21,7 +22,9 @@ function PageHeader({ children }: { children: ReactNode }) {
 }
 
 export function PageHeaderTitle({ children }: { children: ReactNode }) {
-	const { setTopBarTitle } = useUIStore();
+	const setTopBarTitle = useUIStore(
+		useShallow((state) => state.setTopBarTitle),
+	);
 
 	useEffect(() => {
 		const first = Children.toArray(children)[0];
@@ -35,7 +38,9 @@ export function PageHeaderTitle({ children }: { children: ReactNode }) {
 }
 
 export function PageHeaderButtons({ children }: { children?: ReactNode }) {
-	const { setTopBarButtons } = useUIStore();
+	const setTopBarButtons = useUIStore(
+		useShallow((state) => state.setTopBarButtons),
+	);
 
 	useEffect(() => {
 		setTopBarButtons(children);

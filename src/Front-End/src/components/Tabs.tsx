@@ -103,7 +103,9 @@ export const TabContent = ({
 }) => {
 	return (
 		<div className={buildClassName("TabContent", className)}>
-			<Transition state={state}>{children}</Transition>
+			<Transition state={state} eachElement>
+				{children}
+			</Transition>
 		</div>
 	);
 };
