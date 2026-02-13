@@ -8,13 +8,15 @@ function DatePicker({
 	show,
 	selected,
 	title,
+	mode = "range",
 	onSelect,
 	onClose,
 }: {
 	show: boolean;
-	selected?: DateRange;
+	selected?: DateRange | Date;
 	title: string;
-	onSelect: (date: DateRange | undefined) => void;
+	mode: "single" | "range";
+	onSelect: (date: DateRange | Date | undefined) => void;
 	onClose: () => void;
 }) {
 	const [portal, setPortal] = useState<boolean>(false);
@@ -35,13 +37,23 @@ function DatePicker({
 			>
 				<div className="bg" onClick={onClose}></div>
 				<div className="DatePickerWrapper">
-					<DayPicker
-						disabled={{ before: new Date() }}
-						animate
-						mode="range"
-						selected={selected}
-						onSelect={(date) => onSelect(date)}
-					/>
+					{mode === "single" ? (
+						<DayPicker
+							disabled={{ before: new Date() }}
+							animate
+							mode="single"
+							selected={selected as Date}
+							onSelect={onSelect}
+						/>
+					) : (
+						<DayPicker
+							disabled={{ before: new Date() }}
+							animate
+							mode="range"
+							selected={selected as DateRange}
+							onSelect={onSelect}
+						/>
+					)}
 					<MainButton text={title} onClick={onClose} />
 				</div>
 			</Transition>,

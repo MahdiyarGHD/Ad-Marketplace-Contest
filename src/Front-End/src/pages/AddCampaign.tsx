@@ -20,6 +20,7 @@ import useCampaignStore, { type Campaign } from "../stores/useCampaignStore";
 import DatePicker from "../components/DatePicker";
 import RLottie from "../components/RLottie";
 import { useShallow } from "zustand/shallow";
+import type { DateRange } from "react-day-picker";
 
 const AdFormats = ["Post"];
 
@@ -442,6 +443,7 @@ function AddCampaign({ success = false }: { success?: boolean }) {
 						<DatePicker
 							show={showDatePicker}
 							title="Select Date"
+							mode="range"
 							selected={
 								draftCampaign.starts_at
 									? {
@@ -453,8 +455,8 @@ function AddCampaign({ success = false }: { success?: boolean }) {
 							onSelect={(date) =>
 								setDraftCampaign({
 									...draftCampaign,
-									starts_at: date?.from?.toISOString(),
-									ends_at: date?.to?.toISOString(),
+									starts_at: (date as DateRange)?.from?.toISOString(),
+									ends_at: (date as DateRange)?.to?.toISOString(),
 								})
 							}
 							onClose={() => setShowDatePicker(false)}

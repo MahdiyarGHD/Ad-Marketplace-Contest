@@ -1,4 +1,4 @@
-import { memo, useEffect } from "react";
+import { memo, useEffect, useState } from "react";
 import PageHeader, {
 	PageHeaderButtons,
 	PageHeaderTitle,
@@ -27,8 +27,13 @@ import {
 } from "lucide-react";
 import useCategoryStore from "../../stores/useCategoryStore";
 import useAppStore from "../../stores/useAppStore";
+import useUIStore from "../../stores/useUIStore";
+import Modal from "../../components/Modal";
+import Application from "../../components/Application";
 
 function ChannelProfile() {
+	const [showApplication, setShowApplication] = useState<boolean>(false);
+
 	const { id } = useParams();
 
 	const {
@@ -41,14 +46,17 @@ function ChannelProfile() {
 		average_views,
 		pricings,
 	} = useChannelStore(useShallow((state) => state.activeChannel)) || {};
-	const { setActiveChannel, setDraftChannel } = useChannelStore(
+	const { setActiveChannel, setDraftChannel, setApplication } = useChannelStore(
 		useShallow((state) => ({
 			setActiveChannel: state.setActiveChannel,
 			setDraftChannel: state.setDraftChannel,
+			setApplication: state.setApplication,
 		})),
 	);
 
 	const userId = useAppStore(useShallow((state) => state.userId));
+
+	const isOwn = owner_id === userId;
 
 	const { getCategory } = useCategoryStore();
 
@@ -80,6 +88,26 @@ function ChannelProfile() {
 		navigate(`/set-channel-data`);
 	};
 
+	const onApply = () => {
+		if (isOwn) return;
+
+		setApplication({
+			channel_id: id,
+			channel: {
+				chat_id,
+				owner_id,
+				title,
+				username,
+				category_id,
+				subscriber_count,
+				average_views,
+				pricings,
+			} as Channel,
+			proposed_price_type: pricings?.[0]?.price_type,
+		});
+		setShowApplication(true);
+	};
+
 	useEffect(() => {
 		backButton.show();
 
@@ -100,13 +128,23 @@ function ChannelProfile() {
 		getChannelInfo();
 	}, [id]);
 
+	useEffect(() => {
+		if (owner_id && !isOwn) {
+			useUIStore.setState({
+				mainButton: { text: "Apply", onClick: onApply },
+			});
+		} else {
+			useUIStore.setState({ mainButton: undefined });
+		}
+	}, [isOwn, owner_id]);
+
 	return (
 		<div className="scrollable">
 			<div className="ChannelProfile Profile">
 				<PageHeader>
 					<PageHeaderTitle> </PageHeaderTitle>
 					<PageHeaderButtons>
-						{owner_id === userId && (
+						{isOwn && (
 							<div className="Edit" onClick={onEdit}>
 								<PencilIcon size={22} />
 							</div>
@@ -202,6 +240,14 @@ function ChannelProfile() {
 						</Transition>
 					</div>
 				</div>
+
+				<Modal
+					open={showApplication}
+					onClose={() => setShowApplication(false)}
+					title="Application"
+				>
+					<Application />
+				</Modal>
 			</div>
 		</div>
 	);
