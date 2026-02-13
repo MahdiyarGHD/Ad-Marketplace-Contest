@@ -8,4 +8,6 @@ public class TelegramBotOptions
     public string BotApiServer { get; set; }
     public string WebhookUrl { get; set; }
     public string SecretToken { get; set; }
+    public string BotUsername { get; set; }
+    public string AppShortName { get; set; }
 }
