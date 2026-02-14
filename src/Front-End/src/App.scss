@@ -281,8 +281,8 @@ body {
         position: relative;
         user-select: none;
         transition:
-            background-color 0.2s ease,
-            opacity 0.3s ease;
+        background-color 0.2s ease,
+        opacity 0.3s ease;
 
         &:hover {
             background-color: var(--hover-bg);
@@ -403,6 +403,10 @@ body {
 
     .ChatItem {
         gap: 1rem;
+    }
+
+    .Menu:last-child .Item::after {
+        display: none !important;
     }
 
     &.row {
@@ -991,7 +995,7 @@ body:not(.Mobile) {
     top: 0;
     left: 0;
     background-color: #00000080;
-    z-index: 9;
+    z-index: 30;
     transition: opacity 0.3s ease;
 
     &.transparent {
@@ -1095,6 +1099,10 @@ body:not(.Mobile) {
 
     .MainButton {
         margin-top: 1rem;
+    }
+
+    .Placeholder {
+        margin: 1rem 0;
     }
 }
 

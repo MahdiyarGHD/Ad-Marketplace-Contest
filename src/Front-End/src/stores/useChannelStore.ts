@@ -43,22 +43,10 @@ export type Channel = {
 	}[];
 };
 
-export type ChannelApplication = {
-	channel_id: string;
-	channel?: Channel;
-	proposed_value?: number;
-	proposed_ad_format: number;
-	proposed_price_type: number;
-	proposed_price_ton: number;
-	proposed_posting_time: string;
-	message: string;
-};
-
 type ChannelState = {
 	myChannels: Channel[];
 	draftChannel: Partial<Channel>;
 	unVerifiedChannels: Channel[];
-	application?: Partial<ChannelApplication>;
 	getMyChannels: () => Promise<void>;
 	verifyChannel: () => Promise<void>;
 	setUnVerifiedChannels: (channels: Channel[]) => void;
@@ -70,8 +58,6 @@ type ChannelState = {
 	setDraftChannelPriceType: (priceType: number, index: number) => void;
 	setDraftChannelAdFormat: (adFormat: number, index: number) => void;
 	setDraftChannelPrice: (priceTon: number, index: number) => void;
-
-	setApplication: (application: Partial<ChannelApplication>) => void;
 
 	influencers: {
 		elements: {
@@ -226,15 +212,6 @@ const useChannelStore = create<ChannelState>((set, get) => ({
 				pricings: state.draftChannel.pricings?.map((item, i) =>
 					i === index ? { ...item, price_ton: priceTon } : item,
 				),
-			},
-		}));
-	},
-
-	setApplication(application: Partial<ChannelApplication>) {
-		set((state) => ({
-			application: {
-				...state.application,
-				...application,
 			},
 		}));
 	},
