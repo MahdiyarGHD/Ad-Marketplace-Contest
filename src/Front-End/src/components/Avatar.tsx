@@ -8,19 +8,21 @@ function Avatar({
 	title,
 	photo,
 	size = 48,
+	isUuid = false,
 	isCampaign = false,
 }: {
 	id: string | number;
 	title?: string;
 	photo?: string;
 	size?: number;
+	isUuid?: boolean;
 	isCampaign?: boolean;
 }) {
 	return (
 		<div
 			className={buildClassName(
 				"Avatar",
-				`peer-color-${getPeerColorIndexById(getPeerIdFromChatId(isCampaign ? uuidToInt(id.toString()) : id))}`,
+				`peer-color-${getPeerColorIndexById(getPeerIdFromChatId(isCampaign || isUuid ? uuidToInt(id.toString()) : id))}`,
 				isCampaign && "campaign",
 			)}
 			style={{

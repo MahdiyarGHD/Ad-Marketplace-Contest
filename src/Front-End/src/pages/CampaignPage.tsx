@@ -170,20 +170,22 @@ function CampaignPage() {
 		if (!id) return;
 
 		getCampaignInfo();
+	}, [id]);
 
+	useEffect(() => {
 		if (status === 0) {
 			useUIStore.setState({
 				mainButton: { text: "Publish", onClick: handlePublish },
 			});
 		}
-	}, [id, status]);
+	}, [status]);
 
 	useEffect(() => {
 		if (advertiser_id && !isOwn) {
 			useUIStore.setState({
 				mainButton: { text: "Apply", onClick: onApply },
 			});
-		} else {
+		} else if (status !== 0) {
 			useUIStore.setState({ mainButton: undefined });
 		}
 	}, [isOwn, advertiser_id]);
@@ -255,13 +257,13 @@ function CampaignPage() {
 					<div className="Statistics">
 						<div className="Item">
 							<Shimmer state={!!budget_ton} className="title">
-								{budget_ton} TON
+								{budget_ton?.toFixed(2)} TON
 							</Shimmer>
 							<div className="subtitle">Budget</div>
 						</div>
 						<div className="Item">
 							<Shimmer state={!!max_price_per_placement} className="title">
-								{max_price_per_placement} TON
+								{max_price_per_placement?.toFixed(2)} TON
 							</Shimmer>
 							<div className="subtitle">Max Price Per Placement</div>
 						</div>

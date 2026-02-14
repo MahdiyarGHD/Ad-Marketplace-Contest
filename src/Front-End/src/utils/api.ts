@@ -39,6 +39,11 @@ export async function requestAPI<
 		});
 
 		if (!res.ok) {
+			if (res.status === 401) {
+				showToast({ title: "Unauthorized. Please log in again." });
+				return false;
+			}
+
 			const error = await res.json();
 			throw new Error(
 				`API Error ${res.status}: ${error.first_error || error.message || res.statusText}`,

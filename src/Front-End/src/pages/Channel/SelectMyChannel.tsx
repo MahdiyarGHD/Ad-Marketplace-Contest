@@ -40,7 +40,9 @@ function SelectChannel() {
 					proposed_ad_format: channel.pricings?.[0]?.ad_format,
 					proposed_price_type: channel.pricings?.[0]?.price_type,
 				});
-				navigate(`/campaign/${applicationCampaign?.id}/apply`);
+				navigate(`/campaign/${applicationCampaign?.id}/apply`, {
+					replace: true,
+				});
 				break;
 			default:
 				navigate("/my-channels");

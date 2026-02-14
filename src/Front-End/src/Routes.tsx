@@ -20,6 +20,7 @@ import MyCampaigns from "./pages/MyCampaigns";
 import CategoryPage from "./pages/CategoryPage";
 import CampaignPage from "./pages/CampaignPage";
 import SelectMyChannel from "./pages/Channel/SelectMyChannel";
+import Applications from "./pages/Applications";
 
 const Loading = () => {
 	return <div className="LoadingBar">Loading...</div>;
@@ -93,6 +94,10 @@ const router = createBrowserRouter(
 						{
 							path: "channel/:id",
 							element: <ChannelProfile />,
+						},
+						{
+							path: "channel/:id/applications",
+							element: <Applications type="channel" />,
 						},
 						{
 							path: "category/:categoryId",

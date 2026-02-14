@@ -165,7 +165,7 @@ function Application({
 			<div className="Application">
 				<div className="Placeholder">
 					<div className="Emoji">
-						<RLottie sticker="congrats" autoplay width={120} height={120} />
+						<RLottie sticker="submitted" autoplay width={120} height={120} />
 					</div>
 					<h2 className="Title">Your Application Submitted</h2>
 					<div className="Subtitle">
@@ -199,7 +199,7 @@ function Application({
 							</div>
 							{application?.channel?.chat_id && (
 								<div className="subtitle">
-									{application?.channel?.chat_id ?? ""}
+									{application?.channel?.username ?? "private channel"}
 								</div>
 							)}
 						</div>

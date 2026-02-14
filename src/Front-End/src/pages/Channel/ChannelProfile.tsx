@@ -20,6 +20,7 @@ import "../Statistics.scss";
 import { Shimmer } from "../../components/Shimmer";
 import Transition from "../../components/Transition";
 import {
+	ChevronRight,
 	ChevronRightIcon,
 	EllipsisVerticalIcon,
 	PencilIcon,
@@ -214,6 +215,34 @@ function ChannelProfile() {
 						<div className="subtitle">Average Views</div>
 					</div>
 				</div>
+
+				{isOwn && (
+					<div className="Section">
+						<div className="title">Manage</div>
+						<div className="Items">
+							<div
+								className="Item"
+								onClick={() => navigate(`/channel/${id}/applications`)}
+							>
+								<div className="body">
+									<div className="title">Applications</div>
+								</div>
+								<div className="meta">
+									<ChevronRight />
+								</div>
+							</div>
+							<div className="Item">
+								<div className="body">
+									<div className="title">Invitations</div>
+								</div>
+								<div className="meta">
+									<ChevronRight />
+								</div>
+							</div>
+						</div>
+					</div>
+				)}
+
 				<div className="Section">
 					<div className="title">Pricing</div>
 					<div
@@ -234,7 +263,7 @@ function ChannelProfile() {
 									<div className="flex-1">
 										{/* <DollarSign /> */}
 										<Shimmer className="title" state={!!price?.price_ton}>
-											{price?.price_ton} TON
+											{price?.price_ton.toFixed(2)} TON
 										</Shimmer>
 										<div className="subtitle">Price</div>
 									</div>
