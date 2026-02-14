@@ -73,6 +73,7 @@ function CampaignPage() {
 			advertiser_id,
 			title,
 			category_id,
+			category,
 			brief,
 			description,
 			budget_ton,
@@ -225,10 +226,43 @@ function CampaignPage() {
 					</div>
 				</div>
 
+				<div className="Section">
+					<div className="Items">
+						<div className="Item">
+							<div className="body">
+								<div className="title">Starts At</div>
+							</div>
+							<Shimmer className="meta" state={!!starts_at}>
+								{new Date(starts_at ?? "").toLocaleString("en-US", {
+									month: "long",
+									day: "numeric",
+									hour12: false,
+									hour: "2-digit",
+									minute: "2-digit",
+								}) || "N/A"}
+							</Shimmer>
+						</div>
+						<div className="Item">
+							<div className="body">
+								<div className="title">Ends At</div>
+							</div>
+							<Shimmer className="meta" state={!!ends_at}>
+								{new Date(ends_at ?? "").toLocaleString("en-US", {
+									month: "long",
+									day: "numeric",
+									hour12: false,
+									hour: "2-digit",
+									minute: "2-digit",
+								}) || "N/A"}
+							</Shimmer>
+						</div>
+					</div>
+				</div>
+
 				{!targeting && <LoadingSkeleton />}
 
 				<Transition state={!!targeting} eachElement eachElementDelay={40}>
-					{targeting && (
+					{targeting && Object.keys(targeting).length > 0 && (
 						<div className="Section">
 							<div className="title">Targeting</div>
 							<div className="Items">

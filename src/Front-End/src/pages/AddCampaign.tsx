@@ -44,6 +44,10 @@ function AddCampaign({ success = false }: { success?: boolean }) {
 
 	const onBackButton = () => {
 		window.history.back();
+
+		if (isUpdating) {
+			clearDraftCampaign();
+		}
 	};
 
 	const onSelectCategory = () => {
@@ -129,10 +133,6 @@ function AddCampaign({ success = false }: { success?: boolean }) {
 			backButton.hide();
 
 			backButton.offClick(onBackButton);
-
-			if (isUpdating) {
-				clearDraftCampaign();
-			}
 		};
 	}, []);
 

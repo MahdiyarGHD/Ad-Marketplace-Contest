@@ -1013,7 +1013,7 @@ body:not(.Mobile) {
     bottom: 120px;
     left: 0;
     right: 0;
-    z-index: 9;
+    z-index: 50;
 }
 
 .Toast {
@@ -1096,6 +1096,10 @@ body:not(.Mobile) {
     .MainButton {
         margin-top: 1rem;
     }
+}
+
+.DatePickerWrapper {
+    background-color: var(--secondary-bg-color);
 }
 
 .Skeleton {

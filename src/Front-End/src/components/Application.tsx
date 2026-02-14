@@ -241,6 +241,7 @@ function Application() {
 				<div className="Item">
 					<div className="body">
 						<Textarea
+							style={{ minHeight: 64 }}
 							placeholder="Message"
 							value={application?.message}
 							onChange={(e) => setApplication({ message: e.target.value })}
