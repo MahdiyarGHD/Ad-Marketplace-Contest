@@ -1,5 +1,11 @@
 import { postEvent, type ImpactHapticFeedbackStyle } from "@tma.js/sdk-react";
 
+declare global {
+	interface Window {
+		coolDown: number | null;
+	}
+}
+
 export function buildClassName(
 	...params: (string | false | undefined)[]
 ): string {
@@ -16,3 +22,25 @@ export function invokeHapticFeedbackImpact(style: ImpactHapticFeedbackStyle) {
 		impact_style: style,
 	});
 }
+
+export function handleCoolDown(action: () => void, coolDown = 300) {
+	if (window.coolDown) clearTimeout(window.coolDown);
+	window.coolDown = setTimeout(() => {
+		window.coolDown = null;
+		action();
+	}, coolDown);
+}
+
+export const isEmptyValue = (value: unknown): boolean => {
+	if (value == null) return true;
+
+	if (typeof value === "number") return value === 0;
+
+	if (typeof value === "string") return value.trim() === "";
+
+	if (Array.isArray(value)) {
+		return value.every((v) => v === 0);
+	}
+
+	return false;
+};

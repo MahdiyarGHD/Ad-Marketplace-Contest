@@ -44,6 +44,10 @@ function AddCampaign({ success = false }: { success?: boolean }) {
 
 	const onBackButton = () => {
 		window.history.back();
+
+		if (isUpdating) {
+			clearDraftCampaign();
+		}
 	};
 
 	const onSelectCategory = () => {
@@ -129,10 +133,6 @@ function AddCampaign({ success = false }: { success?: boolean }) {
 			backButton.hide();
 
 			backButton.offClick(onBackButton);
-
-			if (isUpdating) {
-				clearDraftCampaign();
-			}
 		};
 	}, []);
 
@@ -246,7 +246,9 @@ function AddCampaign({ success = false }: { success?: boolean }) {
 								placeholder="0"
 								value={draftCampaign.budget_ton || ""}
 								onChange={(e) =>
-									setDraftCampaign({ budget_ton: Number(e.target.value) })
+									setDraftCampaign({
+										budget_ton: Math.min(Number(e.target.value), 100000),
+									})
 								}
 							/>
 							<div className="subtitle">Budget</div>
@@ -262,7 +264,10 @@ function AddCampaign({ success = false }: { success?: boolean }) {
 								value={draftCampaign.max_price_per_placement || ""}
 								onChange={(e) =>
 									setDraftCampaign({
-										max_price_per_placement: Number(e.target.value),
+										max_price_per_placement: Math.min(
+											Number(e.target.value),
+											100000,
+										),
 									})
 								}
 							/>

@@ -126,5 +126,5 @@ body[data-theme="dark"] {
 
 .Mobile[data-theme="dark"] {
 	--bg-color: var(--tg-theme--secondary-bg-color, #000000);
-	--secondary-bg-color: var(--tg-theme-bg-color, #111);
+	--secondary-bg-color: var(--tg-theme-bg-color, #222);
 }

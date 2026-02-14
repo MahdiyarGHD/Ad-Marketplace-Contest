@@ -15,22 +15,35 @@ export async function requestAPI<
 	const { showToast } = useUIStore.getState();
 
 	const headers: { [key: string]: string } = {};
+	const hasBody = body && Object.keys(body).length > 0;
 
 	if (token) {
 		headers.Authorization = `Bearer ${token}`;
+	}
+
+	if (method === "GET" && hasBody) {
+		const queryParams = new URLSearchParams(
+			body as Record<string, string>,
+		).toString();
+		path += `?${queryParams}`;
 	}
 
 	try {
 		const res = await fetch(import.meta.env.VITE_BACKEND_BASE_URL + path, {
 			method,
 			headers: {
-				"Content-Type": method !== "GET" ? "application/json" : "",
+				"Content-Type": method !== "GET" && hasBody ? "application/json" : "",
 				...headers,
 			},
-			body: method !== "GET" && body ? JSON.stringify(body) : undefined,
+			body: method !== "GET" && hasBody ? JSON.stringify(body) : undefined,
 		});
 
 		if (!res.ok) {
+			if (res.status === 401) {
+				showToast({ title: "Unauthorized. Please log in again." });
+				return false;
+			}
+
 			const error = await res.json();
 			throw new Error(
 				`API Error ${res.status}: ${error.first_error || error.message || res.statusText}`,

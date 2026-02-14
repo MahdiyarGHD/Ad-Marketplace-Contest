@@ -46,6 +46,10 @@ function SetChannelData() {
 
 	const onBackButton = () => {
 		window.history.back();
+
+		if (isUpdating) {
+			clearDraftChannel();
+		}
 	};
 
 	const onSelectChannel = () => {
@@ -114,10 +118,6 @@ function SetChannelData() {
 			backButton.hide();
 
 			backButton.offClick(onBackButton);
-
-			if (isUpdating) {
-				clearDraftChannel();
-			}
 		};
 	}, []);
 

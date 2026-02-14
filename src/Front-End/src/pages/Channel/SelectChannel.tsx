@@ -1,4 +1,3 @@
-import { ChevronRight } from "lucide-react";
 import PageHeader, { PageHeaderTitle } from "../../components/PageHeader";
 import Transition from "../../components/Transition";
 import { memo, useEffect } from "react";
@@ -6,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { invokeHapticFeedbackImpact } from "../../utils/common";
 import { backButton } from "@tma.js/sdk-react";
 import useChannelStore from "../../stores/useChannelStore";
-import Avatar from "../../components/Avatar";
+import { renderChannel } from "../Home";
 
 function SelectChannel() {
 	const { unVerifiedChannels, setDraftChannel } = useChannelStore();
@@ -44,22 +43,9 @@ function SelectChannel() {
 
 			<div className="ChannelList Items">
 				<Transition state eachElement eachElementDelay={20}>
-					{unVerifiedChannels.map((channel) => (
-						<div
-							key={channel.chat_id}
-							className="ChatItem"
-							onClick={() => onSelectChannel(channel)}
-						>
-							<Avatar id={channel.chat_id} title={channel.title} photo="" />
-							<div className="body">
-								<div className="title">{channel.title}</div>
-								<div className="subtitle">subtitle</div>
-							</div>
-							<div className="meta">
-								<ChevronRight />
-							</div>
-						</div>
-					))}
+					{unVerifiedChannels.map((channel) =>
+						renderChannel(channel, onSelectChannel),
+					)}
 				</Transition>
 			</div>
 			{unVerifiedChannels.length === 0 && (

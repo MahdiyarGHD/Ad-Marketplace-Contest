@@ -20,6 +20,7 @@ import "../Statistics.scss";
 import { Shimmer } from "../../components/Shimmer";
 import Transition from "../../components/Transition";
 import {
+	ChevronRight,
 	ChevronRightIcon,
 	EllipsisVerticalIcon,
 	PencilIcon,
@@ -30,6 +31,7 @@ import useAppStore from "../../stores/useAppStore";
 import useUIStore from "../../stores/useUIStore";
 import Modal from "../../components/Modal";
 import Application from "../../components/Application";
+import useApplicationStore from "../../stores/useApplicationStore";
 
 function ChannelProfile() {
 	const [showApplication, setShowApplication] = useState<boolean>(false);
@@ -46,12 +48,19 @@ function ChannelProfile() {
 		average_views,
 		pricings,
 	} = useChannelStore(useShallow((state) => state.activeChannel)) || {};
-	const { setActiveChannel, setDraftChannel, setApplication } = useChannelStore(
+	const { setActiveChannel, setDraftChannel } = useChannelStore(
 		useShallow((state) => ({
 			setActiveChannel: state.setActiveChannel,
 			setDraftChannel: state.setDraftChannel,
-			setApplication: state.setApplication,
 		})),
+	);
+
+	const setApplication = useApplicationStore(
+		useShallow((state) => state.setApplication),
+	);
+
+	const clearApplication = useApplicationStore(
+		useShallow((state) => state.clearApplication),
 	);
 
 	const userId = useAppStore(useShallow((state) => state.userId));
@@ -103,9 +112,16 @@ function ChannelProfile() {
 				average_views,
 				pricings,
 			} as Channel,
+			proposed_ad_format: pricings?.[0]?.ad_format,
 			proposed_price_type: pricings?.[0]?.price_type,
 		});
 		setShowApplication(true);
+	};
+
+	const onApplicationClose = () => {
+		setShowApplication(false);
+
+		clearApplication();
 	};
 
 	useEffect(() => {
@@ -199,6 +215,34 @@ function ChannelProfile() {
 						<div className="subtitle">Average Views</div>
 					</div>
 				</div>
+
+				{isOwn && (
+					<div className="Section">
+						<div className="title">Manage</div>
+						<div className="Items">
+							<div
+								className="Item"
+								onClick={() => navigate(`/channel/${id}/applications`)}
+							>
+								<div className="body">
+									<div className="title">Applications</div>
+								</div>
+								<div className="meta">
+									<ChevronRight />
+								</div>
+							</div>
+							<div className="Item">
+								<div className="body">
+									<div className="title">Invitations</div>
+								</div>
+								<div className="meta">
+									<ChevronRight />
+								</div>
+							</div>
+						</div>
+					</div>
+				)}
+
 				<div className="Section">
 					<div className="title">Pricing</div>
 					<div
@@ -219,7 +263,7 @@ function ChannelProfile() {
 									<div className="flex-1">
 										{/* <DollarSign /> */}
 										<Shimmer className="title" state={!!price?.price_ton}>
-											{price?.price_ton} TON
+											{price?.price_ton.toFixed(2)} TON
 										</Shimmer>
 										<div className="subtitle">Price</div>
 									</div>
@@ -243,10 +287,10 @@ function ChannelProfile() {
 
 				<Modal
 					open={showApplication}
-					onClose={() => setShowApplication(false)}
+					onClose={onApplicationClose}
 					title="Application"
 				>
-					<Application />
+					<Application type="channel" onClose={onApplicationClose} />
 				</Modal>
 			</div>
 		</div>
