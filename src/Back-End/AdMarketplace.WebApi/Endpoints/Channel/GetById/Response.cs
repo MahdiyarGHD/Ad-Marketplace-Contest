@@ -11,6 +11,7 @@ public class Response
     public string? Username { get; set; }
     public string? Description { get; set; }
     public int SubscriberCount { get; set; }
+    public int PremiumCount { get; set; }
     public int AverageViews { get; set; }
     public List<LanguageDistributionContract>? LanguageDistributionJson { get; set; }
     public Guid OwnerId { get; set; }
