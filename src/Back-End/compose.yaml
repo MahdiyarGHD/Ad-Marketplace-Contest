@@ -7,6 +7,8 @@
       - TelegramBot__Token=${TELEGRAM_TOKEN}
       - TelegramBot__BotApiServer=https://api.telegram.org
       - TelegramBot__WebhookUrl=${WEBHOOK_URL}
+      - TelegramBot__BotUsername=${BOT_USERNAME}
+      - TelegramBot__AppShortName=${APP_SHORTNAME}
       - TelegramBot__SecretToken=${BOT_SECRET_TOKEN}
       - TelegramApi__Credentials__0__ApiId=${TELEGRAM_API_ID}
       - TelegramApi__Credentials__0__ApiHash=${TELEGRAM_API_HASH}

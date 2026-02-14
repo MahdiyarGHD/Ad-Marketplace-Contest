@@ -29,6 +29,7 @@ public class Endpoint(IChannelService channelService)
             Username = result.Value.Username,
             Description = result.Value.Description,
             SubscriberCount = result.Value.SubscriberCount,
+            PremiumCount = result.Value.PremiumCount,
             AverageViews = result.Value.AverageViews,
             LanguageDistributionJson = result.Value.LanguageDistributionJson,
             OwnerId = result.Value.OwnerId,

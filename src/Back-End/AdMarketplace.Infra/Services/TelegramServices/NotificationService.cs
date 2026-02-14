@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Telegram.Bot;
+using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace AdMarketplace.Infra.Services.TelegramServices;
@@ -50,11 +51,23 @@ public class NotificationService(
         if (deal is null) return;
 
         var ownerChatId = deal.Channel.Owner.UserId;
-        var text = $"📋 New deal created for your channel \"{deal.Channel.Title}\"\n" +
-                   $"Amount: {deal.AmountTon} TON\n" +
-                   $"Deal ID: {deal.Id}";
+        var scheduledInfo = deal.ScheduledPostTime.HasValue
+            ? $"📅 Scheduled: {deal.ScheduledPostTime.Value:MMM dd, yyyy 'at' HH:mm} UTC\n"
+            : "";
+        var durationInfo = deal.RequiredPostDurationHours.HasValue
+            ? $"⏱ Duration: {FormatDuration(deal.RequiredPostDurationHours.Value)}\n"
+            : "";
 
-        await SendSafeAsync(ownerChatId, text, ct, CreateDealButton(deal.Id));
+        var text = $"📋 <b>New Deal Created</b>\n\n" +
+                   $"🏷 Channel: <b>{EscapeHtml(deal.Channel.Title)}</b>\n" +
+                   $"👤 Advertiser: {EscapeHtml(deal.Advertiser.FirstName)}\n" +
+                   $"📝 Format: {FormatAdType(deal.AdFormat)}\n" +
+                   $"💰 Amount: <b>{deal.AmountTon} TON</b> ({FormatPriceType(deal.PriceType)})\n" +
+                   scheduledInfo +
+                   durationInfo +
+                   $"\n⏳ <i>Awaiting payment from advertiser...</i>";
+
+        await SendSafeAsync(ownerChatId, text, ct, CreateDealButton(deal.Id), parseMode: ParseMode.Html);
     }
 
     public async Task NotifyEscrowFundedAsync(Guid dealId, CancellationToken ct = default)
@@ -63,12 +76,19 @@ public class NotificationService(
         if (deal is null) return;
 
         var ownerChatId = deal.Channel.Owner.UserId;
-        var text = $"💰 Escrow funded for deal on \"{deal.Channel.Title}\"\n" +
-                   $"Amount: {deal.AmountTon} TON\n" +
-                   $"Please submit your ad draft.\n" +
-                   $"Deal ID: {deal.Id}";
+        var scheduledInfo = deal.ScheduledPostTime.HasValue
+            ? $"📅 Posting scheduled for: {deal.ScheduledPostTime.Value:MMM dd, yyyy 'at' HH:mm} UTC\n"
+            : "";
 
-        await SendSafeAsync(ownerChatId, text, ct, CreateDealButton(deal.Id));
+        var text = $"💰 <b>Escrow Funded!</b>\n\n" +
+                   $"Great news! Payment has been secured for your channel.\n\n" +
+                   $"🏷 Channel: <b>{EscapeHtml(deal.Channel.Title)}</b>\n" +
+                   $"💵 Amount: <b>{deal.AmountTon} TON</b>\n" +
+                   $"📝 Format: {FormatAdType(deal.AdFormat)}\n" +
+                   scheduledInfo +
+                   $"\n✏️ <b>Next Step:</b> Please submit your ad draft for review.";
+
+        await SendSafeAsync(ownerChatId, text, ct, CreateDealButton(deal.Id), parseMode: ParseMode.Html);
     }
 
     public async Task NotifyDraftSubmittedAsync(Guid dealId, CancellationToken ct = default)
@@ -78,11 +98,18 @@ public class NotificationService(
 
         var advertiserChatId = deal.Advertiser.UserId;
         var ownerChatId = deal.Channel.Owner.UserId;
-        var text = $"📝 Draft submitted for review on \"{deal.Channel.Title}\"\n" +
-                   $"Please review and approve or reject.\n" +
-                   $"Deal ID: {deal.Id}";
+        var scheduledInfo = deal.ScheduledPostTime.HasValue
+            ? $"📅 Scheduled for: {deal.ScheduledPostTime.Value:MMM dd, yyyy 'at' HH:mm} UTC\n"
+            : "";
 
-        await SendSafeAsync(advertiserChatId, text, ct, CreateDealButton(deal.Id));
+        var text = $"📝 <b>Draft Submitted for Review</b>\n\n" +
+                   $"🏷 Channel: <b>{EscapeHtml(deal.Channel.Title)}</b>\n" +
+                   $"📝 Format: {FormatAdType(deal.AdFormat)}\n" +
+                   scheduledInfo +
+                   $"\n👇 <i>The draft content is attached below.</i>\n\n" +
+                   $"✅ Please review and <b>approve</b> or <b>reject</b> the draft.";
+
+        await SendSafeAsync(advertiserChatId, text, ct, CreateDealButton(deal.Id), parseMode: ParseMode.Html);
 
         if (deal.DraftMessageId.HasValue)
             await CopyMessageSafeAsync(advertiserChatId, ownerChatId, (int)deal.DraftMessageId.Value, ct);
@@ -94,11 +121,19 @@ public class NotificationService(
         if (deal is null) return;
 
         var ownerChatId = deal.Channel.Owner.UserId;
-        var text = $"✅ Draft approved for \"{deal.Channel.Title}\"\n" +
-                   $"The ad will be posted automatically.\n" +
-                   $"Deal ID: {deal.Id}";
+        var scheduledInfo = deal.ScheduledPostTime.HasValue
+            ? $"📅 Posting at: <b>{deal.ScheduledPostTime.Value:MMM dd, yyyy 'at' HH:mm} UTC</b>"
+            : "📅 Posting: <b>As soon as possible</b>";
 
-        await SendSafeAsync(ownerChatId, text, ct, CreateDealButton(deal.Id));
+        var text = $"✅ <b>Draft Approved!</b>\n\n" +
+                   $"Your ad draft has been approved by the advertiser.\n\n" +
+                   $"🏷 Channel: <b>{EscapeHtml(deal.Channel.Title)}</b>\n" +
+                   $"📝 Format: {FormatAdType(deal.AdFormat)}\n" +
+                   $"💰 Amount: <b>{deal.AmountTon} TON</b>\n" +
+                   scheduledInfo +
+                   $"\n\n🚀 <i>The ad will be auto-posted at the scheduled time.</i>";
+
+        await SendSafeAsync(ownerChatId, text, ct, CreateDealButton(deal.Id), parseMode: ParseMode.Html);
     }
 
     public async Task NotifyDraftRejectedAsync(Guid dealId, string feedback, CancellationToken ct = default)
@@ -107,12 +142,15 @@ public class NotificationService(
         if (deal is null) return;
 
         var ownerChatId = deal.Channel.Owner.UserId;
-        var text = $"❌ Draft rejected for \"{deal.Channel.Title}\"\n" +
-                   $"Feedback: {feedback}\n" +
-                   $"Please submit a revised draft.\n" +
-                   $"Deal ID: {deal.Id}";
+        var text = $"❌ <b>Draft Rejected</b>\n\n" +
+                   $"Your ad draft needs revision.\n\n" +
+                   $"🏷 Channel: <b>{EscapeHtml(deal.Channel.Title)}</b>\n" +
+                   $"📝 Format: {FormatAdType(deal.AdFormat)}\n\n" +
+                   $"💬 <b>Feedback from advertiser:</b>\n" +
+                   $"<i>\"{EscapeHtml(feedback)}\"</i>\n\n" +
+                   $"✏️ Please submit a revised draft addressing the feedback.";
 
-        await SendSafeAsync(ownerChatId, text, ct, CreateDealButton(deal.Id));
+        await SendSafeAsync(ownerChatId, text, ct, CreateDealButton(deal.Id), parseMode: ParseMode.Html);
     }
 
     public async Task NotifyDealPostedAsync(Guid dealId, CancellationToken ct = default)
@@ -121,11 +159,31 @@ public class NotificationService(
         if (deal is null) return;
 
         var advertiserChatId = deal.Advertiser.UserId;
-        var text = $"📢 Your ad has been posted on \"{deal.Channel.Title}\"\n" +
-                   $"Verification in progress.\n" +
-                   $"Deal ID: {deal.Id}";
+        var ownerChatId = deal.Channel.Owner.UserId;
+        var durationInfo = deal.RequiredPostDurationHours.HasValue
+            ? $"⏱ Post duration: {FormatDuration(deal.RequiredPostDurationHours.Value)}\n"
+            : "";
+        var channelLink = deal.Channel.Username != null
+            ? $"🔗 Channel: @{deal.Channel.Username}\n"
+            : "";
 
-        await SendSafeAsync(advertiserChatId, text, ct, CreateDealButton(deal.Id));
+        var advertiserText = $"📢 <b>Ad Posted!</b>\n\n" +
+                   $"Your ad is now live!\n\n" +
+                   $"🏷 Channel: <b>{EscapeHtml(deal.Channel.Title)}</b>\n" +
+                   channelLink +
+                   $"👥 Subscribers: {FormatNumber(deal.Channel.SubscriberCount)}\n" +
+                   $"📝 Format: {FormatAdType(deal.AdFormat)}\n" +
+                   durationInfo +
+                   $"\n🔍 <i>Verification in progress to ensure the post stays up...</i>";
+
+        var ownerText = $"📢 <b>Ad Posted Successfully!</b>\n\n" +
+                   $"🏷 Channel: <b>{EscapeHtml(deal.Channel.Title)}</b>\n" +
+                   $"💰 Amount: <b>{deal.AmountTon} TON</b>\n" +
+                   durationInfo +
+                   $"\n⏳ <i>Funds will be released after verification period.</i>";
+
+        await SendSafeAsync(advertiserChatId, advertiserText, ct, CreateDealButton(deal.Id), parseMode: ParseMode.Html);
+        await SendSafeAsync(ownerChatId, ownerText, ct, CreateDealButton(deal.Id), parseMode: ParseMode.Html);
     }
 
     public async Task NotifyDealCompletedAsync(Guid dealId, CancellationToken ct = default)
@@ -137,13 +195,23 @@ public class NotificationService(
         var advertiserChatId = deal.Advertiser.UserId;
         var button = CreateDealButton(deal.Id);
 
-        await SendSafeAsync(ownerChatId,
-            $"🎉 Deal completed! Funds released for \"{deal.Channel.Title}\"\n" +
-            $"Amount: {deal.AmountTon} TON\nDeal ID: {deal.Id}", ct, button);
+        var ownerText = $"🎉 <b>Deal Completed!</b>\n\n" +
+            $"Congratulations! Your payment has been released.\n\n" +
+            $"🏷 Channel: <b>{EscapeHtml(deal.Channel.Title)}</b>\n" +
+            $"💵 Amount Received: <b>{deal.AmountTon} TON</b>\n" +
+            $"📝 Format: {FormatAdType(deal.AdFormat)}\n\n" +
+            $"✨ <i>Thank you for using AdMarketplace!</i>";
 
-        await SendSafeAsync(advertiserChatId,
-            $"🎉 Deal completed on \"{deal.Channel.Title}\"\n" +
-            $"Deal ID: {deal.Id}", ct, button);
+        var advertiserText = $"🎉 <b>Deal Completed!</b>\n\n" +
+            $"Your ad campaign has been successfully completed.\n\n" +
+            $"🏷 Channel: <b>{EscapeHtml(deal.Channel.Title)}</b>\n" +
+            $"👥 Reached: {FormatNumber(deal.Channel.SubscriberCount)} subscribers\n" +
+            $"📝 Format: {FormatAdType(deal.AdFormat)}\n" +
+            $"💰 Amount: <b>{deal.AmountTon} TON</b>\n\n" +
+            $"✨ <i>Thank you for using AdMarketplace!</i>";
+
+        await SendSafeAsync(ownerChatId, ownerText, ct, button, parseMode: ParseMode.Html);
+        await SendSafeAsync(advertiserChatId, advertiserText, ct, button, parseMode: ParseMode.Html);
     }
 
     public async Task NotifyDealRefundedAsync(Guid dealId, CancellationToken ct = default)
@@ -155,12 +223,22 @@ public class NotificationService(
         var advertiserChatId = deal.Advertiser.UserId;
         var button = CreateDealButton(deal.Id);
 
-        await SendSafeAsync(ownerChatId,
-            $"🔄 Deal refunded for \"{deal.Channel.Title}\"\nDeal ID: {deal.Id}", ct, button);
+        var ownerText = $"🔄 <b>Deal Refunded</b>\n\n" +
+            $"The deal has been refunded to the advertiser.\n\n" +
+            $"🏷 Channel: <b>{EscapeHtml(deal.Channel.Title)}</b>\n" +
+            $"💰 Amount: {deal.AmountTon} TON\n" +
+            $"📝 Format: {FormatAdType(deal.AdFormat)}\n\n" +
+            $"<i>No funds have been charged.</i>";
 
-        await SendSafeAsync(advertiserChatId,
-            $"🔄 Refund processed for deal on \"{deal.Channel.Title}\"\n" +
-            $"Amount: {deal.AmountTon} TON\nDeal ID: {deal.Id}", ct, button);
+        var advertiserText = $"🔄 <b>Refund Processed</b>\n\n" +
+            $"Your payment has been refunded.\n\n" +
+            $"🏷 Channel: <b>{EscapeHtml(deal.Channel.Title)}</b>\n" +
+            $"💵 Refunded: <b>{deal.AmountTon} TON</b>\n" +
+            $"📝 Format: {FormatAdType(deal.AdFormat)}\n\n" +
+            $"<i>Funds should arrive in your wallet shortly.</i>";
+
+        await SendSafeAsync(ownerChatId, ownerText, ct, button, parseMode: ParseMode.Html);
+        await SendSafeAsync(advertiserChatId, advertiserText, ct, button, parseMode: ParseMode.Html);
     }
 
     public async Task NotifyDealCancelledAsync(Guid dealId, CancellationToken ct = default)
@@ -172,11 +250,22 @@ public class NotificationService(
         var advertiserChatId = deal.Advertiser.UserId;
         var button = CreateDealButton(deal.Id);
 
-        await SendSafeAsync(ownerChatId,
-            $"🚫 Deal cancelled for \"{deal.Channel.Title}\"\nDeal ID: {deal.Id}", ct, button);
+        var ownerText = $"🚫 <b>Deal Cancelled</b>\n\n" +
+            $"This deal has been cancelled due to inactivity.\n\n" +
+            $"🏷 Channel: <b>{EscapeHtml(deal.Channel.Title)}</b>\n" +
+            $"📝 Format: {FormatAdType(deal.AdFormat)}\n" +
+            $"💰 Amount: {deal.AmountTon} TON\n\n" +
+            $"<i>The deal timed out without payment.</i>";
 
-        await SendSafeAsync(advertiserChatId,
-            $"🚫 Deal cancelled on \"{deal.Channel.Title}\"\nDeal ID: {deal.Id}", ct, button);
+        var advertiserText = $"🚫 <b>Deal Cancelled</b>\n\n" +
+            $"Your deal has been cancelled due to inactivity.\n\n" +
+            $"🏷 Channel: <b>{EscapeHtml(deal.Channel.Title)}</b>\n" +
+            $"📝 Format: {FormatAdType(deal.AdFormat)}\n" +
+            $"💰 Amount: {deal.AmountTon} TON\n\n" +
+            $"<i>No payment was processed.</i>";
+
+        await SendSafeAsync(ownerChatId, ownerText, ct, button, parseMode: ParseMode.Html);
+        await SendSafeAsync(advertiserChatId, advertiserText, ct, button, parseMode: ParseMode.Html);
     }
 
     public async Task NotifyDealDisputedAsync(Guid dealId, CancellationToken ct = default)
@@ -188,13 +277,22 @@ public class NotificationService(
         var advertiserChatId = deal.Advertiser.UserId;
         var button = CreateDealButton(deal.Id);
 
-        await SendSafeAsync(ownerChatId,
-            $"⚠️ Deal disputed for \"{deal.Channel.Title}\"\n" +
-            $"The post may have been deleted or edited.\nDeal ID: {deal.Id}", ct, button);
+        var ownerText = $"⚠️ <b>Deal Disputed</b>\n\n" +
+            $"An issue has been detected with your ad post.\n\n" +
+            $"🏷 Channel: <b>{EscapeHtml(deal.Channel.Title)}</b>\n" +
+            $"📝 Format: {FormatAdType(deal.AdFormat)}\n" +
+            $"💰 Amount: {deal.AmountTon} TON\n\n" +
+            $"⚠️ <i>The post may have been deleted or edited. Our team will review this.</i>";
 
-        await SendSafeAsync(advertiserChatId,
-            $"⚠️ Deal disputed on \"{deal.Channel.Title}\"\n" +
-            $"The post may have been deleted or edited.\nDeal ID: {deal.Id}", ct, button);
+        var advertiserText = $"⚠️ <b>Deal Disputed</b>\n\n" +
+            $"An issue has been detected with your ad.\n\n" +
+            $"🏷 Channel: <b>{EscapeHtml(deal.Channel.Title)}</b>\n" +
+            $"📝 Format: {FormatAdType(deal.AdFormat)}\n" +
+            $"💰 Amount: {deal.AmountTon} TON\n\n" +
+            $"⚠️ <i>The post may have been deleted or edited. Our team will review this.</i>";
+
+        await SendSafeAsync(ownerChatId, ownerText, ct, button, parseMode: ParseMode.Html);
+        await SendSafeAsync(advertiserChatId, advertiserText, ct, button, parseMode: ParseMode.Html);
     }
 
     public async Task NotifyDisputeResolvedAsync(Guid dealId, DisputeResolutionType resolution, CancellationToken ct = default)
@@ -206,17 +304,26 @@ public class NotificationService(
         var advertiserChatId = deal.Advertiser.UserId;
         var button = CreateDealButton(deal.Id);
 
-        var resolutionText = resolution == DisputeResolutionType.RefundAdvertiser
-            ? "Funds have been refunded to the advertiser."
-            : "Funds have been released to the channel owner.";
+        var (resolutionText, ownerOutcome, advertiserOutcome) = resolution == DisputeResolutionType.RefundAdvertiser
+            ? ("Refund to Advertiser", "Funds have been refunded to the advertiser.", "Your payment has been refunded.")
+            : ("Release to Channel", "Funds have been released to you.", "Funds have been released to the channel owner.");
 
-        await SendSafeAsync(ownerChatId,
-            $"⚖️ Dispute resolved for \"{deal.Channel.Title}\"\n" +
-            $"{resolutionText}\nDeal ID: {deal.Id}", ct, button);
+        var ownerText = $"⚖️ <b>Dispute Resolved</b>\n\n" +
+            $"🏷 Channel: <b>{EscapeHtml(deal.Channel.Title)}</b>\n" +
+            $"📝 Format: {FormatAdType(deal.AdFormat)}\n" +
+            $"💰 Amount: {deal.AmountTon} TON\n\n" +
+            $"📋 Resolution: <b>{resolutionText}</b>\n" +
+            $"💵 {ownerOutcome}";
 
-        await SendSafeAsync(advertiserChatId,
-            $"⚖️ Dispute resolved on \"{deal.Channel.Title}\"\n" +
-            $"{resolutionText}\nDeal ID: {deal.Id}", ct, button);
+        var advertiserText = $"⚖️ <b>Dispute Resolved</b>\n\n" +
+            $"🏷 Channel: <b>{EscapeHtml(deal.Channel.Title)}</b>\n" +
+            $"📝 Format: {FormatAdType(deal.AdFormat)}\n" +
+            $"💰 Amount: {deal.AmountTon} TON\n\n" +
+            $"📋 Resolution: <b>{resolutionText}</b>\n" +
+            $"💵 {advertiserOutcome}";
+
+        await SendSafeAsync(ownerChatId, ownerText, ct, button, parseMode: ParseMode.Html);
+        await SendSafeAsync(advertiserChatId, advertiserText, ct, button, parseMode: ParseMode.Html);
     }
 
     public async Task NotifyChannelApplicationReceivedAsync(Guid applicationId, CancellationToken ct = default)
@@ -225,12 +332,24 @@ public class NotificationService(
         if (app is null) return;
 
         var ownerChatId = app.Channel.Owner.UserId;
-        await SendSafeAsync(ownerChatId,
-            $"📩 New application for your channel \"{app.Channel.Title}\"\n" +
-            $"From: {app.Advertiser.FirstName}\n" +
-            $"Format: {app.ProposedAdFormat}, Price: {app.ProposedPriceTon} TON ({app.ProposedPriceType})\n" +
-            (app.Message is not null ? $"Message: {app.Message}\n" : "") +
-            $"Application ID: {app.Id}", ct, CreateApplicationButton(app.Id));
+        var scheduledInfo = app.ProposedPostingTime.HasValue
+            ? $"📅 Proposed posting: {app.ProposedPostingTime.Value:MMM dd, yyyy 'at' HH:mm} UTC\n"
+            : "";
+        var messageInfo = app.Message is not null
+            ? $"\n💬 <b>Message:</b>\n<i>\"{EscapeHtml(app.Message)}\"</i>\n"
+            : "";
+
+        var text = $"📩 <b>New Application Received</b>\n\n" +
+            $"An advertiser wants to place an ad on your channel!\n\n" +
+            $"🏷 Channel: <b>{EscapeHtml(app.Channel.Title)}</b>\n" +
+            $"👤 Advertiser: {EscapeHtml(app.Advertiser.FirstName)}\n" +
+            $"📝 Format: {FormatAdType(app.ProposedAdFormat)}\n" +
+            $"💰 Offer: <b>{app.ProposedPriceTon} TON</b> ({FormatPriceType(app.ProposedPriceType)})\n" +
+            scheduledInfo +
+            messageInfo +
+            $"\n✅ Review and respond to this application.";
+
+        await SendSafeAsync(ownerChatId, text, ct, CreateApplicationButton(app.Id), parseMode: ParseMode.Html);
     }
 
     public async Task NotifyChannelApplicationAcceptedAsync(Guid applicationId, CancellationToken ct = default)
@@ -239,11 +358,15 @@ public class NotificationService(
         if (app is null) return;
 
         var advertiserChatId = app.Advertiser.UserId;
-        await SendSafeAsync(advertiserChatId,
-            $"✅ Your application for \"{app.Channel.Title}\" has been accepted!\n" +
-            $"Format: {app.ProposedAdFormat}, Price: {app.ProposedPriceTon} TON\n" +
-            $"A deal has been created automatically. Please fund the escrow.\n" +
-            $"Application ID: {app.Id}", ct, CreateApplicationButton(app.Id));
+        var text = $"✅ <b>Application Accepted!</b>\n\n" +
+            $"Great news! Your application has been accepted.\n\n" +
+            $"🏷 Channel: <b>{EscapeHtml(app.Channel.Title)}</b>\n" +
+            $"👥 Subscribers: {FormatNumber(app.Channel.SubscriberCount)}\n" +
+            $"📝 Format: {FormatAdType(app.ProposedAdFormat)}\n" +
+            $"💰 Price: <b>{app.ProposedPriceTon} TON</b>\n\n" +
+            $"💳 <b>Next Step:</b> Please fund the escrow to proceed.";
+
+        await SendSafeAsync(advertiserChatId, text, ct, CreateApplicationButton(app.Id), parseMode: ParseMode.Html);
     }
 
     public async Task NotifyChannelApplicationRejectedAsync(Guid applicationId, string? reason, CancellationToken ct = default)
@@ -252,10 +375,19 @@ public class NotificationService(
         if (app is null) return;
 
         var advertiserChatId = app.Advertiser.UserId;
-        await SendSafeAsync(advertiserChatId,
-            $"❌ Your application for \"{app.Channel.Title}\" has been rejected.\n" +
-            (reason is not null ? $"Reason: {reason}\n" : "") +
-            $"Application ID: {app.Id}", ct, CreateApplicationButton(app.Id));
+        var reasonInfo = reason is not null
+            ? $"\n💬 <b>Reason:</b>\n<i>\"{EscapeHtml(reason)}\"</i>\n"
+            : "";
+
+        var text = $"❌ <b>Application Rejected</b>\n\n" +
+            $"Unfortunately, your application was not accepted.\n\n" +
+            $"🏷 Channel: <b>{EscapeHtml(app.Channel.Title)}</b>\n" +
+            $"📝 Format: {FormatAdType(app.ProposedAdFormat)}\n" +
+            $"💰 Offer: {app.ProposedPriceTon} TON\n" +
+            reasonInfo +
+            $"\n<i>You can try applying to other channels.</i>";
+
+        await SendSafeAsync(advertiserChatId, text, ct, CreateApplicationButton(app.Id), parseMode: ParseMode.Html);
     }
 
     public async Task NotifyChannelApplicationCounterOfferAsync(Guid applicationId, CancellationToken ct = default)
@@ -266,13 +398,21 @@ public class NotificationService(
         var recipientChatId = app.LastCounterByUserId == app.AdvertiserId
             ? app.Channel.Owner.UserId
             : app.Advertiser.UserId;
+        var fromAdvertiser = app.LastCounterByUserId == app.AdvertiserId;
+        var counterparty = fromAdvertiser ? "advertiser" : "channel owner";
+        var messageInfo = app.CounterMessage is not null
+            ? $"\n💬 <b>Message:</b>\n<i>\"{EscapeHtml(app.CounterMessage)}\"</i>\n"
+            : "";
 
-        await SendSafeAsync(recipientChatId,
-            $"🔄 Counter-offer on \"{app.Channel.Title}\"\n" +
-            $"New terms: {app.CounterAdFormat}, {app.CounterPriceTon} TON ({app.CounterPriceType})\n" +
-            (app.CounterMessage is not null ? $"Message: {app.CounterMessage}\n" : "") +
-            $"You can accept, reject, or counter.\n" +
-            $"Application ID: {app.Id}", ct, CreateApplicationButton(app.Id));
+        var text = $"🔄 <b>Counter-Offer Received</b>\n\n" +
+            $"The {counterparty} has proposed new terms.\n\n" +
+            $"🏷 Channel: <b>{EscapeHtml(app.Channel.Title)}</b>\n" +
+            $"📝 Format: {FormatAdType(app.CounterAdFormat ?? app.ProposedAdFormat)}\n" +
+            $"💰 New Price: <b>{app.CounterPriceTon} TON</b> ({FormatPriceType(app.CounterPriceType ?? app.ProposedPriceType)})\n" +
+            messageInfo +
+            $"\n✅ You can <b>accept</b>, <b>reject</b>, or send a <b>counter-offer</b>.";
+
+        await SendSafeAsync(recipientChatId, text, ct, CreateApplicationButton(app.Id), parseMode: ParseMode.Html);
     }
 
     public async Task NotifyCampaignApplicationReceivedAsync(Guid applicationId, CancellationToken ct = default)
@@ -281,12 +421,22 @@ public class NotificationService(
         if (app is null) return;
 
         var advertiserChatId = app.Campaign.Advertiser.UserId;
-        await SendSafeAsync(advertiserChatId,
-            $"📩 New application for your campaign \"{app.Campaign.Title}\"\n" +
-            $"Channel: {app.Channel.Title}\n" +
-            $"Format: {app.ProposedAdFormat}, Price: {app.ProposedPriceTon} TON ({app.ProposedPriceType})\n" +
-            (app.Message is not null ? $"Message: {app.Message}\n" : "") +
-            $"Application ID: {app.Id}", ct);
+        var messageInfo = app.Message is not null
+            ? $"\n💬 <b>Message:</b>\n<i>\"{EscapeHtml(app.Message)}\"</i>\n"
+            : "";
+
+        var text = $"📩 <b>New Campaign Application</b>\n\n" +
+            $"A channel wants to participate in your campaign!\n\n" +
+            $"📢 Campaign: <b>{EscapeHtml(app.Campaign.Title)}</b>\n" +
+            $"🏷 Channel: <b>{EscapeHtml(app.Channel.Title)}</b>\n" +
+            $"👥 Subscribers: {FormatNumber(app.Channel.SubscriberCount)}\n" +
+            $"👁 Avg. Views: {FormatNumber(app.Channel.AverageViews)}\n" +
+            $"📝 Format: {FormatAdType(app.ProposedAdFormat)}\n" +
+            $"💰 Asking: <b>{app.ProposedPriceTon} TON</b> ({FormatPriceType(app.ProposedPriceType)})\n" +
+            messageInfo +
+            $"\n✅ Review this application.";
+
+        await SendSafeAsync(advertiserChatId, text, ct, CreateApplicationButton(app.Id), parseMode: ParseMode.Html);
     }
 
     public async Task NotifyCampaignApplicationAcceptedAsync(Guid applicationId, CancellationToken ct = default)
@@ -295,12 +445,15 @@ public class NotificationService(
         if (app is null) return;
 
         var ownerChatId = app.Channel.Owner.UserId;
-        await SendSafeAsync(ownerChatId,
-            $"✅ Your application for campaign \"{app.Campaign.Title}\" has been accepted!\n" +
-            $"Channel: {app.Channel.Title}\n" +
-            $"Format: {app.ProposedAdFormat}, Price: {app.ProposedPriceTon} TON\n" +
-            $"A deal has been created automatically.\n" +
-            $"Application ID: {app.Id}", ct);
+        var text = $"✅ <b>Campaign Application Accepted!</b>\n\n" +
+            $"Your channel has been selected for the campaign!\n\n" +
+            $"📢 Campaign: <b>{EscapeHtml(app.Campaign.Title)}</b>\n" +
+            $"🏷 Channel: <b>{EscapeHtml(app.Channel.Title)}</b>\n" +
+            $"📝 Format: {FormatAdType(app.ProposedAdFormat)}\n" +
+            $"💰 Price: <b>{app.ProposedPriceTon} TON</b>\n\n" +
+            $"⏳ <i>A deal has been created. Awaiting advertiser payment.</i>";
+
+        await SendSafeAsync(ownerChatId, text, ct, CreateApplicationButton(app.Id), parseMode: ParseMode.Html);
     }
 
     public async Task NotifyCampaignApplicationRejectedAsync(Guid applicationId, string? reason, CancellationToken ct = default)
@@ -309,10 +462,18 @@ public class NotificationService(
         if (app is null) return;
 
         var ownerChatId = app.Channel.Owner.UserId;
-        await SendSafeAsync(ownerChatId,
-            $"❌ Your application for campaign \"{app.Campaign.Title}\" has been rejected.\n" +
-            (reason is not null ? $"Reason: {reason}\n" : "") +
-            $"Application ID: {app.Id}", ct);
+        var reasonInfo = reason is not null
+            ? $"\n💬 <b>Reason:</b>\n<i>\"{EscapeHtml(reason)}\"</i>\n"
+            : "";
+
+        var text = $"❌ <b>Campaign Application Rejected</b>\n\n" +
+            $"Your application was not selected.\n\n" +
+            $"📢 Campaign: <b>{EscapeHtml(app.Campaign.Title)}</b>\n" +
+            $"🏷 Channel: <b>{EscapeHtml(app.Channel.Title)}</b>\n" +
+            reasonInfo +
+            $"\n<i>Keep exploring other campaigns!</i>";
+
+        await SendSafeAsync(ownerChatId, text, ct, CreateApplicationButton(app.Id), parseMode: ParseMode.Html);
     }
 
     public async Task NotifyCampaignApplicationCounterOfferAsync(Guid applicationId, CancellationToken ct = default)
@@ -324,14 +485,21 @@ public class NotificationService(
         var recipientChatId = lastCounterByAdvertiser
             ? app.Channel.Owner.UserId
             : app.Campaign.Advertiser.UserId;
+        var counterparty = lastCounterByAdvertiser ? "advertiser" : "channel owner";
+        var messageInfo = app.CounterMessage is not null
+            ? $"\n💬 <b>Message:</b>\n<i>\"{EscapeHtml(app.CounterMessage)}\"</i>\n"
+            : "";
 
-        await SendSafeAsync(recipientChatId,
-            $"🔄 Counter-offer on campaign \"{app.Campaign.Title}\"\n" +
-            $"Channel: {app.Channel.Title}\n" +
-            $"New terms: {app.CounterAdFormat}, {app.CounterPriceTon} TON ({app.CounterPriceType})\n" +
-            (app.CounterMessage is not null ? $"Message: {app.CounterMessage}\n" : "") +
-            $"You can accept, reject, or counter.\n" +
-            $"Application ID: {app.Id}", ct);
+        var text = $"🔄 <b>Counter-Offer Received</b>\n\n" +
+            $"The {counterparty} has proposed new terms.\n\n" +
+            $"📢 Campaign: <b>{EscapeHtml(app.Campaign.Title)}</b>\n" +
+            $"🏷 Channel: <b>{EscapeHtml(app.Channel.Title)}</b>\n" +
+            $"📝 Format: {FormatAdType(app.CounterAdFormat ?? app.ProposedAdFormat)}\n" +
+            $"💰 New Price: <b>{app.CounterPriceTon} TON</b> ({FormatPriceType(app.CounterPriceType ?? app.ProposedPriceType)})\n" +
+            messageInfo +
+            $"\n✅ You can <b>accept</b>, <b>reject</b>, or send a <b>counter-offer</b>.";
+
+        await SendSafeAsync(recipientChatId, text, ct, CreateApplicationButton(app.Id), parseMode: ParseMode.Html);
     }
 
     public async Task NotifyCampaignInvitationReceivedAsync(Guid invitationId, CancellationToken ct = default)
@@ -340,12 +508,24 @@ public class NotificationService(
         if (invitation is null) return;
 
         var ownerChatId = invitation.Channel.Owner.UserId;
-        await SendSafeAsync(ownerChatId,
-            $"📨 You've been invited to campaign \"{invitation.Campaign.Title}\"\n" +
-            $"Channel: {invitation.Channel.Title}\n" +
-            $"Format: {invitation.ProposedAdFormat}, Price: {invitation.ProposedPriceTon} TON ({invitation.ProposedPriceType})\n" +
-            (invitation.Message is not null ? $"Message: {invitation.Message}\n" : "") +
-            $"Invitation ID: {invitation.Id}", ct);
+        var scheduledInfo = invitation.ProposedPostingTime.HasValue
+            ? $"📅 Proposed posting: {invitation.ProposedPostingTime.Value:MMM dd, yyyy 'at' HH:mm} UTC\n"
+            : "";
+        var messageInfo = invitation.Message is not null
+            ? $"\n💬 <b>Message:</b>\n<i>\"{EscapeHtml(invitation.Message)}\"</i>\n"
+            : "";
+
+        var text = $"📨 <b>Campaign Invitation</b>\n\n" +
+            $"You've been invited to participate in a campaign!\n\n" +
+            $"📢 Campaign: <b>{EscapeHtml(invitation.Campaign.Title)}</b>\n" +
+            $"🏷 Channel: <b>{EscapeHtml(invitation.Channel.Title)}</b>\n" +
+            $"📝 Format: {FormatAdType(invitation.ProposedAdFormat)}\n" +
+            $"💰 Offer: <b>{invitation.ProposedPriceTon} TON</b> ({FormatPriceType(invitation.ProposedPriceType)})\n" +
+            scheduledInfo +
+            messageInfo +
+            $"\n✅ Review and respond to this invitation.";
+
+        await SendSafeAsync(ownerChatId, text, ct, CreateInvitationButton(invitation.Id), parseMode: ParseMode.Html);
     }
 
     public async Task NotifyCampaignInvitationAcceptedAsync(Guid invitationId, CancellationToken ct = default)
@@ -354,12 +534,16 @@ public class NotificationService(
         if (invitation is null) return;
 
         var advertiserChatId = invitation.Campaign.Advertiser.UserId;
-        await SendSafeAsync(advertiserChatId,
-            $"✅ Your invitation for \"{invitation.Channel.Title}\" has been accepted!\n" +
-            $"Campaign: {invitation.Campaign.Title}\n" +
-            $"Format: {invitation.ProposedAdFormat}, Price: {invitation.ProposedPriceTon} TON\n" +
-            $"A deal has been created automatically. Please fund the escrow.\n" +
-            $"Invitation ID: {invitation.Id}", ct);
+        var text = $"✅ <b>Invitation Accepted!</b>\n\n" +
+            $"Great news! Your invitation has been accepted.\n\n" +
+            $"📢 Campaign: <b>{EscapeHtml(invitation.Campaign.Title)}</b>\n" +
+            $"🏷 Channel: <b>{EscapeHtml(invitation.Channel.Title)}</b>\n" +
+            $"👥 Subscribers: {FormatNumber(invitation.Channel.SubscriberCount)}\n" +
+            $"📝 Format: {FormatAdType(invitation.ProposedAdFormat)}\n" +
+            $"💰 Price: <b>{invitation.ProposedPriceTon} TON</b>\n\n" +
+            $"💳 <b>Next Step:</b> Please fund the escrow to proceed.";
+
+        await SendSafeAsync(advertiserChatId, text, ct, CreateInvitationButton(invitation.Id), parseMode: ParseMode.Html);
     }
 
     public async Task NotifyCampaignInvitationRejectedAsync(Guid invitationId, string? reason, CancellationToken ct = default)
@@ -368,11 +552,18 @@ public class NotificationService(
         if (invitation is null) return;
 
         var advertiserChatId = invitation.Campaign.Advertiser.UserId;
-        await SendSafeAsync(advertiserChatId,
-            $"❌ Your invitation to \"{invitation.Channel.Title}\" has been rejected.\n" +
-            $"Campaign: {invitation.Campaign.Title}\n" +
-            (reason is not null ? $"Reason: {reason}\n" : "") +
-            $"Invitation ID: {invitation.Id}", ct);
+        var reasonInfo = reason is not null
+            ? $"\n💬 <b>Reason:</b>\n<i>\"{EscapeHtml(reason)}\"</i>\n"
+            : "";
+
+        var text = $"❌ <b>Invitation Declined</b>\n\n" +
+            $"The channel owner has declined your invitation.\n\n" +
+            $"📢 Campaign: <b>{EscapeHtml(invitation.Campaign.Title)}</b>\n" +
+            $"🏷 Channel: <b>{EscapeHtml(invitation.Channel.Title)}</b>\n" +
+            reasonInfo +
+            $"\n<i>Consider inviting other channels.</i>";
+
+        await SendSafeAsync(advertiserChatId, text, ct, CreateInvitationButton(invitation.Id), parseMode: ParseMode.Html);
     }
 
     public async Task NotifyCampaignInvitationWithdrawnAsync(Guid invitationId, CancellationToken ct = default)
@@ -381,10 +572,13 @@ public class NotificationService(
         if (invitation is null) return;
 
         var ownerChatId = invitation.Channel.Owner.UserId;
-        await SendSafeAsync(ownerChatId,
-            $"🔙 Invitation withdrawn for campaign \"{invitation.Campaign.Title}\"\n" +
-            $"Channel: {invitation.Channel.Title}\n" +
-            $"Invitation ID: {invitation.Id}", ct, CreateInvitationButton(invitation.Id));
+        var text = $"🔙 <b>Invitation Withdrawn</b>\n\n" +
+            $"The advertiser has withdrawn their invitation.\n\n" +
+            $"📢 Campaign: <b>{EscapeHtml(invitation.Campaign.Title)}</b>\n" +
+            $"🏷 Channel: <b>{EscapeHtml(invitation.Channel.Title)}</b>\n\n" +
+            $"<i>This invitation is no longer available.</i>";
+
+        await SendSafeAsync(ownerChatId, text, ct, CreateInvitationButton(invitation.Id), parseMode: ParseMode.Html);
     }
 
     public async Task NotifyPostDeletedAsync(Guid dealId, CancellationToken ct = default)
@@ -397,18 +591,25 @@ public class NotificationService(
         var button = CreateDealButton(deal.Id);
 
         var durationText = deal.RequiredPostDurationHours.HasValue
-            ? $"{deal.RequiredPostDurationHours.Value:F1} hours"
+            ? FormatDuration(deal.RequiredPostDurationHours.Value)
             : "the agreed duration";
 
-        await SendSafeAsync(ownerChatId,
-            $"🗑️ Ad post removed from \"{deal.Channel.Title}\"\n" +
-            $"The post duration of {durationText} has ended.\n" +
-            $"Deal ID: {deal.Id}", ct, button);
+        var ownerText = $"🗑️ <b>Ad Post Removed</b>\n\n" +
+            $"The ad post has been removed as the duration period ended.\n\n" +
+            $"🏷 Channel: <b>{EscapeHtml(deal.Channel.Title)}</b>\n" +
+            $"⏱ Duration: {durationText}\n" +
+            $"📝 Format: {FormatAdType(deal.AdFormat)}\n\n" +
+            $"✅ <i>Deal completed successfully!</i>";
 
-        await SendSafeAsync(advertiserChatId,
-            $"🗑️ Your ad has been removed from \"{deal.Channel.Title}\"\n" +
-            $"The post duration of {durationText} has ended.\n" +
-            $"Deal ID: {deal.Id}", ct, button);
+        var advertiserText = $"🗑️ <b>Ad Post Removed</b>\n\n" +
+            $"Your ad has been removed as the posting period ended.\n\n" +
+            $"🏷 Channel: <b>{EscapeHtml(deal.Channel.Title)}</b>\n" +
+            $"⏱ Duration: {durationText}\n" +
+            $"📝 Format: {FormatAdType(deal.AdFormat)}\n\n" +
+            $"✅ <i>Campaign completed successfully!</i>";
+
+        await SendSafeAsync(ownerChatId, ownerText, ct, button, parseMode: ParseMode.Html);
+        await SendSafeAsync(advertiserChatId, advertiserText, ct, button, parseMode: ParseMode.Html);
     }
 
     private async Task<Database.Models.Deal?> LoadDealAsync(Guid dealId, CancellationToken ct)
@@ -469,11 +670,11 @@ public class NotificationService(
         return invitation;
     }
 
-    private async Task SendSafeAsync(long chatId, string text, CancellationToken ct, InlineKeyboardMarkup? replyMarkup = null)
+    private async Task SendSafeAsync(long chatId, string text, CancellationToken ct, InlineKeyboardMarkup? replyMarkup = null, ParseMode parseMode = ParseMode.Html)
     {
         try
         {
-            await botClient.SendMessage(chatId, text, replyMarkup: replyMarkup, cancellationToken: ct);
+            await botClient.SendMessage(chatId, text, replyMarkup: replyMarkup, parseMode: parseMode, cancellationToken: ct);
         }
         catch (Exception ex)
         {
@@ -491,5 +692,38 @@ public class NotificationService(
         {
             logger.LogWarning(ex, "Failed to copy draft message {MessageId} to chat {ChatId}", messageId, toChatId);
         }
+    }
+
+    private static string EscapeHtml(string text) =>
+        text.Replace("&", "&amp;").Replace("<", "&lt;").Replace(">", "&gt;");
+
+    private static string FormatAdType(AdFormatType type) => type switch
+    {
+        AdFormatType.Post => "📄 Post",
+        _ => type.ToString()
+    };
+
+    private static string FormatPriceType(PriceType type) => type switch
+    {
+        PriceType.PerHour => "per hour",
+        PriceType.PerDay => "per day",
+        PriceType.PerThousandViews => "per 1K views",
+        _ => type.ToString()
+    };
+
+    private static string FormatDuration(double hours)
+    {
+        if (hours >= 24)
+            return $"{hours / 24:F1} days";
+        return $"{hours:F1} hours";
+    }
+
+    private static string FormatNumber(int number)
+    {
+        if (number >= 1_000_000)
+            return $"{number / 1_000_000.0:F1}M";
+        if (number >= 1_000)
+            return $"{number / 1_000.0:F1}K";
+        return number.ToString();
     }
 }
