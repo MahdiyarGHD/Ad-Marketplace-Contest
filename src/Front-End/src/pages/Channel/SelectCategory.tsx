@@ -60,7 +60,7 @@ function SelectCategory({ title }: { title?: string }) {
 				setDraftCampaignPreferredCategory(category);
 				break;
 			case "filter":
-				setFilterCategory?.("category", category.id);
+				setFilterCategory?.("categoryId", category.id);
 				navigate("/");
 				break;
 			default:

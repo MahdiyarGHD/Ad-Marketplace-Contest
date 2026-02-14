@@ -1,5 +1,7 @@
 import type { ReactNode } from "react";
 import { create } from "zustand";
+import type { Channel } from "./useChannelStore";
+import type { Campaign } from "./useCampaignStore";
 
 type Toast = {
 	id?: number;
@@ -22,6 +24,8 @@ type NumberFilter = BaseFilter & {
 type RangeFilter = BaseFilter & {
 	type: "range";
 	range: [number, number];
+	minKey: string;
+	maxKey: string;
 };
 
 export type OptionsFilter = BaseFilter & {
@@ -49,8 +53,11 @@ type UIState = {
 	search?: {
 		query: string;
 		filters: FilterValues;
+		results?: Channel[] | Campaign[];
 		setQuery: (value: string) => void;
 		setFilter: (key: string, value: string | number | [number, number]) => void;
+		setFilters: (filters: FilterValues) => void;
+		setResults: (results?: Channel[] | Campaign[]) => void;
 	};
 	setTopBarTitle: (value: string) => void;
 	setTopBarButtons: (value: ReactNode) => void;
@@ -72,6 +79,16 @@ const useUIStore = create<UIState>((set) => ({
 					filters: state.search!.filters,
 					setQuery: state.search!.setQuery,
 					setFilter: state.search!.setFilter,
+					setFilters: state.search!.setFilters,
+					setResults: state.search!.setResults,
+				},
+			}));
+		},
+		setFilters(filters) {
+			set((state) => ({
+				search: {
+					...state.search!,
+					filters,
 				},
 			}));
 		},
@@ -83,6 +100,14 @@ const useUIStore = create<UIState>((set) => ({
 						...state.search!.filters,
 						[key]: value,
 					},
+				},
+			}));
+		},
+		setResults(results) {
+			set((state) => ({
+				search: {
+					...state.search!,
+					results,
 				},
 			}));
 		},

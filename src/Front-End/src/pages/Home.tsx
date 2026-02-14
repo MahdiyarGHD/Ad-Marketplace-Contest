@@ -25,6 +25,9 @@ import type { Campaign } from "../stores/useCampaignStore";
 import useCampaignStore from "../stores/useCampaignStore";
 import { useShallow } from "zustand/shallow";
 import Search from "../components/Search";
+import { requestAPI } from "../utils/api";
+import type { FilterValues } from "../stores/useUIStore";
+import useUIStore from "../stores/useUIStore";
 
 const renderCategory = (
 	category: Category,
@@ -99,6 +102,13 @@ function Home() {
 		useShallow((state) => state.setActiveCampaign),
 	);
 
+	const searchResults = useUIStore(
+		useShallow((state) => state.search?.results),
+	);
+	const setSearchResults = useUIStore(
+		useShallow((state) => state.search?.setResults),
+	);
+
 	const navigate = useNavigate();
 
 	const showChannelProfile = (channel: Channel) => {
@@ -122,6 +132,29 @@ function Home() {
 
 	const showCategoryPageById = (categoryId: string, type: string) => {
 		navigate(`/category/${categoryId}?type=${type}`);
+	};
+
+	const onSearch = async (
+		query?: string,
+		filters?: FilterValues,
+		type?: "channels" | "campaigns",
+	) => {
+		if (query === "" && (!filters || Object.keys(filters).length === 0)) {
+			setSearchResults?.(undefined);
+			return;
+		}
+
+		const response = await requestAPI(
+			`/api/${type}/search`,
+			{
+				query: query || "",
+				...filters,
+			},
+			"GET",
+		);
+
+		setSearchResults?.(response.value[type!] as Channel[] | Campaign[]);
+		console.log("Search", response);
 	};
 
 	useEffect(() => {
@@ -154,7 +187,7 @@ function Home() {
 						element.$type === "category" && navigate(`/categories/${type}`);
 					}}
 				>
-					<div className="icon">{element.icon}</div>
+					{/* <div className="icon">{element.icon}</div> */}
 					<h2 className="title">{element.label}</h2>
 					<div className="meta">
 						Show All <ChevronRight size={18} />
@@ -238,14 +271,30 @@ function Home() {
 					</>
 				}
 			>
-				<TabContent state={true} className="scrollable">
-					<Search onSearch={() => {}} />
-					{influencers.elements.map((element) =>
-						renderSection(element, "channel"),
+				<TabContent state={true} className="">
+					<Search type="channels" onSearch={onSearch} />
+					{searchResults && searchResults !== undefined ? (
+						searchResults.length > 0 ? (
+							renderSection(
+								{
+									$type: "channel",
+									icon: "",
+									label: "Search Results",
+									items: searchResults,
+								},
+								"channel",
+							)
+						) : (
+							<NoResultsPlaceholder />
+						)
+					) : (
+						influencers.elements.map((element) =>
+							renderSection(element, "channel"),
+						)
 					)}
 					{influencers.elements.length === 0 && <LoadingSkeleton />}
 				</TabContent>
-				<TabContent state={true} className="scrollable">
+				<TabContent state={true} className="">
 					{campaigns.elements.map((element) =>
 						renderSection(element, "campaign"),
 					)}
@@ -286,6 +335,16 @@ const NoCampaignPlaceholder = memo(() => (
 		</div>
 		<h2 className="Title">No Campaigns Yet</h2>
 		<p className="Subtitle">There is no campaign yet.</p>
+	</div>
+));
+
+const NoResultsPlaceholder = memo(() => (
+	<div className="Placeholder">
+		<div className="Emoji">
+			<RLottie sticker="pepe" autoplay width={120} height={120} />
+		</div>
+		<h2 className="Title">No Results</h2>
+		<p className="Subtitle">There are no results for your search.</p>
 	</div>
 ));
 

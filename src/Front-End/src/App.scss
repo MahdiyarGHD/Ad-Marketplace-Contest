@@ -339,7 +339,9 @@ body {
             }
 
             .title {
-                line-height: 1.2;
+                line-height: 1.4;
+                text-overflow: ellipsis;
+                overflow: hidden;
 
                 &.preWrap {
                     white-space: pre-wrap;
@@ -409,7 +411,7 @@ body {
         align-items: center;
         overflow-x: auto;
         scroll-snap-type: x mandatory;
-        // background-color: var(--secondary-bg-color);
+        background-color: var(--secondary-bg-color);
         // padding: 0 .25rem;
         // scrollbar-width: none;
 
@@ -507,7 +509,7 @@ body {
     align-items: center;
     justify-content: center;
     gap: 1rem;
-    height: 100%;
+    // height: 100%;
     padding: 0 1rem;
 
     .Title {
@@ -584,22 +586,37 @@ body {
 
 .Tabs {
     display: flex;
-    gap: 8px;
-    padding: 8px;
+    gap: .5rem;
+    margin: .5rem;
+    padding: .25rem;
+    border-radius: 2rem;
     position: sticky;
-    top: 0px;
-    background-color: var(--secondary);
+    top: .5rem;
+    background-color: var(--secondary-bg-color);
+    background-color: color-mix(
+            in srgb,
+            var(--secondary-bg-color) 50%,
+            transparent
+        ) !important;
+    backdrop-filter: blur(16px);
+    box-shadow: 0px -20px 16px 8px #000a;
+    border: 1px solid var(--border-color);
     z-index: 1;
 }
 
 .Tab {
     background-color: transparent;
     padding: 6px;
-    border-radius: 8px;
+    flex: 1;
+    text-align: center;
+    border-radius: 1rem;
     font-weight: 500;
     transition: all 0.3s ease;
     cursor: pointer;
     user-select: none;
+    // color: var(--secondary-text);
+    // font-size: 1.5rem;
+    // font-weight: bold;
 }
 
 .Tab:hover {
@@ -607,6 +624,7 @@ body {
 }
 
 .Tab.active {
+    // color: var(--text-color);
     background-color: var(--active-bg);
 }
 
@@ -620,7 +638,7 @@ body {
     flex: 1;
     display: flex;
     flex-direction: column;
-    height: 100%;
+    // height: 100%;
 }
 
 .TabContent {
@@ -648,15 +666,17 @@ body {
 .SearchBar {
     display: flex;
     margin: 0 .5rem;
+    margin-bottom: .5rem;
     gap: .5rem;
 
     >div {
         display: flex;
         align-items: center;
         background-color: var(--secondary-bg-color);
-        padding: .5rem;
-        border-radius: 1rem;
-        gap: .5rem;
+        padding: 0.25rem;
+        border-radius: 1.5rem;
+        border: 1px solid var(--border-color);
+        gap: 0.5rem;
     }
 
     .Input {
@@ -664,10 +684,26 @@ body {
     }
 
     .icon {
-        width: 3rem;
+        min-width: 2.5rem;
         display: inline-flex;
         justify-content: center;
         align-items: center;
+    }
+
+    .Filter {
+        min-width: 3rem;
+        position: relative;
+
+        .count {
+            position: absolute;
+            right: 0;
+            bottom: 0;
+            background-color: var(--tg-theme-accent-text-color);
+            line-height: 1;
+            padding: 2px 4px;
+            font-size: .75rem;
+            border-radius: 2rem;
+        }
     }
 
     input {
@@ -720,6 +756,7 @@ textarea {
     &.x {
         overflow-x: auto;
         overflow-y: hidden;
+        scrollbar-width: none;
     }
 }
 

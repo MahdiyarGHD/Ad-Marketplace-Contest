@@ -1,18 +1,21 @@
-import { memo } from "react";
+import { memo, useState } from "react";
 import { AdFormats, PriceTypes } from "../stores/useChannelStore";
 import Menu, { DropdownMenu, MenuItem } from "./Menu";
 import TextTransition from "./TextTransition";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import MainButton from "./MainButton";
-import type { Filter, OptionsFilter } from "../stores/useUIStore";
+import type { Filter, FilterValues, OptionsFilter } from "../stores/useUIStore";
 import useUIStore from "../stores/useUIStore";
 import { useShallow } from "zustand/shallow";
 import { useNavigate } from "react-router-dom";
 import useCategoryStore from "../stores/useCategoryStore";
 
-function Filters() {
-	const values = useUIStore(useShallow((state) => state.search?.filters));
-	const setFilter = useUIStore(useShallow((state) => state.search?.setFilter));
+function Filters({ onApply }: { onApply: (filters?: FilterValues) => void }) {
+	const appliedFilters = useUIStore(
+		useShallow((state) => state.search?.filters),
+	);
+
+	const [values, setValues] = useState<FilterValues>(appliedFilters || {});
 
 	const { getCategory } = useCategoryStore();
 
@@ -20,7 +23,7 @@ function Filters() {
 
 	const filters: Filter[] = [
 		{
-			key: "category",
+			key: "categoryId",
 			title: "Category",
 			type: "text",
 			onClick: () => navigate("/select-category/filter"),
@@ -30,17 +33,19 @@ function Filters() {
 			title: "Subscribers",
 			type: "range",
 			range: [0, 1_000_000],
+			minKey: "minSubscribers",
+			maxKey: "maxSubscribers",
 		},
 		{
-			key: "avgViews",
+			key: "minAverageViews",
 			title: "Min Average Views",
 			type: "number",
 			unit: "Views",
 			range: [0, 1_000_000],
 		},
 		{
-			key: "MinPrice",
-			title: "Min Price",
+			key: "maxPrice",
+			title: "Max Price",
 			type: "number",
 			unit: "TON",
 			range: [0, 100_000],
@@ -58,8 +63,6 @@ function Filters() {
 			options: PriceTypes,
 		},
 	];
-
-	console.log("Filters", values);
 
 	const renderFilterWithOptions = (filter: OptionsFilter) => {
 		return (
@@ -84,7 +87,9 @@ function Filters() {
 						<MenuItem
 							key={key}
 							title={type}
-							onClick={() => setFilter?.(filter.key, key)}
+							onClick={() =>
+								setValues((prev) => ({ ...prev, [filter.key]: key }))
+							}
 						/>
 					))}
 				</DropdownMenu>
@@ -102,7 +107,7 @@ function Filters() {
 							<div className="title">{filter.title}</div>
 						</div>
 						<div className="meta">
-							{(filter.key === "category" &&
+							{(filter.key === "categoryId" &&
 								values?.[filter.key] &&
 								getCategory(values?.[filter.key] as string)?.name) ||
 								"Select"}
@@ -123,7 +128,10 @@ function Filters() {
 								placeholder="0"
 								value={(values?.[filter.key] as number) || ""}
 								onChange={(e) =>
-									setFilter?.(filter.key, Number(e.target.value))
+									setValues((prev) => ({
+										...prev,
+										[filter.key]: Number(e.target.value),
+									}))
 								}
 							/>
 							{filter.unit}
@@ -140,23 +148,29 @@ function Filters() {
 								<input
 									type="number"
 									placeholder="Min"
-									value={(values?.[filter.key] as number[])?.[0] || ""}
+									value={(values?.[filter.minKey] as number) || ""}
 									onChange={(e) =>
-										setFilter?.(filter.key, [
-											Math.max(filter.range[0], Number(e.target.value)),
-											(values?.[filter.key] as number[])?.[1] || 0,
-										])
+										setValues((prev) => ({
+											...prev,
+											[filter.minKey]: Math.max(
+												filter.range[0],
+												Number(e.target.value),
+											),
+										}))
 									}
 								/>
 								<input
 									type="number"
 									placeholder="Max"
-									value={(values?.[filter.key] as number[])?.[1] || ""}
+									value={(values?.[filter.maxKey] as number) || ""}
 									onChange={(e) =>
-										setFilter?.(filter.key, [
-											(values?.[filter.key] as number[])?.[0] || 0,
-											Math.min(Number(e.target.value), filter.range[1]),
-										])
+										setValues((prev) => ({
+											...prev,
+											[filter.maxKey]: Math.min(
+												Number(e.target.value),
+												filter.range[1],
+											),
+										}))
 									}
 								/>
 							</div>
@@ -177,7 +191,7 @@ function Filters() {
 					{renderFilters(filter)}
 				</div>
 			))}
-			<MainButton text="Apply" onClick={() => {}} />
+			<MainButton text="Apply" onClick={() => onApply(values)} />
 		</div>
 	);
 }
