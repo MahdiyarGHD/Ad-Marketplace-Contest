@@ -10,9 +10,15 @@ import useCampaignStore, { type Campaign } from "../stores/useCampaignStore";
 import { requestAPI } from "../utils/api";
 import { backButton, popup } from "@tma.js/sdk-react";
 import { invokeHapticFeedbackImpact } from "../utils/common";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import useCategoryStore from "../stores/useCategoryStore";
-import { BanIcon, MoreVerticalIcon, PencilIcon, TagIcon } from "lucide-react";
+import {
+	BanIcon,
+	ChevronRight,
+	MoreVerticalIcon,
+	PencilIcon,
+	TagIcon,
+} from "lucide-react";
 import {
 	AdFormats,
 	PriceTypes,
@@ -70,7 +76,7 @@ function CampaignPage() {
 
 	const category = getCategory(category_id ?? "");
 
-	const { apply } = useParams();
+	const apply = location.pathname.endsWith("/apply");
 
 	const navigate = useNavigate();
 
@@ -281,6 +287,33 @@ function CampaignPage() {
 						</div>
 					</div>
 				</div>
+
+				{isOwn && (
+					<div className="Section">
+						<div className="title">Manage</div>
+						<div className="Items">
+							<div
+								className="Item"
+								onClick={() => navigate(`/campaign/${id}/applications`)}
+							>
+								<div className="body">
+									<div className="title">Applications</div>
+								</div>
+								<div className="meta">
+									<ChevronRight />
+								</div>
+							</div>
+							<div className="Item">
+								<div className="body">
+									<div className="title">Invitations</div>
+								</div>
+								<div className="meta">
+									<ChevronRight />
+								</div>
+							</div>
+						</div>
+					</div>
+				)}
 
 				<div className="Section">
 					<div className="title">Description</div>

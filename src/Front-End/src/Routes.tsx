@@ -120,8 +120,12 @@ const router = createBrowserRouter(
 							element: <MyCampaigns />,
 						},
 						{
-							path: "campaign/:id/:apply?",
+							path: "campaign/:id/apply?",
 							element: <CampaignPage />,
+						},
+						{
+							path: "campaign/:id/applications",
+							element: <Applications type="campaign" />,
 						},
 					],
 				},

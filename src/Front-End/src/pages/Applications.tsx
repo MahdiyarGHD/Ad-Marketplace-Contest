@@ -1,6 +1,6 @@
 import { backButton } from "@tma.js/sdk-react";
 import { memo, useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { invokeHapticFeedbackImpact } from "../utils/common";
 import PageHeader, { PageHeaderTitle } from "../components/PageHeader";
 import Transition from "../components/Transition";
@@ -35,15 +35,15 @@ function Applications({ type }: { type: "campaign" | "channel" }) {
 
 	const applications = useApplicationStore((state) => state.applications);
 
-	const { getChannelApplications } = useApplicationStore(
-		useShallow((state) => ({
-			getChannelApplications: state.getChannelApplications,
-		})),
-	);
+	const { getChannelApplications, getCampaignApplications } =
+		useApplicationStore(
+			useShallow((state) => ({
+				getChannelApplications: state.getChannelApplications,
+				getCampaignApplications: state.getCampaignApplications,
+			})),
+		);
 
 	const { id } = useParams();
-
-	const navigate = useNavigate();
 
 	const onBackButton = () => {
 		window.history.back();
@@ -64,6 +64,7 @@ function Applications({ type }: { type: "campaign" | "channel" }) {
 		if (type && id) {
 			switch (type) {
 				case "campaign":
+					getCampaignApplications(id);
 					break;
 				case "channel":
 					getChannelApplications(id);
@@ -96,7 +97,7 @@ function Applications({ type }: { type: "campaign" | "channel" }) {
 				);
 			case 2:
 				return (
-					<div className="Avatar peer-color-6">
+					<div className="Avatar peer-color-0">
 						<XIcon />
 					</div>
 				);
@@ -117,11 +118,15 @@ function Applications({ type }: { type: "campaign" | "channel" }) {
 						<div className="ChatItem">
 							{renderStatus(application.status ?? 0)}
 							<div className="body">
-								<div className="title">{application.advertiser_name}</div>
-								<div className="subtitle">{application.message}</div>
+								<div className="title">
+									{application.advertiser_name ?? application.channel_title}
+								</div>
+								<div className="subtitle" dir="auto">
+									{application.message}
+								</div>
 							</div>
 							<div className="meta">
-								{ApplicationStatus[application.status!]}
+								{ApplicationStatus[application.status ?? 0]}
 							</div>
 						</div>
 						<div className="Item">
@@ -168,6 +173,7 @@ function Applications({ type }: { type: "campaign" | "channel" }) {
 				{application && (
 					<ApplicationReview
 						application={application}
+						type={type}
 						onClose={() => setShowApplication(false)}
 					/>
 				)}

@@ -15,16 +15,18 @@ import { buildClassName } from "../utils/common";
 
 function ApplicationReview({
 	application,
+	type,
 	onClose,
 }: {
 	application: ApplicationType;
+	type: "channel" | "campaign";
 	onClose: () => void;
 }) {
 	const { showToast } = useUIStore.getState();
 
 	const onAccept = async () => {
 		const response = await requestAPI(
-			`/api/channel-applications/${application.id}/accept`,
+			`/api/${type === "channel" ? "channel-applications" : "applications"}/${application.id}/accept`,
 		);
 
 		if (!response.isError && response.value) {
@@ -35,7 +37,7 @@ function ApplicationReview({
 
 	const onReject = async () => {
 		const response = await requestAPI(
-			`/api/channel-applications/${application.id}/reject`,
+			`/api/${type === "channel" ? "channel-applications" : "applications"}/${application.id}/reject`,
 		);
 
 		if (!response.isError && response.value) {
@@ -48,13 +50,17 @@ function ApplicationReview({
 		<div className="ApplicationReview Profile">
 			<div className="User">
 				<Avatar
-					id={application?.advertiser_id ?? ""}
+					id={application?.advertiser_id ?? application?.channel_id ?? ""}
 					size={80}
-					title={application?.advertiser_name ?? ""}
+					title={
+						application?.advertiser_name ?? application?.channel_title ?? ""
+					}
 					isUuid
 				/>
 				<div className="info">
-					<Shimmer className="title">{application.advertiser_name}</Shimmer>
+					<Shimmer className="title">
+						{application.advertiser_name ?? application.channel_title}
+					</Shimmer>
 					<div
 						className={buildClassName(
 							"subtitle",

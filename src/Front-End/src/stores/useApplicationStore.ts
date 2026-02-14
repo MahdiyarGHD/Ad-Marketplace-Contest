@@ -8,6 +8,7 @@ export type ApplicationType = {
 	advertiser_id?: string;
 	advertiser_name?: string;
 	channel_id: string;
+	channel_title?: string;
 	channel?: Channel;
 	campaign_id?: string;
 	campaign?: Campaign;
@@ -26,6 +27,7 @@ type ApplicationState = {
 	setApplication: (application: Partial<ApplicationType>) => void;
 	setApplications: (applications: ApplicationType[]) => void;
 	getChannelApplications: (channelId: string) => Promise<void>;
+	getCampaignApplications: (campaignId: string) => Promise<void>;
 	clearApplication: () => void;
 };
 
@@ -49,6 +51,18 @@ const useApplicationStore = create<ApplicationState>((set) => ({
 
 		const response = await requestAPI(
 			`/api/channels/${channelId}/applications`,
+			{},
+			"GET",
+		);
+		if (!response.isError && response.value?.applications) {
+			set({ applications: response.value.applications as ApplicationType[] });
+		}
+	},
+	async getCampaignApplications(campaignId: string) {
+		set({ applications: undefined });
+
+		const response = await requestAPI(
+			`/api/campaigns/${campaignId}/applications`,
 			{},
 			"GET",
 		);
