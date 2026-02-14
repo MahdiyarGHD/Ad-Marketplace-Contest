@@ -37,8 +37,7 @@ jobs:
             
             cd src/Back-End || echo "Warning: Could not change directory to src/Back-End"
             
-            printf "TELEGRAM_TOKEN=${{ secrets.TELEGRAM_TOKEN }}\nBOT_SECRET_TOKEN=${{ secrets.BOT_SECRET_TOKEN }}\nTELEGRAM_API_ID=${{ secrets.TELEGRAM_API_ID }}\nTELEGRAM_API_HASH=${{ secrets.TELEGRAM_API_HASH }}\nWEBHOOK_URL=${{ secrets.WEBHOOK_URL }}\n‌‌BOT_USERNAME=${{ secrets.BOT_USERNAME }}\nAPP_SHORTNAME=${{ secrets.APP_SHORTNAME }}\n" > .env
-
+            printf "TELEGRAM_TOKEN=${{ secrets.TELEGRAM_TOKEN }}\nBOT_SECRET_TOKEN=${{ secrets.BOT_SECRET_TOKEN }}\nTELEGRAM_API_ID=${{ secrets.TELEGRAM_API_ID }}\nTELEGRAM_API_HASH=${{ secrets.TELEGRAM_API_HASH }}\nWEBHOOK_URL=${{ secrets.WEBHOOK_URL }}\nBOT_USERNAME=${{ secrets.BOT_USERNAME }}\nAPP_SHORTNAME=${{ secrets.APP_SHORTNAME }}\n" > .env
             echo "Starting Docker Compose..."
             docker compose down --remove-orphans
             docker compose up -d --build
