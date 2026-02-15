@@ -10,6 +10,11 @@ public static class AdMarketDbContextSchema
         public const string TableName = "Users";
     }
     
+    public static class UserTransaction
+    {
+        public const string TableName = "UserTransactions";
+    }
+    
     public static class Agent
     {
         public const string TableName = "Agents";

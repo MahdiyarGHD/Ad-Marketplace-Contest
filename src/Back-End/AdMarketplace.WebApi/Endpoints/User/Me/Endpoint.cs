@@ -10,7 +10,7 @@ public class Endpoint(IUserService userService)
 {
     public override void Configure()
     {
-        Get("/api/users/me");
+        Get("/api/user/me");
     }
 
     public override async Task<ErrorOr<Response>> ExecuteAsync(CancellationToken ct)
