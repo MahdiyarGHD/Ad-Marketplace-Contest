@@ -35,6 +35,7 @@ import useApplicationStore from "../../stores/useApplicationStore";
 
 function ChannelProfile() {
 	const [showApplication, setShowApplication] = useState<boolean>(false);
+	const [applicationType, setApplicationType] = useState<"apply" | "invite">();
 
 	const { id } = useParams();
 
@@ -70,6 +71,8 @@ function ChannelProfile() {
 	const { getCategory } = useCategoryStore();
 
 	const category = getCategory(category_id ?? "");
+
+	const invite = location.pathname.endsWith("/invite");
 
 	const navigate = useNavigate();
 
@@ -115,6 +118,29 @@ function ChannelProfile() {
 			proposed_ad_format: pricings?.[0]?.ad_format,
 			proposed_price_type: pricings?.[0]?.price_type,
 		});
+		setApplicationType("apply");
+		setShowApplication(true);
+	};
+
+	const onInvite = () => {
+		if (isOwn) return;
+
+		setApplication({
+			channel_id: id,
+			channel: {
+				chat_id,
+				owner_id,
+				title,
+				username,
+				category_id,
+				subscriber_count,
+				average_views,
+				pricings,
+			} as Channel,
+			proposed_ad_format: pricings?.[0]?.ad_format,
+			proposed_price_type: pricings?.[0]?.price_type,
+		});
+		setApplicationType("invite");
 		setShowApplication(true);
 	};
 
@@ -148,11 +174,19 @@ function ChannelProfile() {
 		if (owner_id && !isOwn) {
 			useUIStore.setState({
 				mainButton: { text: "Apply", onClick: onApply },
+				textButton: { text: "Invite to campaign", onClick: onInvite },
 			});
 		} else {
-			useUIStore.setState({ mainButton: undefined });
+			useUIStore.setState({ mainButton: undefined, textButton: undefined });
 		}
 	}, [isOwn, owner_id]);
+
+	useEffect(() => {
+		if (invite) {
+			setApplicationType("invite");
+			setShowApplication(true);
+		}
+	}, [invite]);
 
 	return (
 		<div className="scrollable">
@@ -231,7 +265,10 @@ function ChannelProfile() {
 									<ChevronRight />
 								</div>
 							</div>
-							<div className="Item">
+							<div
+								className="Item"
+								onClick={() => navigate(`/channel/${id}/invitations`)}
+							>
 								<div className="body">
 									<div className="title">Invitations</div>
 								</div>
@@ -288,9 +325,12 @@ function ChannelProfile() {
 				<Modal
 					open={showApplication}
 					onClose={onApplicationClose}
-					title="Application"
+					title={applicationType === "apply" ? "Application" : "Invite"}
 				>
-					<Application type="channel" onClose={onApplicationClose} />
+					<Application
+						type={applicationType === "invite" ? "invite" : "channel"}
+						onClose={onApplicationClose}
+					/>
 				</Modal>
 			</div>
 		</div>

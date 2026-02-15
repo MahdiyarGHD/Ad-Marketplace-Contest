@@ -49,6 +49,7 @@ type UIState = {
 	topBarTitle?: string;
 	topBarButtons?: ReactNode;
 	mainButton?: { text: string; onClick?: () => void };
+	textButton?: { text: string; onClick?: () => void };
 	toasts: Toast[];
 	search?: {
 		query: string;

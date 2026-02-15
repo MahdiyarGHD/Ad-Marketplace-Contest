@@ -11,6 +11,7 @@ export type ApplicationType = {
 	channel_title?: string;
 	channel?: Channel;
 	campaign_id?: string;
+	campaign_title?: string;
 	campaign?: Campaign;
 	proposed_value?: number;
 	proposed_ad_format: number;
@@ -28,6 +29,8 @@ type ApplicationState = {
 	setApplications: (applications: ApplicationType[]) => void;
 	getChannelApplications: (channelId: string) => Promise<void>;
 	getCampaignApplications: (campaignId: string) => Promise<void>;
+	getChannelInvitations: (channelId: string) => Promise<void>;
+	getCampaignInvitations: (campaignId: string) => Promise<void>;
 	getMyApplications: () => Promise<void>;
 	clearApplication: () => void;
 };
@@ -81,6 +84,30 @@ const useApplicationStore = create<ApplicationState>((set) => ({
 		);
 		if (!response.isError && response.value?.applications) {
 			set({ applications: response.value.applications as ApplicationType[] });
+		}
+	},
+	async getChannelInvitations(channelId: string) {
+		set({ applications: undefined });
+
+		const response = await requestAPI(
+			`/api/channels/${channelId}/invitations`,
+			{},
+			"GET",
+		);
+		if (!response.isError && response.value?.invitations) {
+			set({ applications: response.value.invitations as ApplicationType[] });
+		}
+	},
+	async getCampaignInvitations(campaignId: string) {
+		set({ applications: undefined });
+
+		const response = await requestAPI(
+			`/api/campaigns/${campaignId}/invitations`,
+			{},
+			"GET",
+		);
+		if (!response.isError && response.value?.invitations) {
+			set({ applications: response.value.invitations as ApplicationType[] });
 		}
 	},
 }));

@@ -46,7 +46,7 @@ export async function requestAPI<
 
 			const error = await res.json();
 			throw new Error(
-				`API Error ${res.status}: ${error.first_error || error.message || res.statusText}`,
+				`API Error ${res.status}: ${error.first_error?.description || error.message || res.statusText}`,
 			);
 		}
 

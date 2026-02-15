@@ -21,6 +21,7 @@ import CategoryPage from "./pages/CategoryPage";
 import CampaignPage from "./pages/CampaignPage";
 import SelectMyChannel from "./pages/Channel/SelectMyChannel";
 import Applications from "./pages/Applications";
+import SelectMyCampaign from "./pages/SelectMyCampaign";
 
 const Loading = () => {
 	return <div className="LoadingBar">Loading...</div>;
@@ -92,12 +93,16 @@ const router = createBrowserRouter(
 							element: <SelectCategory title="Browse Categories" />,
 						},
 						{
-							path: "channel/:id",
+							path: "channel/:id/invite?",
 							element: <ChannelProfile />,
 						},
 						{
 							path: "channel/:id/applications",
 							element: <Applications type="channel" />,
+						},
+						{
+							path: "channel/:id/invitations",
+							element: <Applications type="channel" invite />,
 						},
 						{
 							path: "category/:categoryId",
@@ -126,6 +131,14 @@ const router = createBrowserRouter(
 						{
 							path: "campaign/:id/applications",
 							element: <Applications type="campaign" />,
+						},
+						{
+							path: "campaign/:id/invitations",
+							element: <Applications type="campaign" invite />,
+						},
+						{
+							path: "select-my-campaign/:set",
+							element: <SelectMyCampaign />,
 						},
 						{
 							path: "my-channel-applications",

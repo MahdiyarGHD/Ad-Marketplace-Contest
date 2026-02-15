@@ -32,6 +32,10 @@ body {
             }
         }
     }
+
+    > .TextButton {
+        margin-top: .5rem;
+    }
 }
 
 .SafeArea {
@@ -763,6 +767,7 @@ table.Details {
     display: flex;
     gap: .5rem;
     padding: 0 1rem;
+    margin-top: .5rem;
     margin-bottom: 1rem;
 }
 
@@ -793,7 +798,6 @@ table.Details {
     justify-content: center;
     padding: .5rem;
     margin: 0 1rem;
-    margin-bottom: .5rem;
     color: var(--tg-theme-accent-text-color);
     /* background-color: var(--secondary-bg-color); */
     border-radius: .5rem;

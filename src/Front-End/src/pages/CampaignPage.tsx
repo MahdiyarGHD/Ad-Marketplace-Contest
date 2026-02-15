@@ -197,7 +197,6 @@ function CampaignPage() {
 	}, [isOwn, advertiser_id]);
 
 	useEffect(() => {
-		console.log(apply);
 		if (apply) {
 			setShowApplication(true);
 		}
@@ -303,7 +302,10 @@ function CampaignPage() {
 									<ChevronRight />
 								</div>
 							</div>
-							<div className="Item">
+							<div
+								className="Item"
+								onClick={() => navigate(`/campaign/${id}/invitations`)}
+							>
 								<div className="body">
 									<div className="title">Invitations</div>
 								</div>
