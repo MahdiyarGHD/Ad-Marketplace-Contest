@@ -6,7 +6,7 @@ using FastEndpoints;
 
 namespace AdMarketplace.Endpoints.User.Charge;
 
-public class Endpoint(IUserService userService)
+public class Endpoint(IUserService userService, ITransactionService transactionService)
     : Endpoint<Request, ErrorOr<Success>>
 {
     public override void Configure()
@@ -21,6 +21,8 @@ public class Endpoint(IUserService userService)
             return userResult.Errors;
         var user = userResult.Value;
 
+        // var isExists = 
+        
         return Result.Success;
     }
 }

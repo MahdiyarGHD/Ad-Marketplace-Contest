@@ -10,6 +10,7 @@ using AdMarketplace.Infra.Services.AgentServices;
 using AdMarketplace.Infra.Services.CampaignServices;
 using AdMarketplace.Infra.Services.CategoryServices;
 using AdMarketplace.Infra.Services.ChannelServices;
+using AdMarketplace.Infra.Services.PaymentServices;
 using AdMarketplace.Infra.Services.TelegramServices;
 using AdMarketplace.Infra.Services.UserServices;
 using AdMarketplace.Workers.ChannelAnalytics;
@@ -45,6 +46,7 @@ public static class ServiceCollectionExtensions
             services.AddScoped<ICampaignInvitationService, CampaignInvitationService>();
             services.AddScoped<IChannelApplicationService, ChannelApplicationService>();
             services.AddScoped<IDealService, DealService>();
+            services.AddScoped<ITransactionService, TransactionService>();
             
             services.AddSingleton<IAnalyticsUpdateQueue, AnalyticsUpdateQueue>();
             services.AddHostedService<AnalyticsConsumerWorker>();

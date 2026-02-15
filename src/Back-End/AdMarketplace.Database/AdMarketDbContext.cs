@@ -6,6 +6,7 @@ namespace AdMarketplace.Database;
 public class AdMarketDbContext(DbContextOptions<AdMarketDbContext> dbContextOptions) : DbContext(dbContextOptions)
 {
     public DbSet<User> Users => Set<User>();
+    public DbSet<UserTransaction> UserTransactions => Set<UserTransaction>();
     public DbSet<Agent> Agents => Set<Agent>();
     public DbSet<Channel> Channels => Set<Channel>();
     public DbSet<Category> Categories => Set<Category>();
