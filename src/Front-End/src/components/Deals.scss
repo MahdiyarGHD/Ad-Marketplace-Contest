@@ -1,0 +1,22 @@
+.Deals {
+    .Items {
+        background-color: var(--secondary-bg-color);
+        flex: none;
+    }
+
+    .ChatItem {
+        .Avatar {
+            width: 3rem;
+            height: 3rem;
+        }
+    }
+}
+
+.DealReview {
+    .DealAvatars {
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+        color: var(--secondary-text);
+    }
+}

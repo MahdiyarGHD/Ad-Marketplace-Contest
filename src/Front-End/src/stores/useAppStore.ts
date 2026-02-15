@@ -22,7 +22,7 @@ const useAppStore = create<AppState>((set) => ({
 		console.log("token", response.value.access_token);
 	},
 	async getMe() {
-		const response = await requestAPI("/api/users/me", {}, "GET");
+		const response = await requestAPI("/api/user/me", {}, "GET");
 
 		if (response.value) {
 			set({ userId: response.value.id });

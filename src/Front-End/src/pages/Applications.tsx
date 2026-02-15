@@ -152,7 +152,7 @@ function Applications({
 							<div className="body">
 								<div className="title">
 									{application.advertiser_name ??
-										application.channel_title ??
+										application.channel?.title ??
 										application.campaign_title}
 								</div>
 								<div className="subtitle" dir="auto">

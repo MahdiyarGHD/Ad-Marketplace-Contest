@@ -103,14 +103,14 @@ function ApplicationReview({
 				<Avatar
 					id={
 						application?.advertiser_id ??
-						application?.channel_id ??
+						application?.channel?.id ??
 						application.campaign_id ??
 						""
 					}
 					size={80}
 					title={
 						application?.advertiser_name ??
-						application?.channel_title ??
+						application?.channel?.title ??
 						application?.campaign_title ??
 						""
 					}
@@ -120,7 +120,7 @@ function ApplicationReview({
 				<div className="info">
 					<Shimmer className="title">
 						{application.advertiser_name ??
-							application.channel_title ??
+							application.channel?.title ??
 							application.campaign_title}
 					</Shimmer>
 					<div
