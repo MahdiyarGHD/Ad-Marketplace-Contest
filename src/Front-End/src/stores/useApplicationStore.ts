@@ -28,6 +28,7 @@ type ApplicationState = {
 	setApplications: (applications: ApplicationType[]) => void;
 	getChannelApplications: (channelId: string) => Promise<void>;
 	getCampaignApplications: (campaignId: string) => Promise<void>;
+	getMyApplications: () => Promise<void>;
 	clearApplication: () => void;
 };
 
@@ -63,6 +64,18 @@ const useApplicationStore = create<ApplicationState>((set) => ({
 
 		const response = await requestAPI(
 			`/api/campaigns/${campaignId}/applications`,
+			{},
+			"GET",
+		);
+		if (!response.isError && response.value?.applications) {
+			set({ applications: response.value.applications as ApplicationType[] });
+		}
+	},
+	async getMyApplications() {
+		set({ applications: undefined });
+
+		const response = await requestAPI(
+			`/api/my-channel-applications`,
 			{},
 			"GET",
 		);

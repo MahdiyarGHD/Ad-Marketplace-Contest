@@ -75,6 +75,22 @@ function Profile() {
 					</div>
 				</div>
 			</div>
+
+			<div className="Section">
+				<div className="Items">
+					<div
+						className="Item"
+						onClick={() => navigate("/my-channel-applications")}
+					>
+						<div className="body">
+							<div className="title">My Applications</div>
+						</div>
+						<div className="meta">
+							<ChevronRightIcon />
+						</div>
+					</div>
+				</div>
+			</div>
 		</div>
 	);
 }

@@ -1,8 +1,9 @@
 .Applications {
     .Items {
         background-color: var(--secondary-bg-color);
+        flex: none;
     }
-    
+
     .ChatItem {
         .Avatar {
             width: 3rem;

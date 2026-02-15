@@ -29,17 +29,22 @@ export const ApplicationStatus: { [key: number]: string } = {
 	4: "Counter Offer",
 };
 
-function Applications({ type }: { type: "campaign" | "channel" }) {
+function Applications({
+	type,
+}: {
+	type: "campaign" | "channel" | "advertiser";
+}) {
 	const [application, setApplication] = useState<ApplicationType | null>(null);
 	const [showApplication, setShowApplication] = useState<boolean>(false);
 
 	const applications = useApplicationStore((state) => state.applications);
 
-	const { getChannelApplications, getCampaignApplications } =
+	const { getChannelApplications, getCampaignApplications, getMyApplications } =
 		useApplicationStore(
 			useShallow((state) => ({
 				getChannelApplications: state.getChannelApplications,
 				getCampaignApplications: state.getCampaignApplications,
+				getMyApplications: state.getMyApplications,
 			})),
 		);
 
@@ -61,13 +66,16 @@ function Applications({ type }: { type: "campaign" | "channel" }) {
 
 		invokeHapticFeedbackImpact("medium");
 
-		if (type && id) {
+		if ((type && id) || type === "advertiser") {
 			switch (type) {
 				case "campaign":
-					getCampaignApplications(id);
+					getCampaignApplications(id!);
 					break;
 				case "channel":
-					getChannelApplications(id);
+					getChannelApplications(id!);
+					break;
+				case "advertiser":
+					getMyApplications();
 					break;
 				default:
 					break;

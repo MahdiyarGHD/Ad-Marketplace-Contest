@@ -127,6 +127,10 @@ const router = createBrowserRouter(
 							path: "campaign/:id/applications",
 							element: <Applications type="campaign" />,
 						},
+						{
+							path: "my-channel-applications",
+							element: <Applications type="advertiser" />,
+						},
 					],
 				},
 			],

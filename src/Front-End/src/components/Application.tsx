@@ -50,9 +50,11 @@ export const PriceTypesInfo = {
 function Application({
 	onClose,
 	type,
+	counterOffer = false,
 }: {
 	onClose: () => void;
 	type: "channel" | "campaign";
+	counterOffer?: boolean;
 }) {
 	const [showDatePicker, setShowDatePicker] = useState(false);
 	const [success, setSuccess] = useState(false);
@@ -127,12 +129,15 @@ function Application({
 			showToast({ title: (error as Error).message });
 			return;
 		}
+		const endpoint =
+			type === "channel" ? "channel-applications" : "applications";
 
 		const response = await requestAPI(
-			`/api/${type === "channel" ? "channel-applications" : "applications"}/`,
+			`/api/${endpoint}/${counterOffer ? `${application?.id}/counter-offer` : ""}`,
 			{
-				campaign_id: type === "campaign" && application?.campaign_id,
-				channel_id: application?.channel_id,
+				campaign_id:
+					type === "campaign" && !counterOffer && application?.campaign_id,
+				channel_id: !counterOffer && application?.channel_id,
 				message: application?.message,
 				proposed_ad_format: application?.proposed_ad_format,
 				proposed_price_type: application?.proposed_price_type,
@@ -156,9 +161,29 @@ function Application({
 		}
 	};
 
+	const getChannelInfo = async () => {
+		if (!application?.channel_id) return;
+
+		const response = await requestAPI(
+			`/api/channels/${application.channel_id}`,
+			{},
+			"GET",
+		);
+
+		if (!response.isError && response.value) {
+			setApplication({ channel: response.value });
+		}
+	};
+
 	useEffect(() => {
 		invokeHapticFeedbackImpact("medium");
 	}, []);
+
+	useEffect(() => {
+		if (!application?.channel && application?.channel_id) {
+			getChannelInfo();
+		}
+	}, [application?.channel_id]);
 
 	const renderSuccess = () => {
 		return (
@@ -184,7 +209,7 @@ function Application({
 
 	return (
 		<div className="Application">
-			{type === "campaign" && (
+			{type === "campaign" && !counterOffer && (
 				<div className="Items">
 					<div className="ChatItem" onClick={onSelectChannel}>
 						<Avatar

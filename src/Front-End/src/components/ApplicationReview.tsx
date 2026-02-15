@@ -1,4 +1,4 @@
-import { memo } from "react";
+import { memo, useState } from "react";
 import type { ApplicationType } from "../stores/useApplicationStore";
 import Avatar from "./Avatar";
 import { Shimmer } from "./Shimmer";
@@ -12,6 +12,10 @@ import { requestAPI } from "../utils/api";
 import useUIStore from "../stores/useUIStore";
 import { ApplicationStatus } from "../pages/Applications";
 import { buildClassName } from "../utils/common";
+import Modal from "./Modal";
+import Application from "./Application";
+import useApplicationStore from "../stores/useApplicationStore";
+import { useShallow } from "zustand/shallow";
 
 function ApplicationReview({
 	application,
@@ -19,9 +23,19 @@ function ApplicationReview({
 	onClose,
 }: {
 	application: ApplicationType;
-	type: "channel" | "campaign";
+	type: "channel" | "campaign" | "advertiser";
 	onClose: () => void;
 }) {
+	const [showCounterOffer, setShowCounterOffer] = useState<boolean>(false);
+
+	const setApplication = useApplicationStore(
+		useShallow((state) => state.setApplication),
+	);
+
+	const clearApplication = useApplicationStore(
+		useShallow((state) => state.clearApplication),
+	);
+
 	const { showToast } = useUIStore.getState();
 
 	const onAccept = async () => {
@@ -46,6 +60,27 @@ function ApplicationReview({
 		}
 	};
 
+	const onCounterOffer = () => {
+		if (!application.id) return;
+
+		setApplication({
+			id: application.id,
+			channel_id: application.channel_id,
+			campaign_id: application.campaign_id,
+			proposed_price_ton: application.proposed_price_ton,
+			proposed_ad_format: application.proposed_ad_format,
+			proposed_price_type: application.proposed_price_type,
+		});
+
+		setShowCounterOffer(true);
+	};
+
+	const onCounterOfferClose = () => {
+		setShowCounterOffer(false);
+
+		clearApplication();
+	};
+
 	return (
 		<div className="ApplicationReview Profile">
 			<div className="User">
@@ -56,6 +91,7 @@ function ApplicationReview({
 						application?.advertiser_name ?? application?.channel_title ?? ""
 					}
 					isUuid
+					// isUuid={!!application?.advertiser_id || !!application.campaign_id}
 				/>
 				<div className="info">
 					<Shimmer className="title">
@@ -95,13 +131,14 @@ function ApplicationReview({
 					<td className="value">{application.message}</td>
 				</tr>
 			</table>
-			{application.status === 0 && (
-				<div className="TextButton primary">
+			{((application.status === 0 && type !== "advertiser") ||
+				application.status === 4) && (
+				<div className="TextButton primary" onClick={onCounterOffer}>
 					<span>Counter Offer</span>
 				</div>
 			)}
 			<div className="Actions">
-				{application.status === 0 ? (
+				{application.status === 0 && type !== "advertiser" ? (
 					<>
 						<div className="Button secondary" onClick={onReject}>
 							Reject
@@ -116,6 +153,15 @@ function ApplicationReview({
 					</div>
 				)}
 			</div>
+			<Modal
+				open={showCounterOffer}
+				onClose={onCounterOfferClose}
+				title="Application"
+			>
+				{type !== "advertiser" && (
+					<Application type={type} counterOffer onClose={onCounterOfferClose} />
+				)}
+			</Modal>
 		</div>
 	);
 }
