@@ -9,6 +9,7 @@ public class User : IDateTimeSchema
     public string FirstName { get; private set; }
     public string? LastName { get; private set; }
     public string? UserName { get; private set; }
+    public decimal Balance { get; set; }
     public DateTimeOffset CreatedAt { get; private init; }
     public DateTimeOffset? UpdatedAt { get; private set; }
     

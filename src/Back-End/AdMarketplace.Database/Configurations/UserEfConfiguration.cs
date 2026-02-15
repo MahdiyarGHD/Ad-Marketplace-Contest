@@ -29,6 +29,10 @@ public class UserEfConfiguration: IEntityTypeConfiguration<User>
         builder.Property(x => x.LastName)
             .IsRequired(false)
             .HasMaxLength(64);
+
+        builder.Property(x => x.Balance)
+            .HasDefaultValue(0)
+            .HasPrecision(32, 8);
         
         builder.Property(x => x.UserName)
             .IsRequired(false)
