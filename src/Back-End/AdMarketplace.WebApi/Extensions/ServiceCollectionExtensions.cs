@@ -139,6 +139,9 @@ public static class ServiceCollectionExtensions
 
             services.Configure<CorsOptions>(
                 configuration.GetSection(CorsOptions.KeyName));
+            
+            services.Configure<TonSettingOptions>(
+                configuration.GetSection(TonSettingOptions.KeyName));
 
             return services;
         }
