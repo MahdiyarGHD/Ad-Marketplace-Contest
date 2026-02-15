@@ -37,4 +37,17 @@ public class UserService(AdMarketDbContext dbContext) : IUserService
 
          return user;
      }
+
+     public async Task<ErrorOr<User>> IncreaseBalance(Guid id, decimal amount)
+     {
+         var user = await dbContext.Users
+             .AsTracking()
+             .FirstOrDefaultAsync(u => u.Id.Equals(id));
+         if (user is null)
+             return Error.NotFound("User.NotFound", "User not found");
+         user.IncreaseBalance(amount);
+
+         await dbContext.SaveChangesAsync();
+         return user;
+     }
 }

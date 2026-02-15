@@ -27,13 +27,13 @@ public class Endpoint(IUserService userService, ITransactionService transactionS
         if(isExists)
             return Error.Conflict("Transaction.AlreadyExists", "The specified transaction is already used.");
         
-        var amountTon = await tonPaymentService.GetDepositAmountAsync(
+        var nanoAmountTon = await tonPaymentService.GetDepositAmountAsync(
             req.TransactionHash,
             expectedMemo: user.Id.ToString(),
             expectedSender: req.WalletAddress 
         );
 
-        if (amountTon == null)
+        if (nanoAmountTon == null)
             return Error.Validation("Transaction.Invalid", "Could not verify transaction on the blockchain. Check hash, sender, or memo.");
 
         var checkNetwork = await transactionService.RecordPaymentAsync(new UserTransaction
@@ -41,7 +41,7 @@ public class Endpoint(IUserService userService, ITransactionService transactionS
             Id = Guid.NewGuid(),
             UserId = user.Id,
             TransactionHash = req.TransactionHash,
-            Amount = amountTon.Value,
+            Amount = nanoAmountTon.Value,
             LogicalTime = 0, 
             Destination = "BusinessWallet", 
             CreatedAt = DateTime.UtcNow
@@ -49,6 +49,8 @@ public class Endpoint(IUserService userService, ITransactionService transactionS
         
         if (checkNetwork.IsError)
             return checkNetwork.Errors;
+        
+        await userService.IncreaseBalance(user.Id, nanoAmountTon.Value / 1_000_000_000m);
         
         return Result.Success;
     }

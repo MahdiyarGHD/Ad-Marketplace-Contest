@@ -31,7 +31,8 @@ public class TonPaymentService
         if (transactions is not { Length: > 0 }) 
             return null;
 
-        var payment = transactions.FirstOrDefault(t => t.TransactionId.Hash == txHash);
+        // var payment = transactions.FirstOrDefault(t => t.TransactionId.Hash == txHash);
+        var payment = transactions.First();
 
         if (payment.TransactionId.Hash != txHash) 
             return null;

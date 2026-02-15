@@ -35,4 +35,9 @@ public class User : IDateTimeSchema
     {
         Balance -= amount;
     }
+    
+    public void IncreaseBalance(decimal amount)
+    {
+        Balance += amount;
+    }
 }
