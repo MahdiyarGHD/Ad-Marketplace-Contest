@@ -31,7 +31,7 @@ public class UserEfConfiguration: IEntityTypeConfiguration<User>
             .HasMaxLength(64);
 
         builder.Property(x => x.Balance)
-            .HasDefaultValue(0)
+            .HasDefaultValue(100)
             .HasPrecision(32, 8);
         
         builder.Property(x => x.UserName)
