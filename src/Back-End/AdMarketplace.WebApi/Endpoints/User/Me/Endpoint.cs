@@ -24,6 +24,7 @@ public class Endpoint(IUserService userService)
         return new Response
         {
             Id = user.Id,
+            Balance = user.Balance,
             UserId = user.UserId,
             FirstName = user.FirstName,
             LastName = user.LastName,
