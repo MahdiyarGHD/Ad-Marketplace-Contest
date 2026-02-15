@@ -1,7 +1,11 @@
 ﻿using AdMarketplace.Domain.Options;
 using Microsoft.Extensions.Options;
 using TonSdk.Client;
+using TonSdk.Contracts.Wallet;
 using TonSdk.Core;
+using TonSdk.Core.Block;
+using TonSdk.Core.Boc;
+using TonSdk.Core.Crypto;
 
 namespace AdMarketplace.Infra.Services.PaymentServices;
 
@@ -49,5 +53,57 @@ public class TonPaymentService
         var actualNano = long.Parse(payment.InMsg.Value.ToNano());
 
         return actualNano;
+    }
+    
+    public async Task<string?> RefundAsync(string targetAddress, decimal amountTon, string memo)
+    {
+        var mnemonic = new Mnemonic(_tonSetting.Mnemonic.Split(' '));
+        var wallet = new WalletV4(new WalletV4Options 
+        { 
+            PublicKey = mnemonic.Keys.PublicKey, 
+            Workchain = 0 
+        });
+
+        var addressInfo = await _client.GetAddressInformation(wallet.Address);
+        if (addressInfo is null)
+            return null;
+        
+        var seqno = addressInfo.Value.Data == null ? 0 : wallet.ParseStorage(addressInfo.Value.Data.Parse()).Seqno;
+
+        Cell body = new CellBuilder().StoreUInt(0, 32).StoreString(memo).Build();
+        
+        var info = new IntMsgInfo(new IntMsgInfoOptions
+        {
+            Dest = new Address(targetAddress),
+            Value = new Coins(amountTon),
+            Bounce = false
+        });
+        
+        var messageOptions = new MessageXOptions
+        {
+            Info = info,
+            Body = body
+        };
+        
+        var message = new MessageX(messageOptions);
+
+        var transfer = new WalletTransfer
+        {
+            Message = message,
+            Mode = 3 
+        };
+        
+        ExternalInMessage externalMessage = wallet.CreateTransferMessage(new[] { transfer }, seqno);
+
+        var signedMessage = externalMessage.Sign(mnemonic.Keys.PrivateKey);
+
+        Cell cellToSend = signedMessage.Cell; 
+
+        var sendResult = await _client.SendBoc(cellToSend);
+
+        if (sendResult is null)
+            return null;
+        
+        return sendResult.Value.Type != "ok" ? throw new Exception($"Transaction rejected: {sendResult.Value.Type}") : cellToSend.Hash.ToString("hex");
     }
 }

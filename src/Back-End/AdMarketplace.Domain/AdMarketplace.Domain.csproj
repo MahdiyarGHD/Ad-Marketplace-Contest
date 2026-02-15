@@ -10,6 +10,7 @@
 
     <ItemGroup>
       <PackageReference Include="ErrorOr" Version="2.0.1" />
+      <PackageReference Include="TonSdk.Contracts" Version="0.4.0" />
     </ItemGroup>
 
 </Project>

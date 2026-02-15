@@ -21,7 +21,8 @@ public class Endpoint(
         if (userResult.IsError)
             return userResult.Errors;
 
-        var result = await dealService.GetByAdvertiserIdAsync(userResult.Value.Id, req.Skip, req.Take);
+        var userId = userResult.Value.Id;
+        var result = await dealService.GetByUserIdAsync(userId, req.Skip, req.Take);
 
         if (result.IsError)
             return result.Errors;
@@ -33,6 +34,10 @@ public class Endpoint(
             CampaignTitle = d.Campaign?.Title,
             ChannelId = d.ChannelId,
             ChannelTitle = d.Channel.Title,
+            AdvertiserId = d.AdvertiserId,
+            AdvertiserFirstName = d.Advertiser.FirstName,
+            AdvertiserUserName = d.Advertiser.UserName,
+            Role = d.AdvertiserId == userId ? DealRoleType.Advertiser : DealRoleType.ChannelOwner,
             AmountTon = d.AmountTon,
             Status = d.Status,
             DraftStatus = d.DraftStatus,

@@ -21,6 +21,7 @@ public interface IDealService
 
     Task<ErrorOr<Deal>> GetByIdAsync(Guid id);
     Task<ErrorOr<Deal>> GetByApplicationIdAsync(Guid applicationId);
+    Task<ErrorOr<List<Deal>>> GetByUserIdAsync(Guid userId, int skip, int take);
     Task<ErrorOr<List<Deal>>> GetByAdvertiserIdAsync(Guid advertiserId, int skip, int take);
     Task<ErrorOr<List<Deal>>> GetByChannelIdAsync(Guid channelId, int skip, int take);
     Task<ErrorOr<List<Deal>>> GetByCampaignIdAsync(Guid campaignId, int skip, int take);

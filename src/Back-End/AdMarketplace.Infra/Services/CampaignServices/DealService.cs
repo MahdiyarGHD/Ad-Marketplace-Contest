@@ -172,6 +172,21 @@ public class DealService(
         return deal;
     }
 
+    public async Task<ErrorOr<List<Deal>>> GetByUserIdAsync(Guid userId, int skip, int take)
+    {
+        var deals = await dbContext.Deals
+            .Include(d => d.Campaign)
+            .Include(d => d.Channel)
+            .Include(d => d.Advertiser)
+            .Where(d => d.AdvertiserId == userId || d.Channel.OwnerId == userId)
+            .OrderByDescending(d => d.CreatedAt)
+            .Skip(skip)
+            .Take(take)
+            .ToListAsync();
+
+        return deals;
+    }
+
     public async Task<ErrorOr<List<Deal>>> GetByAdvertiserIdAsync(Guid advertiserId, int skip, int take)
     {
         var deals = await dbContext.Deals
