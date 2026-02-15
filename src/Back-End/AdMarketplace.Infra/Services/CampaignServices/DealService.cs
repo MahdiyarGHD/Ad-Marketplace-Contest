@@ -262,6 +262,15 @@ public class DealService(
         if (deal.AutoCancelAt.HasValue && deal.AutoCancelAt.Value <= DateTimeOffset.UtcNow)
             return Error.Validation("Deal.Expired", "Deal has expired and can no longer be funded");
 
+        var advertiser = await dbContext.Users
+            .AsTracking()
+            .FirstOrDefaultAsync(user => user.Id.Equals(deal.AdvertiserId) && user.Balance >= deal.AmountTon);
+        
+        if (advertiser is null)
+            return Error.Validation("Deal.NotEnoughCredit", "Advertiser doesn't have enough credit");
+        
+        advertiser.Deduct(deal.AmountTon);
+        
         deal.FundEscrow(transactionHash, walletAddress);
         await dbContext.SaveChangesAsync();
 

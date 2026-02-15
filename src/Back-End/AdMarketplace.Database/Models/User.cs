@@ -30,4 +30,9 @@ public class User : IDateTimeSchema
             CreatedAt = DateTimeOffset.UtcNow
         };
     }
+
+    public void Deduct(decimal amount)
+    {
+        Balance -= amount;
+    }
 }
