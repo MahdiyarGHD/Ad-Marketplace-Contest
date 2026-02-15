@@ -15,6 +15,6 @@ public class TonPaymentService
             ApiKey = apiKey
         };
         
-        _client = new TonClient(TonClientType.HTTP_TONCENTERAPIV3, options);
+        _client = new TonClient(TonClientType.HTTP_TONCENTERAPIV2, options);
     }
 }
