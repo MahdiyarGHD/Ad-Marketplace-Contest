@@ -101,6 +101,9 @@ public class CampaignApplicationService(
         var applications = await dbContext.CampaignApplications
             .Include(a => a.Campaign)
             .Include(a => a.Channel)
+                .ThenInclude(c => c.Pricings)
+            .Include(a => a.Channel)
+                .ThenInclude(c => c.Category)
             .Where(a => a.CampaignId == campaignId)
             .OrderByDescending(a => a.CreatedAt)
             .Skip(skip)

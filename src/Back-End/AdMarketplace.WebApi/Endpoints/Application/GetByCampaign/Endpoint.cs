@@ -37,8 +37,27 @@ public class Endpoint(
         var applications = result.Value.Select(a => new ApplicationItem
         {
             Id = a.Id,
-            ChannelId = a.ChannelId,
-            ChannelTitle = a.Channel.Title,
+            Channel = new ChannelInfo
+            {
+                Id = a.Channel.Id,
+                ChatId = a.Channel.ChatId,
+                Title = a.Channel.Title,
+                Username = a.Channel.Username,
+                Description = a.Channel.Description,
+                SubscriberCount = a.Channel.SubscriberCount,
+                PremiumCount = a.Channel.PremiumCount,
+                AverageViews = a.Channel.AverageViews,
+                LanguageDistribution = a.Channel.LanguageDistributionJson,
+                CategoryId = a.Channel.CategoryId,
+                CategoryName = a.Channel.Category?.Name,
+                Pricings = a.Channel.Pricings.Select(p => new ChannelPricingInfo
+                {
+                    Id = p.Id,
+                    AdFormat = p.AdFormat,
+                    PriceType = p.PriceType,
+                    PriceTon = p.PriceTon
+                }).ToList()
+            },
             ProposedAdFormat = a.ProposedAdFormat,
             ProposedPriceType = a.ProposedPriceType,
             ProposedPriceTon = a.ProposedPriceTon,

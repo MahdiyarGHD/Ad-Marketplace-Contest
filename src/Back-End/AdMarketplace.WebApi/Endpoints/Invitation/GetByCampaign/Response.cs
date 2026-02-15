@@ -16,6 +16,8 @@ public class InvitationItem
     public required AdFormatType ProposedAdFormat { get; set; }
     public required PriceType ProposedPriceType { get; set; }
     public required decimal ProposedPriceTon { get; set; }
+    public DateTimeOffset? ProposedPostingTime { get; set; }
+    public string? Message { get; set; }
     public InvitationStatusType Status { get; set; }
     public DateTimeOffset CreatedAt { get; set; }
 }

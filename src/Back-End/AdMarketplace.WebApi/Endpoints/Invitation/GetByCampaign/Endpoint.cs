@@ -42,6 +42,8 @@ public class Endpoint(
             ProposedAdFormat = i.ProposedAdFormat,
             ProposedPriceType = i.ProposedPriceType,
             ProposedPriceTon = i.ProposedPriceTon,
+            ProposedPostingTime = i.ProposedPostingTime,
+            Message = i.Message,
             Status = i.Status,
             CreatedAt = i.CreatedAt
         }).ToList();
