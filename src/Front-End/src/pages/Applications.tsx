@@ -31,22 +31,31 @@ export const ApplicationStatus: { [key: number]: string } = {
 
 function Applications({
 	type,
+	invite,
 }: {
 	type: "campaign" | "channel" | "advertiser";
+	invite?: boolean;
 }) {
 	const [application, setApplication] = useState<ApplicationType | null>(null);
 	const [showApplication, setShowApplication] = useState<boolean>(false);
 
 	const applications = useApplicationStore((state) => state.applications);
 
-	const { getChannelApplications, getCampaignApplications, getMyApplications } =
-		useApplicationStore(
-			useShallow((state) => ({
-				getChannelApplications: state.getChannelApplications,
-				getCampaignApplications: state.getCampaignApplications,
-				getMyApplications: state.getMyApplications,
-			})),
-		);
+	const {
+		getChannelApplications,
+		getCampaignApplications,
+		getMyApplications,
+		getChannelInvitations,
+		getCampaignInvitations,
+	} = useApplicationStore(
+		useShallow((state) => ({
+			getChannelApplications: state.getChannelApplications,
+			getCampaignApplications: state.getCampaignApplications,
+			getMyApplications: state.getMyApplications,
+			getChannelInvitations: state.getChannelInvitations,
+			getCampaignInvitations: state.getCampaignInvitations,
+		})),
+	);
 
 	const { id } = useParams();
 
@@ -67,18 +76,31 @@ function Applications({
 		invokeHapticFeedbackImpact("medium");
 
 		if ((type && id) || type === "advertiser") {
-			switch (type) {
-				case "campaign":
-					getCampaignApplications(id!);
-					break;
-				case "channel":
-					getChannelApplications(id!);
-					break;
-				case "advertiser":
-					getMyApplications();
-					break;
-				default:
-					break;
+			if (invite && id) {
+				switch (type) {
+					case "campaign":
+						getCampaignInvitations(id!);
+						break;
+					case "channel":
+						getChannelInvitations(id!);
+						break;
+					default:
+						break;
+				}
+			} else {
+				switch (type) {
+					case "campaign":
+						getCampaignApplications(id!);
+						break;
+					case "channel":
+						getChannelApplications(id!);
+						break;
+					case "advertiser":
+						getMyApplications();
+						break;
+					default:
+						break;
+				}
 			}
 		}
 
@@ -117,7 +139,9 @@ function Applications({
 	return (
 		<div className="Applications scrollable">
 			<PageHeader>
-				<PageHeaderTitle>Applications</PageHeaderTitle>
+				<PageHeaderTitle>
+					{invite ? "Invitations" : "Applications"}
+				</PageHeaderTitle>
 			</PageHeader>
 
 			<Transition state eachElement eachElementDelay={20}>
@@ -127,7 +151,9 @@ function Applications({
 							{renderStatus(application.status ?? 0)}
 							<div className="body">
 								<div className="title">
-									{application.advertiser_name ?? application.channel_title}
+									{application.advertiser_name ??
+										application.channel_title ??
+										application.campaign_title}
 								</div>
 								<div className="subtitle" dir="auto">
 									{application.message}
@@ -182,6 +208,7 @@ function Applications({
 					<ApplicationReview
 						application={application}
 						type={type}
+						invite={invite}
 						onClose={() => setShowApplication(false)}
 					/>
 				)}
@@ -191,9 +218,12 @@ function Applications({
 					<div className="Emoji">
 						<RLottie sticker="pepe" autoplay width={120} height={120} />
 					</div>
-					<h2 className="Title">No Applications</h2>
+					<h2 className="Title">
+						No {invite ? "Invitations" : "Applications"}
+					</h2>
 					<p className="Subtitle">
-						There are no applications for this {type} yet.
+						There are no {invite ? "invitations" : "applications"} for this{" "}
+						{type} yet.
 					</p>
 				</div>
 			)}

@@ -20,10 +20,12 @@ import { useShallow } from "zustand/shallow";
 function ApplicationReview({
 	application,
 	type,
+	invite = false,
 	onClose,
 }: {
 	application: ApplicationType;
 	type: "channel" | "campaign" | "advertiser";
+	invite?: boolean;
 	onClose: () => void;
 }) {
 	const [showCounterOffer, setShowCounterOffer] = useState<boolean>(false);
@@ -38,25 +40,39 @@ function ApplicationReview({
 
 	const { showToast } = useUIStore.getState();
 
+	const endpoint = `/api/${invite ? "invitations" : type === "channel" ? "channel-applications" : "applications"}/${application.id}`;
+
+	const showActions = () => {
+		if (type === "advertiser") return false;
+
+		if (application.status === 1 || application.status === 2) return false;
+
+		if (invite && type === "campaign") return false;
+
+		return true;
+	};
+
 	const onAccept = async () => {
-		const response = await requestAPI(
-			`/api/${type === "channel" ? "channel-applications" : "applications"}/${application.id}/accept`,
-		);
+		const response = await requestAPI(`${endpoint}/accept`);
 
 		if (!response.isError && response.value) {
 			showToast({ title: "Application accepted" });
+			setApplication({ status: 1 });
 			onClose();
+		} else {
+			showToast({ title: response.first_error?.description });
 		}
 	};
 
 	const onReject = async () => {
-		const response = await requestAPI(
-			`/api/${type === "channel" ? "channel-applications" : "applications"}/${application.id}/reject`,
-		);
+		const response = await requestAPI(`${endpoint}/reject`);
 
 		if (!response.isError && response.value) {
 			showToast({ title: "Application rejected" });
+			setApplication({ status: 2 });
 			onClose();
+		} else {
+			showToast({ title: response.first_error?.description });
 		}
 	};
 
@@ -85,17 +101,27 @@ function ApplicationReview({
 		<div className="ApplicationReview Profile">
 			<div className="User">
 				<Avatar
-					id={application?.advertiser_id ?? application?.channel_id ?? ""}
+					id={
+						application?.advertiser_id ??
+						application?.channel_id ??
+						application.campaign_id ??
+						""
+					}
 					size={80}
 					title={
-						application?.advertiser_name ?? application?.channel_title ?? ""
+						application?.advertiser_name ??
+						application?.channel_title ??
+						application?.campaign_title ??
+						""
 					}
 					isUuid
 					// isUuid={!!application?.advertiser_id || !!application.campaign_id}
 				/>
 				<div className="info">
 					<Shimmer className="title">
-						{application.advertiser_name ?? application.channel_title}
+						{application.advertiser_name ??
+							application.channel_title ??
+							application.campaign_title}
 					</Shimmer>
 					<div
 						className={buildClassName(
@@ -131,14 +157,13 @@ function ApplicationReview({
 					<td className="value">{application.message}</td>
 				</tr>
 			</table>
-			{((application.status === 0 && type !== "advertiser") ||
-				application.status === 4) && (
+			{(showActions() || application.status === 4) && (
 				<div className="TextButton primary" onClick={onCounterOffer}>
 					<span>Counter Offer</span>
 				</div>
 			)}
 			<div className="Actions">
-				{application.status === 0 && type !== "advertiser" ? (
+				{showActions() ? (
 					<>
 						<div className="Button secondary" onClick={onReject}>
 							Reject

@@ -53,7 +53,7 @@ function Application({
 	counterOffer = false,
 }: {
 	onClose: () => void;
-	type: "channel" | "campaign";
+	type: "channel" | "campaign" | "invite";
 	counterOffer?: boolean;
 }) {
 	const [showDatePicker, setShowDatePicker] = useState(false);
@@ -102,10 +102,17 @@ function Application({
 		navigate("/select-my-channel/application");
 	};
 
+	const onSelectCampaign = () => {
+		navigate("/select-my-campaign/application");
+	};
+
 	const handleApply = async () => {
 		try {
 			if (!application?.channel_id) {
 				throw new Error("Please select a channel");
+			}
+			if (!application?.campaign_id && type === "invite") {
+				throw new Error("Please select a campaign");
 			}
 			if (!application?.proposed_value) {
 				throw new Error("Please enter a proposed value");
@@ -130,13 +137,19 @@ function Application({
 			return;
 		}
 		const endpoint =
-			type === "channel" ? "channel-applications" : "applications";
+			type === "channel"
+				? "channel-applications"
+				: type === "invite"
+					? "invitations"
+					: "applications";
 
 		const response = await requestAPI(
 			`/api/${endpoint}/${counterOffer ? `${application?.id}/counter-offer` : ""}`,
 			{
 				campaign_id:
-					type === "campaign" && !counterOffer && application?.campaign_id,
+					(type === "campaign" || type === "invite") &&
+					!counterOffer &&
+					application?.campaign_id,
 				channel_id: !counterOffer && application?.channel_id,
 				message: application?.message,
 				proposed_ad_format: application?.proposed_ad_format,
@@ -214,9 +227,7 @@ function Application({
 					<div className="ChatItem" onClick={onSelectChannel}>
 						<Avatar
 							id={application?.channel?.chat_id ?? ""}
-							title={
-								application?.channel?.title ?? "C"
-							} /* photo={draftChannel.photo} */
+							title={application?.channel?.title ?? "C"}
 						/>
 						<div className="body">
 							<div className="title">
@@ -225,6 +236,26 @@ function Application({
 							{application?.channel?.chat_id && (
 								<div className="subtitle">
 									{application?.channel?.username ?? "private channel"}
+								</div>
+							)}
+						</div>
+						<div className="meta">
+							<ChevronRight />
+						</div>
+					</div>
+				</div>
+			)}
+			{type === "invite" && !counterOffer && (
+				<div className="Items">
+					<div className="ChatItem" onClick={onSelectCampaign}>
+						<Avatar id={application?.campaign?.id ?? ""} isCampaign />
+						<div className="body">
+							<div className="title">
+								{application?.campaign?.title || "Select Campaign..."}
+							</div>
+							{application?.campaign && (
+								<div className="subtitle">
+									{application?.campaign?.description ?? "campaign"}
 								</div>
 							)}
 						</div>

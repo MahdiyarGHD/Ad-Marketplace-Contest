@@ -65,7 +65,7 @@ const Menu = forwardRef(
 
 			const { top, bottom, right } = menu.current!.getBoundingClientRect();
 
-			if (window.screen.height - bottom - 120 < h) {
+			if (window.innerHeight - bottom - 120 < h) {
 				dropdownMenu.style.top = `${top - h}px`;
 				dropdownMenu.classList.add("bottom");
 			} else {

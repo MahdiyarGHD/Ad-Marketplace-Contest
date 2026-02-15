@@ -10,11 +10,13 @@ import { useShallow } from "zustand/shallow";
 
 function Main({ bottomBarVisible = true }: { bottomBarVisible?: boolean }) {
 	const mainButton = useUIStore(useShallow((state) => state.mainButton));
+	const textButton = useUIStore(useShallow((state) => state.textButton));
 
 	useEffect(() => {
 		return () => {
 			useUIStore.setState({
 				mainButton: undefined,
+				textButton: undefined,
 			});
 		};
 	}, []);
@@ -28,6 +30,12 @@ function Main({ bottomBarVisible = true }: { bottomBarVisible?: boolean }) {
 			</Transition>
 
 			<Toasts />
+
+			{textButton && (
+				<div className="TextButton primary" onClick={textButton.onClick}>
+					{textButton.text}
+				</div>
+			)}
 
 			{mainButton && (
 				<MainButton text={mainButton.text} onClick={mainButton.onClick!} />
