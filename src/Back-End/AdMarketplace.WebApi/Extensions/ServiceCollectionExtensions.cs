@@ -47,6 +47,7 @@ public static class ServiceCollectionExtensions
             services.AddScoped<IChannelApplicationService, ChannelApplicationService>();
             services.AddScoped<IDealService, DealService>();
             services.AddScoped<ITransactionService, TransactionService>();
+            services.AddSingleton<TonPaymentService>();
             
             services.AddSingleton<IAnalyticsUpdateQueue, AnalyticsUpdateQueue>();
             services.AddHostedService<AnalyticsConsumerWorker>();

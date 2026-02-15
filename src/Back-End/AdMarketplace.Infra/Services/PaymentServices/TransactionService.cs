@@ -26,7 +26,7 @@ public class TransactionService(AdMarketDbContext dbContext) : ITransactionServi
         if (await TransactionExistsAsync(tx.TransactionHash))
             return Error.Conflict("Transaction.Duplicate", "This transaction has already been processed.");
 
-        using var dbTransaction = await dbContext.Database.BeginTransactionAsync();
+        await using var dbTransaction = await dbContext.Database.BeginTransactionAsync();
 
         try
         {

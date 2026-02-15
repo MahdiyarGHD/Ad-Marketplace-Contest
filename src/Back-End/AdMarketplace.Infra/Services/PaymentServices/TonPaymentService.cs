@@ -22,28 +22,31 @@ public class TonPaymentService
         _client = new TonClient(TonClientType.HTTP_TONCENTERAPIV2, options);
     }
     
-    public async Task<bool> VerifyPayment(string txHash, decimal expectedAmountTon, string expectedMemo, string expectedSender)
+    public async Task<decimal?> GetDepositAmountAsync(string txHash, string expectedMemo, string expectedSender)
     {
         var wallet = new Address(_tonSetting.BusinessWallet);
     
         var transactions = await _client.GetTransactions(wallet, 20); 
 
         if (transactions is not { Length: > 0 }) 
-            return false;
+            return null;
 
         var payment = transactions.FirstOrDefault(t => t.TransactionId.Hash == txHash);
 
-        if (payment.TransactionId.Hash != txHash) return false;
-
-        var actualNano = long.Parse(payment.InMsg.Value.ToNano());
-        var expectedNano = (long)(expectedAmountTon * 1_000_000_000);
-
-        if (actualNano < expectedNano) return false;
+        if (payment.TransactionId.Hash != txHash) 
+            return null;
 
         var actualSender = payment.InMsg.Source.ToString();
-        var actualMemo = payment.InMsg.Message; 
+        var actualMemo = payment.InMsg.Message;
 
-        return actualSender == new Address(expectedSender).ToString() 
-               && actualMemo == expectedMemo;
+        if (actualSender != new Address(expectedSender).ToString())
+            return null;
+
+        if (actualMemo != expectedMemo)
+            return null;
+        
+        var actualNano = long.Parse(payment.InMsg.Value.ToNano());
+
+        return actualNano;
     }
 }

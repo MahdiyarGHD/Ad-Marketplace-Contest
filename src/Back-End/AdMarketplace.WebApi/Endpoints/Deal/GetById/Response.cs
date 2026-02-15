@@ -10,6 +10,8 @@ public class Response
     public required Guid ChannelId { get; set; }
     public required string ChannelTitle { get; set; }
     public required Guid AdvertiserId { get; set; }
+    public required string AdvertiserFirstName { get; set; }
+    public string? AdvertiserLastName { get; set; }
     public required decimal AmountTon { get; set; }
     public required AdFormatType AdFormat { get; set; }
     public required PriceType PriceType { get; set; }

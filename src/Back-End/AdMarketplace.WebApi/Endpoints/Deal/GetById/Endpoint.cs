@@ -39,6 +39,8 @@ public class Endpoint(
             ChannelId = deal.ChannelId,
             ChannelTitle = deal.Channel.Title,
             AdvertiserId = deal.AdvertiserId,
+            AdvertiserFirstName = deal.Advertiser.FirstName,
+            AdvertiserLastName = deal.Advertiser.LastName,
             AmountTon = deal.AmountTon,
             AdFormat = deal.AdFormat,
             PriceType = deal.PriceType,
