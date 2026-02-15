@@ -162,6 +162,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
+    color: var(--primary-text);
     background-color: var(--active-bg);
     background-image: linear-gradient(var(--color-white) -300%, var(--color-user));
     border-radius: 50%;
@@ -609,7 +610,7 @@ body {
             transparent
         ) !important;
     backdrop-filter: blur(16px);
-    box-shadow: 0px -20px 16px 8px #000a;
+    box-shadow: 0px -20px 16px 8px var(--shadow-color);
     border: 1px solid var(--border-color);
     z-index: 1;
 }
@@ -708,6 +709,7 @@ body {
             position: absolute;
             right: 0;
             bottom: 0;
+            color: var(--primary-text);
             background-color: var(--tg-theme-accent-text-color);
             line-height: 1;
             padding: 2px 4px;
@@ -718,6 +720,12 @@ body {
 
     input {
         font-weight: 500;
+    }
+}
+
+.Modal .Filters {
+    .MainButton {
+        margin-top: 0.5rem;
     }
 }
 
@@ -761,6 +769,7 @@ table.Details {
 .Button {
     flex: 1;
     border-radius: .75rem;
+    color: var(--tg-theme-button-text-color);
     background-color: var(--tg-theme-button-color);
     padding: 1rem;
     text-align: center;
@@ -774,6 +783,7 @@ table.Details {
     }
 
     &.secondary {
+        color: var(--text-color);
         background-color: var(--secondary-background);
     }
 }
@@ -1181,6 +1191,7 @@ body:not(.Mobile) {
 
     .MainButton {
         margin-top: 1rem;
+        margin-bottom: 0;
     }
 
     .Placeholder {

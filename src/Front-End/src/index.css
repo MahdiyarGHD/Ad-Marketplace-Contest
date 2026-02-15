@@ -100,6 +100,7 @@ body {
 	--shimmer-color-1: #0004;
 	--shimmer-color-2: #000;
 	--dropdown-bg: var(--tg-theme-secondary-bg-color, #fff);
+	--shadow-color: color-mix(in srgb, var(--bg-color) 67%, transparent);
 
 	--topbar-height: 60px;
 
@@ -117,11 +118,12 @@ body[data-theme="dark"] {
 	--text-color: #fff;
 	--secondary-text: #fff7;
 	--primary-background: #fff;
-	--primary-text: #000;
+	--primary-text: #fff;
 	--secondary-background: #fff1;
 	--shimmer-color-1: #fff5;
 	--shimmer-color-2: #fff;
 	--dropdown-bg: var(--tg-theme-secondary-bg-color, #111);
+	--shadow-color: color-mix(in srgb, var(--bg-color) 67%, transparent);
 }
 
 .Mobile[data-theme="dark"] {

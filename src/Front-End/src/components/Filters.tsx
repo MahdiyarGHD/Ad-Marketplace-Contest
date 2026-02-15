@@ -191,6 +191,9 @@ function Filters({ onApply }: { onApply: (filters?: FilterValues) => void }) {
 					{renderFilters(filter)}
 				</div>
 			))}
+			<div className="TextButton primary" onClick={() => setValues({})}>
+				Clear
+			</div>
 			<MainButton text="Apply" onClick={() => onApply(values)} />
 		</div>
 	);
