@@ -14,19 +14,19 @@ AdMarketplace is a two-sided marketplace platform that enables:
 
 This repository contains both the front-end and back-end components:
 
-### [Front-End](./Front-End/README.md)
+### [Front-End](./src/Front-End/README.md)
 Telegram Mini App built with React and optimized for a native Telegram look and feel.
 
 **Tech Stack:** React 19, TypeScript, Vite, TMA.js SDK, Zustand
 
-👉 [View Front-End Documentation](./Front-End/README.md)
+👉 [View Front-End Documentation](./src/Front-End/README.md)
 
-### [Back-End](./Back-End/README.md)
+### [Back-End](./src/Back-End/README.md)
 RESTful API and background workers handling the complete deal lifecycle, channel verification, and TON payments.
 
 **Tech Stack:** .NET 10, ASP.NET Core, FastEndpoints, Entity Framework Core 10, PostgreSQL
 
-👉 [View Back-End Documentation](./Back-End/README.md)
+👉 [View Back-End Documentation](./src/Back-End/README.md)
 
 ## ✨ Key Features
 
