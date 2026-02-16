@@ -23,9 +23,7 @@ import { requestAPI } from "../utils/api";
 import { invokeHapticFeedbackImpact } from "../utils/common";
 import useUIStore from "../stores/useUIStore";
 import RLottie from "./RLottie";
-import useApplicationStore, {
-	type ApplicationType,
-} from "../stores/useApplicationStore";
+import useApplicationStore from "../stores/useApplicationStore";
 import Avatar from "./Avatar";
 import { useNavigate } from "react-router-dom";
 
@@ -143,20 +141,32 @@ function Application({
 					? "invitations"
 					: "applications";
 
+		let body = {
+			campaign_id:
+				type === "campaign" || type === "invite"
+					? application?.campaign_id
+					: undefined,
+			channel_id: application?.channel_id,
+			message: application?.message,
+			proposed_ad_format: application?.proposed_ad_format,
+			proposed_price_type: application?.proposed_price_type,
+			proposed_price_ton: calculateTotal(),
+			proposed_posting_time: application?.proposed_posting_time,
+		};
+
+		if (counterOffer) {
+			body = {
+				message: application?.message,
+				ad_format: application?.proposed_ad_format,
+				price_type: application?.proposed_price_type,
+				price_ton: calculateTotal(),
+				posting_time: application?.proposed_posting_time,
+			} as any;
+		}
+
 		const response = await requestAPI(
 			`/api/${endpoint}/${counterOffer ? `${application?.id}/counter-offer` : ""}`,
-			{
-				campaign_id:
-					(type === "campaign" || type === "invite") &&
-					!counterOffer &&
-					application?.campaign_id,
-				channel_id: !counterOffer && application?.channel_id,
-				message: application?.message,
-				proposed_ad_format: application?.proposed_ad_format,
-				proposed_price_type: application?.proposed_price_type,
-				proposed_price_ton: calculateTotal(),
-				proposed_posting_time: application?.proposed_posting_time,
-			} as Partial<ApplicationType>,
+			body,
 			"POST",
 		);
 

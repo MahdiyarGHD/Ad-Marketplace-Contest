@@ -6,13 +6,18 @@ import PageHeader, { PageHeaderTitle } from "../components/PageHeader";
 import Transition from "../components/Transition";
 import { useShallow } from "zustand/shallow";
 import RLottie from "../components/RLottie";
-import { CheckIcon, EllipsisIcon, XIcon } from "lucide-react";
+import {
+	CheckIcon,
+	Clock3Icon,
+	EllipsisIcon,
+	HandshakeIcon,
+	XIcon,
+} from "lucide-react";
 import "./Applications.scss";
 import MainButton from "../components/MainButton";
 import Modal from "../components/Modal";
-import type { DealType } from "../stores/useDealStore";
-import useDealStore from "../stores/useDealStore";
-import DealReview from "../components/DealReview";
+import useDealStore, { type DealType } from "../stores/useDealStore";
+import DealReview, { DealStatusType } from "../components/DealReview";
 
 export const DealStatus: { [key: number]: string } = {
 	0: "Awaiting Payment",
@@ -34,6 +39,7 @@ function Deals({ type = "my" }: { type?: "campaign" | "channel" | "my" }) {
 
 	const deals = useDealStore((state) => state.deals);
 	const setDeal = useDealStore((state) => state.setDeal);
+	const clearDeal = useDealStore((state) => state.clearDeal);
 
 	const { getChannelDeals, getCampaignDeals, getMyDeals } = useDealStore(
 		useShallow((state) => ({
@@ -86,26 +92,86 @@ function Deals({ type = "my" }: { type?: "campaign" | "channel" | "my" }) {
 
 	const renderStatus = (status: number) => {
 		switch (status) {
-			case 0:
+			case DealStatusType.AwaitingPayment:
 				return (
 					<div className="Avatar peer-color-1">
 						<EllipsisIcon />
 					</div>
 				);
-			case 1:
+			case DealStatusType.EscrowFunded:
+				return (
+					<div className="Avatar peer-color-2">
+						<HandshakeIcon />
+					</div>
+				);
+			case DealStatusType.DraftRejected:
+				return (
+					<div className="Avatar peer-color-0">
+						<HandshakeIcon />
+					</div>
+				);
+			case DealStatusType.DraftApproved | DealStatusType.Verifying:
+				return (
+					<div className="Avatar peer-color-3">
+						<HandshakeIcon />
+					</div>
+				);
+			case DealStatusType.Scheduled:
+				return (
+					<div className="Avatar peer-color-2">
+						<Clock3Icon />
+					</div>
+				);
+			case DealStatusType.Completed:
 				return (
 					<div className="Avatar peer-color-3">
 						<CheckIcon />
 					</div>
 				);
-			case 2:
+			case DealStatusType.Cancelled:
 				return (
 					<div className="Avatar peer-color-0">
 						<XIcon />
 					</div>
 				);
 			default:
-				return null;
+				return (
+					<div className="Avatar peer-color-4">
+						<HandshakeIcon />
+					</div>
+				);
+		}
+	};
+
+	const renderActiveItem = (deal: DealType) => {
+		switch (deal.status) {
+			case DealStatusType.Scheduled:
+				return (
+					<div className="Item">
+						<div className="body">
+							<div className="title">Post Time</div>
+						</div>
+						<div className="meta">
+							{new Date(deal.scheduled_post_time).toLocaleString("en-US", {
+								month: "short",
+								day: "numeric",
+								hour: "numeric",
+								minute: "numeric",
+							})}
+						</div>
+					</div>
+				);
+			default:
+				return (
+					<div className="Item">
+						<div className="body">
+							<div className="title">Price</div>
+						</div>
+						<div className="meta">
+							{deal.amount_ton ? `${deal.amount_ton.toFixed(2)} TON` : "N/A"}
+						</div>
+					</div>
+				);
 		}
 	};
 
@@ -125,22 +191,19 @@ function Deals({ type = "my" }: { type?: "campaign" | "channel" | "my" }) {
 									{deal.channel_title ?? deal.campaign_title}
 								</div>
 								<div className="subtitle" dir="auto">
-									{new Date(deal.created_at).toLocaleDateString()}
+									{new Date(deal.created_at).toLocaleDateString("en-US", {
+										month: "short",
+										day: "numeric",
+									})}
 								</div>
 							</div>
 							<div className="meta">{DealStatus[deal.status ?? 0]}</div>
 						</div>
-						<div className="Item">
-							<div className="body">
-								<div className="title">Price</div>
-							</div>
-							<div className="meta">
-								{deal.amount_ton ? `${deal.amount_ton.toFixed(2)} TON` : "N/A"}
-							</div>
-						</div>
+						{renderActiveItem(deal)}
 						<MainButton
 							text="Check Deal"
 							onClick={() => {
+								clearDeal();
 								setDeal(deal);
 								setShowDeal(true);
 							}}
@@ -150,6 +213,7 @@ function Deals({ type = "my" }: { type?: "campaign" | "channel" | "my" }) {
 			</Transition>
 			<Modal
 				className="secondary-bg"
+				fullscreen={true}
 				open={showDeal}
 				onClose={() => setShowDeal(false)}
 			>

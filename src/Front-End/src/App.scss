@@ -805,6 +805,10 @@ table.Details {
     transition: background-color .2s ease;
 }
 
+.icon {
+    display: inline-flex;
+}
+
 input, textarea {
     appearance: none;
     outline: none;
@@ -1182,15 +1186,32 @@ body:not(.Mobile) {
         background-color: var(--secondary-bg-color);
     }
 
+    &.fullscreen {
+        max-height: 100%;
+    }
+
     .Header {
         margin-bottom: .5rem;
         font-size: 18px;
         font-weight: 500;
+
+        .close {
+            position: absolute;
+            right: 0;
+            top: 0;
+            margin: .75rem;
+            padding: .5rem;
+            background-color: var(--secondary-background);
+            color: #888;
+            border-radius: 2rem;
+            cursor: pointer;
+        }
     }
 
     .Content {
         width: 100%;
         overflow-y: auto;
+        scrollbar-width: none;
     }
 
     .MainButton {
