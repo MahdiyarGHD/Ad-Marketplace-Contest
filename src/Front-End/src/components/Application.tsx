@@ -170,8 +170,6 @@ function Application({
 			"POST",
 		);
 
-		console.log(application);
-
 		if (!response.isError && response.value) {
 			// navigate(isUpdating ? `/my-campaigns` : "/add-campaign/success");
 			invokeHapticFeedbackImpact("medium");
@@ -182,6 +180,8 @@ function Application({
 		} else {
 			showToast({ title: response.first_error.description });
 		}
+
+		return;
 	};
 
 	const getChannelInfo = async () => {

@@ -121,8 +121,6 @@ function SetChannelData() {
 		};
 	}, []);
 
-	console.log(draftChannel);
-
 	useEffect(() => {
 		useUIStore.setState({
 			mainButton: {

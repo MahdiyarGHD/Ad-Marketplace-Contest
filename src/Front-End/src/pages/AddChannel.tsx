@@ -24,7 +24,7 @@ function AddChannel() {
 
 	const onSelectChannel = () => {
 		openTelegramLink(
-			`https://t.me/${import.meta.env.VITE_BOT_USERNAME}?startchannel=true&admin=invite_users+promote_members`,
+			`https://t.me/${import.meta.env.VITE_BOT_USERNAME}?startchannel=true&admin=invite_users+promote_members+delete_messages+edit_messages+post_messages+restrict_members+change_info`,
 		);
 
 		setCurrentStatus("waiting");
@@ -109,18 +109,19 @@ function AddChannel() {
 					<p className="InstructionText">
 						2. Select the channel from the list.
 					</p>
-					<p className="InstructionText">3. Add this bot to your channel.</p>
-					<p className="InstructionText"> - Tap "Administrators".</p>
 					<p className="InstructionText">
-						{" "}
-						- Tap "Add Admin" and search for our Bot.
+						3. Grant the following permissions to the bot:
+						<br />- Post Messages
+						<br />- Edit Messages
+						<br />- Delete Messages
+						<br />- Add members
+						<br />- Add new admins
+						<br />- Ban Users
+						<br />
 					</p>
 					<p className="InstructionText">
-						{" "}
-						- Grant the necessary permissions and save.
-					</p>
-					<p className="InstructionText">
-						4. You're all set! Start managing your channel ads.
+						4. Once the permissions are granted, the agent will be added
+						automatically and your channel will be activated.
 					</p>
 				</div>
 			</div>

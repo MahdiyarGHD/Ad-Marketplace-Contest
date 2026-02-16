@@ -19,6 +19,11 @@ export type ApplicationType = {
 	proposed_price_ton: number;
 	proposed_posting_time: string;
 	message: string;
+	counter_ad_format: number;
+	counter_price_type: number;
+	counter_price_ton: number;
+	counter_posting_time: string;
+	counter_message: string;
 	status?: number;
 };
 

@@ -48,7 +48,7 @@ function MyChannels() {
 	}, []);
 
 	return (
-		<div className="MyChannels">
+		<div className="MyChannels scrollable">
 			<PageHeader>
 				<PageHeaderTitle>My Channels</PageHeaderTitle>
 			</PageHeader>

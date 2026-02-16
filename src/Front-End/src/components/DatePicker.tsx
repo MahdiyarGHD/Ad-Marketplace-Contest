@@ -27,8 +27,7 @@ function DatePicker({
 	const [timeValue, setTimeValue] = useState<string>("00:00");
 
 	useEffect(() => {
-		if (!Number.isNaN((selected as Date).getTime())) {
-			console.log("are");
+		if (time && !Number.isNaN((selected as Date).getTime())) {
 			setTimeValue(format(selected as Date, "HH:mm"));
 		}
 	}, [selected]);

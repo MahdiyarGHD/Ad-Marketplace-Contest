@@ -13,7 +13,7 @@ function SelectChannel() {
 	const navigate = useNavigate();
 
 	const onBackButton = () => {
-		navigate("/set-channel-data");
+		window.history.back();
 	};
 
 	const onSelectChannel = (channel: any) => {

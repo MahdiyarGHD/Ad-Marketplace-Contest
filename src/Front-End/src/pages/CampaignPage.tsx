@@ -117,8 +117,6 @@ function CampaignPage() {
 			"PATCH",
 		);
 
-		console.log(response);
-
 		if (!response?.is_error) {
 			useUIStore.setState({ mainButton: { text: "Published" } });
 			getCampaignInfo();

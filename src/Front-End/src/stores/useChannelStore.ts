@@ -112,8 +112,6 @@ const useChannelStore = create<ChannelState>((set, get) => ({
 			look_back_seconds: 900,
 		});
 
-		console.log(response);
-
 		set(() => ({
 			unVerifiedChannels: response.value,
 		}));
@@ -220,8 +218,6 @@ const useChannelStore = create<ChannelState>((set, get) => ({
 	getInfluencers: async () => {
 		const response = await requestAPI("/api/channels/home", {}, "GET");
 
-		console.log(response);
-
 		if (response.value) {
 			set({
 				influencers: response.value,
@@ -230,8 +226,6 @@ const useChannelStore = create<ChannelState>((set, get) => ({
 	},
 	getCampaigns: async () => {
 		const response = await requestAPI("/api/campaigns/home", {}, "GET");
-
-		console.log(response);
 
 		if (response.value) {
 			set({

@@ -40,10 +40,12 @@ function ApplicationReview({
 
 	const { showToast } = useUIStore.getState();
 
-	const endpoint = `/api/${invite ? "invitations" : type === "channel" ? "channel-applications" : "applications"}/${application.id}`;
+	const endpoint = `/api/${invite ? "invitations" : (type === "channel" || type === "advertiser") ? "channel-applications" : "applications"}/${application.id}`;
 
 	const showActions = () => {
-		if (type === "advertiser") return false;
+		if (type === "advertiser" && application.status !== 4) return false;
+
+		if (type === "channel" && application.status === 4) return false;
 
 		if (application.status === 1 || application.status === 2) return false;
 
@@ -70,6 +72,18 @@ function ApplicationReview({
 		if (!response.isError && response.value) {
 			showToast({ title: "Application rejected" });
 			setApplication({ status: 2 });
+			onClose();
+		} else {
+			showToast({ title: response.first_error?.description });
+		}
+	};
+
+	const onAcceptCounterOffer = async () => {
+		const response = await requestAPI(`${endpoint}/accept-counter-offer`);
+
+		if (!response.isError && response.value) {
+			showToast({ title: "Counter offer accepted" });
+			setApplication({ status: 1 });
 			onClose();
 		} else {
 			showToast({ title: response.first_error?.description });
@@ -139,29 +153,70 @@ function ApplicationReview({
 				</div>
 			</div>
 
-			<table className="Details">
+			<table
+				className={buildClassName(
+					"Details",
+					application.counter_message && "counter-offer",
+				)}
+			>
 				<tr>
 					<td className="label">Ad Format</td>
 					<td className="value">
-						{AdFormats[application.proposed_ad_format as AdFormat]}
+						<span>{AdFormats[application.proposed_ad_format as AdFormat]}</span>{" "}
+						{AdFormats[application.counter_ad_format as AdFormat]}
 					</td>
 				</tr>
 				<tr>
 					<td className="label">Price Type</td>
 					<td className="value">
-						{PriceTypes[application.proposed_price_type as PriceType]}
+						<span>
+							{PriceTypes[application.proposed_price_type as PriceType]}
+						</span>{" "}
+						{PriceTypes[application.counter_price_type as PriceType]}
 					</td>
 				</tr>
 				<tr>
 					<td className="label">Price</td>
-					<td className="value">{application.proposed_price_ton} TON</td>
+					<td className="value">
+						<span>{application.proposed_price_ton} TON</span>{" "}
+						{application.counter_price_ton && (
+							<span>{application.counter_price_ton} TON</span>
+						)}
+					</td>
+				</tr>
+				<tr>
+					<td className="label">Posting Time</td>
+					<td className="value">
+						<span>
+							{new Date(application.proposed_posting_time).toLocaleString(
+								"en-US",
+								{
+									dateStyle: "long",
+									timeStyle: "short",
+								},
+							)}
+						</span>{" "}
+						{application.counter_posting_time && (
+							<span>
+								{new Date(application.counter_posting_time).toLocaleString(
+									"en-US",
+									{
+										dateStyle: "long",
+										timeStyle: "short",
+									},
+								)}
+							</span>
+						)}
+					</td>
 				</tr>
 				<tr>
 					<td className="label">Message</td>
-					<td className="value">{application.message}</td>
+					<td className="value">
+						<span>{application.message}</span> {application.counter_message}
+					</td>
 				</tr>
 			</table>
-			{(showActions() || application.status === 4) && !invite && (
+			{showActions() && application.status !== 4 && !invite && (
 				<div className="TextButton primary" onClick={onCounterOffer}>
 					<span>Counter Offer</span>
 				</div>
@@ -172,7 +227,12 @@ function ApplicationReview({
 						<div className="Button secondary" onClick={onReject}>
 							Reject
 						</div>
-						<div className="Button" onClick={onAccept}>
+						<div
+							className="Button"
+							onClick={
+								application.status === 4 ? onAcceptCounterOffer : onAccept
+							}
+						>
 							Accept
 						</div>
 					</>

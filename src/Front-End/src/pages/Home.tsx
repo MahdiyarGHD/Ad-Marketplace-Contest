@@ -132,12 +132,12 @@ function Home() {
 					navigate(`/deals/${id}`);
 					break;
 
-				case "application":
-					navigate(`/application/${id}`);
+				case "channel_application":
+					navigate(`/channel/${id}/applications`);
 					break;
 
 				case "invitation":
-					navigate(`/invitation/${id}`);
+					navigate(`/channel/${id}/invitations`);
 					break;
 			}
 
@@ -196,7 +196,6 @@ function Home() {
 		} else if (type === "campaigns") {
 			setCampaignSearchResults?.(response.value[type!] as Campaign[]);
 		}
-		console.log("Search", response);
 	};
 
 	useEffect(() => {
@@ -208,6 +207,15 @@ function Home() {
 		getInfluencers();
 		getCampaigns();
 	}, [isAuth]);
+
+	const showAllButton = (label: string) => {
+		if (label === "Top Picks") return false;
+
+		if (label === "Featured Campaigns" || label === "New Campaigns")
+			return false;
+
+		return true;
+	};
 
 	const renderSection = (
 		element: {
@@ -223,7 +231,8 @@ function Home() {
 				<div
 					className="flex pointer"
 					onClick={() => {
-						(element.$type === "channel" || element.$type === "campaign") &&
+						showAllButton(element.label) &&
+							(element.$type === "channel" || element.$type === "campaign") &&
 							showCategoryPageById(
 								(element.items[0] as Channel | Campaign).category?.id || "",
 								type,
@@ -233,9 +242,11 @@ function Home() {
 				>
 					{/* <div className="icon">{element.icon}</div> */}
 					<h2 className="title">{element.label}</h2>
-					<div className="meta">
-						Show All <ChevronRight size={18} />
-					</div>
+					{showAllButton(element.label) && (
+						<div className="meta">
+							Show All <ChevronRight size={18} />
+						</div>
+					)}
 				</div>
 				<div
 					className={buildClassName(

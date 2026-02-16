@@ -9,7 +9,7 @@ import useApplicationStore, {
 } from "../stores/useApplicationStore";
 import { useShallow } from "zustand/shallow";
 import RLottie from "../components/RLottie";
-import { CheckIcon, EllipsisIcon, XIcon } from "lucide-react";
+import { CheckIcon, EllipsisIcon, TagsIcon, XIcon } from "lucide-react";
 import "./Applications.scss";
 import {
 	AdFormats,
@@ -131,6 +131,12 @@ function Applications({
 						<XIcon />
 					</div>
 				);
+			case 4:
+				return (
+					<div className="Avatar peer-color-5">
+						<TagsIcon />
+					</div>
+				);
 			default:
 				return null;
 		}
@@ -169,7 +175,12 @@ function Applications({
 								<div className="title">Ad Format</div>
 							</div>
 							<div className="meta">
-								{AdFormats[application.proposed_ad_format as AdFormat]}
+								{
+									AdFormats[
+										(application.counter_ad_format ??
+											application.proposed_ad_format) as AdFormat
+									]
+								}
 							</div>
 						</div>
 						<div className="Item">
@@ -177,7 +188,12 @@ function Applications({
 								<div className="title">Post Type</div>
 							</div>
 							<div className="meta">
-								{PriceTypes[application.proposed_price_type as PriceType]}
+								{
+									PriceTypes[
+										(application.counter_price_type ??
+											application.proposed_price_type) as PriceType
+									]
+								}
 							</div>
 						</div>
 						<div className="Item">
@@ -185,15 +201,19 @@ function Applications({
 								<div className="title">Price</div>
 							</div>
 							<div className="meta">
-								{application.proposed_price_ton
-									? `${application.proposed_price_ton.toFixed(2)} TON`
+								{(application.counter_price_ton ??
+								application.proposed_price_ton)
+									? `${(application.counter_price_ton ?? application.proposed_price_ton)!.toFixed(2)} TON`
 									: "N/A"}
 							</div>
 						</div>
 						<MainButton
 							text="Check Application"
 							onClick={() => {
-								setApplication(application);
+								setApplication({
+									...application,
+									channel_id: application.channel_id ?? id,
+								});
 								setShowApplication(true);
 							}}
 						/>

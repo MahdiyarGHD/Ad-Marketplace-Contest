@@ -169,8 +169,6 @@ const useCampaignStore = create<CampaignState>((set) => ({
 	getCampaigns: async () => {
 		const response = await requestAPI("/api/campaigns/home", {}, "GET");
 
-		console.log(response);
-
 		if (response.value) {
 			set({
 				campaigns: response.value,

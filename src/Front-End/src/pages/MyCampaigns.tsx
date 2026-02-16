@@ -49,7 +49,7 @@ function MyCampaigns() {
 	}, []);
 
 	return (
-		<div className="MyChannels">
+		<div className="MyCampaigns scrollable">
 			<PageHeader>
 				<PageHeaderTitle>My Campaigns</PageHeaderTitle>
 			</PageHeader>

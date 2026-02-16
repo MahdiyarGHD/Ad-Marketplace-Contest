@@ -104,6 +104,7 @@ body {
         color: #aaa;
         cursor: pointer;
         transition: all 0.2s ease;
+        overflow: hidden;
 
         &:active {
             transform: scale(0.95);
@@ -114,6 +115,13 @@ body {
         &.active {
             color: var(--text-color);
             // background-color: var(--active-bg);
+        }
+
+        .title {
+            text-overflow: ellipsis;
+            overflow: hidden;
+            white-space: nowrap;
+            max-width: 6rem;
         }
 
         .meta {
@@ -147,6 +155,24 @@ body {
         background-color: var(--secondary-bg-color);
         color: var(--secondary-text);
         cursor: default;
+    }
+
+    &.loading {
+        opacity: .8;
+        gap: .25rem;
+    }
+}
+
+.loader {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    animation: spin 1s linear infinite;
+
+    @keyframes spin {
+        to {
+            transform: rotate(360deg);
+        }
     }
 }
 
@@ -753,6 +779,13 @@ table.Details {
             font-weight: 500;
             width: 30%;
             background-color: var(--secondary-background);
+        }
+    }
+
+    &.counter-offer td.value {
+        span:first-child {
+            text-decoration: line-through;
+            color: var(--secondary-text);
         }
     }
 

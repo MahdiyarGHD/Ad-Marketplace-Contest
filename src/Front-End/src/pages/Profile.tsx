@@ -21,7 +21,7 @@ function Profile() {
 	const { id, first_name, username } = launchParams.tgWebAppData?.user || {};
 
 	return (
-		<div className="Profile">
+		<div className="Profile scrollable">
 			<PageHeader>
 				<PageHeaderTitle>Profile</PageHeaderTitle>
 				<PageHeaderButtons />

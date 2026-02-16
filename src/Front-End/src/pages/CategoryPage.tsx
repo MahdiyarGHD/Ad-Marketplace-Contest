@@ -41,8 +41,6 @@ function CategoryPage() {
 			"GET",
 		);
 
-		console.log(response);
-
 		if (response.value?.channels) {
 			setList(response.value.channels);
 		}
@@ -54,8 +52,6 @@ function CategoryPage() {
 			{},
 			"GET",
 		);
-
-		console.log(response);
 
 		if (response.value?.campaigns) {
 			setList(response.value.campaigns);

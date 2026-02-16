@@ -82,7 +82,6 @@ function ChannelProfile() {
 		const response = await requestAPI(`/api/channels/${id}`, {}, "GET");
 
 		setActiveChannel(response.value);
-		console.log(response);
 	};
 
 	const onBackButton = () => {
