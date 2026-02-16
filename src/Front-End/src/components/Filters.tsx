@@ -32,7 +32,7 @@ function Filters({
 			key: "categoryId",
 			title: "Category",
 			type: "text",
-			onClick: () => navigate("/select-category/filter"),
+			onClick: () => navigate("/select-category/filter-channels"),
 		},
 		{
 			key: "subscribers",
@@ -75,7 +75,7 @@ function Filters({
 			key: "categoryId",
 			title: "Category",
 			type: "text",
-			onClick: () => navigate("/select-category/filter"),
+			onClick: () => navigate("/select-category/filter-campaigns"),
 		},
 		{
 			key: "budget",
