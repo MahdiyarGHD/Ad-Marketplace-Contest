@@ -73,6 +73,48 @@ public class AgentService(
             {
                 logger.LogInformation("Agent {AgentId} already in channel {ChannelId}, skipping join", agent.Id, channel.Id);
             }
+            catch (RpcException rpcEx) when (rpcEx.Code == 420 && rpcEx.Message.StartsWith("FLOOD_WAIT_"))
+            {
+                var waitSecondsStr = rpcEx.Message.Replace("FLOOD_WAIT_", "");
+                if (int.TryParse(waitSecondsStr, out var waitSeconds))
+                {
+                    logger.LogWarning(
+                        "FLOOD_WAIT detected for channel {ChannelId}. Required wait: {Seconds} seconds",
+                        channelId, waitSeconds);
+
+                    if (waitSeconds <= 120)
+                    {
+                        logger.LogInformation("Waiting {Seconds} seconds before continuing...", waitSeconds + 2);
+                        await Task.Delay(TimeSpan.FromSeconds(waitSeconds + 2));
+                        
+                        try
+                        {
+                            await client.Messages_ImportChatInvite(inviteLink.Replace("https://t.me/+", ""));
+                        }
+                        catch (RpcException retryEx) when (retryEx.Code == 400 && retryEx.Message is "USER_ALREADY_PARTICIPANT" or "INVITE_HASH_EXPIRED")
+                        {
+                            logger.LogInformation("Agent {AgentId} already in channel {ChannelId} after wait, skipping join", agent.Id, channel.Id);
+                        }
+                    }
+                    else
+                    {
+                        channel.SetStatus(ChannelStatusType.UnReady);
+                        channel.DetachAgent();
+                        await dbContext.SaveChangesAsync();
+                        
+                        logger.LogWarning(
+                            "Channel {ChannelId} marked as UnReady due to long FLOOD_WAIT ({Seconds}s). Background worker will retry later.",
+                            channelId, waitSeconds);
+                        
+                        return Error.Failure("Agent.FloodWait", 
+                            $"Telegram rate limit. Channel will be processed in background. Wait time: {waitSeconds}s");
+                    }
+                }
+                else
+                {
+                    throw;
+                }
+            }
 
             await botClient.PromoteChatMember(
                 chatId: channel.ChatId,
