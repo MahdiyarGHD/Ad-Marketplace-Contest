@@ -50,7 +50,7 @@ public class ChannelVerificationService(
         {
             var member = await botClient.GetChatMember(chatId, agentUserId, cancellationToken);
 
-            var hasRequiredPermissions = member is ChatMemberAdministrator and { CanPostMessages: true, CanEditMessages: true } and { CanDeleteMessages: true, CanInviteUsers: true, CanPinMessages: true };
+            var hasRequiredPermissions = member is ChatMemberAdministrator { CanPostMessages: true, CanEditMessages: true } and { CanDeleteMessages: true, CanInviteUsers: true, CanPinMessages: true };
 
             if (!hasRequiredPermissions)
             {

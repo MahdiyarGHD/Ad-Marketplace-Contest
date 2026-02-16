@@ -186,6 +186,9 @@ public class CampaignApplicationService(
             priceType: application.ProposedPriceType,
             scheduledPostTime: application.ProposedPostingTime);
 
+        if (dealResult.IsError)
+            return dealResult.Errors;
+        
         await notificationService.NotifyCampaignApplicationAcceptedAsync(application.Id);
 
         return application;
@@ -318,6 +321,8 @@ public class CampaignApplicationService(
             adFormat: application.ProposedAdFormat,
             priceType: application.ProposedPriceType,
             scheduledPostTime: application.ProposedPostingTime);
+        if (dealResult.IsError)
+            return dealResult.Errors;
 
         await notificationService.NotifyCampaignApplicationAcceptedAsync(application.Id);
 

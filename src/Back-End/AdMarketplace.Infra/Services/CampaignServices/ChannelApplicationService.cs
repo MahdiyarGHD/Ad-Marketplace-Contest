@@ -169,6 +169,8 @@ public class ChannelApplicationService(
             adFormat: application.ProposedAdFormat,
             priceType: application.ProposedPriceType,
             scheduledPostTime: application.ProposedPostingTime);
+        if (dealResult.IsError)
+            return dealResult.Errors;
 
         await notificationService.NotifyChannelApplicationAcceptedAsync(application.Id);
 
@@ -300,6 +302,8 @@ public class ChannelApplicationService(
             adFormat: application.ProposedAdFormat,
             priceType: application.ProposedPriceType,
             scheduledPostTime: application.ProposedPostingTime);
+        if (dealResult.IsError)
+            return dealResult.Errors;
 
         await notificationService.NotifyChannelApplicationAcceptedAsync(application.Id);
 

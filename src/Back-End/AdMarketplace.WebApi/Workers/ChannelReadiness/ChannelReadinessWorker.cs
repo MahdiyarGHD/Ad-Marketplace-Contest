@@ -14,9 +14,9 @@ public class ChannelReadinessWorker(
     IServiceProvider serviceProvider,
     ILogger<ChannelReadinessWorker> logger) : BackgroundService
 {
-    private static readonly TimeSpan PollInterval = TimeSpan.FromSeconds(30);
-    private static readonly TimeSpan ChannelThrottleDelay = TimeSpan.FromSeconds(3);
-    private static readonly TimeSpan BaseRetryInterval = TimeSpan.FromMinutes(1);
+    private static readonly TimeSpan PollInterval = TimeSpan.FromMinutes(30);
+    private static readonly TimeSpan ChannelThrottleDelay = TimeSpan.FromMinutes(1);
+    private static readonly TimeSpan BaseRetryInterval = TimeSpan.FromMinutes(5);
     private static readonly TimeSpan MaxRetryInterval = TimeSpan.FromDays(2);
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)

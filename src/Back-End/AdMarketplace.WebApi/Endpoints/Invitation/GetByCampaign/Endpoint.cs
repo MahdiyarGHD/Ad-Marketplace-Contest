@@ -37,8 +37,27 @@ public class Endpoint(
         {
             Id = i.Id,
             CampaignId = i.CampaignId,
-            ChannelId = i.ChannelId,
-            ChannelTitle = i.Channel.Title,
+            Channel = new ChannelInfo
+            {
+                Id = i.Channel.Id,
+                ChatId = i.Channel.ChatId,
+                Title = i.Channel.Title,
+                Username = i.Channel.Username,
+                Description = i.Channel.Description,
+                SubscriberCount = i.Channel.SubscriberCount,
+                PremiumCount = i.Channel.PremiumCount,
+                AverageViews = i.Channel.AverageViews,
+                LanguageDistribution = i.Channel.LanguageDistributionJson,
+                CategoryId = i.Channel.CategoryId,
+                CategoryName = i.Channel.Category?.Name,
+                Pricings = i.Channel.Pricings.Select(p => new ChannelPricingInfo
+                {
+                    Id = p.Id,
+                    AdFormat = p.AdFormat,
+                    PriceType = p.PriceType,
+                    PriceTon = p.PriceTon
+                }).ToList()
+            },
             ProposedAdFormat = i.ProposedAdFormat,
             ProposedPriceType = i.ProposedPriceType,
             ProposedPriceTon = i.ProposedPriceTon,

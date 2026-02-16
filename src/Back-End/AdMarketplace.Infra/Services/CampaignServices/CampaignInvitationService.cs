@@ -87,6 +87,9 @@ public class CampaignInvitationService(
         var invitations = await dbContext.CampaignInvitations
             .Include(i => i.Campaign)
             .Include(i => i.Channel)
+                .ThenInclude(c => c.Pricings)
+            .Include(i => i.Channel)
+                .ThenInclude(c => c.Category)
             .Where(i => i.CampaignId == campaignId)
             .OrderByDescending(i => i.CreatedAt)
             .Skip(skip)
@@ -101,6 +104,9 @@ public class CampaignInvitationService(
         var invitations = await dbContext.CampaignInvitations
             .Include(i => i.Campaign)
             .Include(i => i.Channel)
+                .ThenInclude(c => c.Pricings)
+            .Include(i => i.Channel)
+                .ThenInclude(c => c.Category)
             .Where(i => i.ChannelId == channelId)
             .OrderByDescending(i => i.CreatedAt)
             .Skip(skip)
@@ -162,7 +168,10 @@ public class CampaignInvitationService(
             adFormat: invitation.ProposedAdFormat,
             priceType: invitation.ProposedPriceType,
             scheduledPostTime: invitation.ProposedPostingTime);
+        if (dealResult.IsError)
+            return dealResult.Errors;
 
+        
         await notificationService.NotifyCampaignInvitationAcceptedAsync(invitation.Id);
 
         return invitation;
