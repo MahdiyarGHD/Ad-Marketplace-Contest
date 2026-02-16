@@ -62,8 +62,8 @@ RESTful API and background workers handling the complete deal lifecycle, channel
 
 For detailed setup instructions, configuration, and API documentation, please refer to the individual README files:
 
-- **[Front-End README](./Front-End/README.md)** - UI setup, environment variables, and development guide
-- **[Back-End README](./Back-End/README.md)** - API documentation, database setup, and architecture details
+- **[Front-End README](./src/Front-End/README.md)** - UI setup, environment variables, and development guide
+- **[Back-End README](./src/Back-End/README.md)** - API documentation, database setup, and architecture details
 
 ## 🔗 Repository
 
