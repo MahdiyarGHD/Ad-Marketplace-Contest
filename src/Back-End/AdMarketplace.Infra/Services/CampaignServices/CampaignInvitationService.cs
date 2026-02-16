@@ -9,6 +9,7 @@ namespace AdMarketplace.Infra.Services.CampaignServices;
 
 public class CampaignInvitationService(
     AdMarketDbContext dbContext,
+    IDealService dealService,
     INotificationService notificationService) : ICampaignInvitationService
 {
     public async Task<ErrorOr<CampaignInvitation>> CreateAsync(
@@ -149,6 +150,18 @@ public class CampaignInvitationService(
 
         invitation.Accept();
         await dbContext.SaveChangesAsync();
+
+        var dealResult = await dealService.CreateAsync(
+            campaignId: invitation.CampaignId,
+            applicationId: null,
+            invitationId: invitation.Id,
+            channelApplicationId: null,
+            channelId: invitation.ChannelId,
+            advertiserId: invitation.Campaign.AdvertiserId,
+            amountTon: invitation.ProposedPriceTon,
+            adFormat: invitation.ProposedAdFormat,
+            priceType: invitation.ProposedPriceType,
+            scheduledPostTime: invitation.ProposedPostingTime);
 
         await notificationService.NotifyCampaignInvitationAcceptedAsync(invitation.Id);
 
