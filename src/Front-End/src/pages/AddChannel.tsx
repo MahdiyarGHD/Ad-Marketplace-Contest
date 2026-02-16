@@ -110,14 +110,7 @@ function AddChannel() {
 						2. Select the channel from the list.
 					</p>
 					<p className="InstructionText">
-						3. Grant the following permissions to the bot:
-						<br />- Post Messages
-						<br />- Edit Messages
-						<br />- Delete Messages
-						<br />- Add members
-						<br />- Add new admins
-						<br />- Ban Users
-						<br />
+						3. Grant the all permissions to the bot
 					</p>
 					<p className="InstructionText">
 						4. Once the permissions are granted, the agent will be added
