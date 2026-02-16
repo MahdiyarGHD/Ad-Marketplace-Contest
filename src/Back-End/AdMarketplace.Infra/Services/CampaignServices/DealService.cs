@@ -9,7 +9,8 @@ namespace AdMarketplace.Infra.Services.CampaignServices;
 
 public class DealService(
     AdMarketDbContext dbContext,
-    INotificationService notificationService) : IDealService
+    INotificationService notificationService,
+    IChannelVerificationService channelVerificationService) : IDealService
 {
     public async Task<ErrorOr<Deal>> CreateAsync(
         Guid? campaignId,
@@ -117,6 +118,11 @@ public class DealService(
             .FirstOrDefaultAsync(p => p.ChannelId == channelId && p.AdFormat == adFormat && p.PriceType == priceType);
 
         var channelUnitPrice = channelPricing?.PriceTon ?? 0m;
+
+        // Verify channel readiness before creating deal
+        var verificationResult = await channelVerificationService.VerifyChannelReadinessAsync(channelId);
+        if (verificationResult.IsError)
+            return verificationResult.Errors;
 
         var deal = Deal.Create(
             campaignId: campaignId,
@@ -310,6 +316,11 @@ public class DealService(
         if (deal.Status != DealStatusType.EscrowFunded && deal.Status != DealStatusType.DraftRejected)
             return Error.Validation("Deal.InvalidStatus", "Cannot submit draft in current status");
 
+        // Verify channel readiness (bot and agent admin rights)
+        var verificationResult = await channelVerificationService.VerifyChannelReadinessAsync(deal.ChannelId);
+        if (verificationResult.IsError)
+            return verificationResult.Errors;
+
         deal.SubmitDraft(messageId);
         await dbContext.SaveChangesAsync();
 
@@ -322,6 +333,7 @@ public class DealService(
     {
         var deal = await dbContext.Deals
             .AsTracking()
+            .Include(d => d.Channel)
             .FirstOrDefaultAsync(d => d.Id == id);
         if (deal is null)
             return Error.NotFound("Deal.NotFound", "Deal not found");
@@ -331,6 +343,11 @@ public class DealService(
 
         if (deal.Status != DealStatusType.DraftSubmitted)
             return Error.Validation("Deal.InvalidStatus", "No draft to approve");
+
+        // Verify channel readiness before approving draft
+        var verificationResult = await channelVerificationService.VerifyChannelReadinessAsync(deal.ChannelId);
+        if (verificationResult.IsError)
+            return verificationResult.Errors;
 
         deal.ApproveDraft();
         await dbContext.SaveChangesAsync();
@@ -366,12 +383,18 @@ public class DealService(
     {
         var deal = await dbContext.Deals
             .AsTracking()
+            .Include(d => d.Channel)
             .FirstOrDefaultAsync(d => d.Id == id);
         if (deal is null)
             return Error.NotFound("Deal.NotFound", "Deal not found");
 
         if (deal.Status != DealStatusType.DraftApproved && deal.Status != DealStatusType.Scheduled)
             return Error.Validation("Deal.InvalidStatus", "Deal is not ready to be posted");
+
+        // Verify channel readiness before posting
+        var verificationResult = await channelVerificationService.VerifyChannelReadinessAsync(deal.ChannelId);
+        if (verificationResult.IsError)
+            return verificationResult.Errors;
 
         deal.MarkAsPosted(messageId);
         await dbContext.SaveChangesAsync();

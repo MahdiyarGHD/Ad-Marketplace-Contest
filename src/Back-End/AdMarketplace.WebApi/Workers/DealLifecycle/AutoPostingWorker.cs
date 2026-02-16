@@ -41,7 +41,7 @@ public class AutoPostingWorker(
         var dbContext = scope.ServiceProvider.GetRequiredService<AdMarketDbContext>();
         var postingService = scope.ServiceProvider.GetRequiredService<IPostingService>();
         var notificationService = scope.ServiceProvider.GetRequiredService<INotificationService>();
-        var channelService = scope.ServiceProvider.GetRequiredService<IChannelService>();
+        var channelVerificationService = scope.ServiceProvider.GetRequiredService<IChannelVerificationService>();
 
         var now = DateTimeOffset.UtcNow;
 
@@ -58,7 +58,7 @@ public class AutoPostingWorker(
         {
             try
             {
-                await PostDealAsync(deal, postingService, notificationService, channelService, ct);
+                await PostDealAsync(deal, postingService, notificationService, channelVerificationService, ct);
             }
             catch (Exception ex)
             {
@@ -74,15 +74,15 @@ public class AutoPostingWorker(
         Database.Models.Deal deal,
         IPostingService postingService,
         INotificationService notificationService,
-        IChannelService channelService,
+        IChannelVerificationService channelVerificationService,
         CancellationToken ct)
     {
-        var adminCheck = await channelService.VerifyBotAdminAsync(deal.ChannelId, ct);
-        if (adminCheck.IsError || !adminCheck.Value)
+        var verificationResult = await channelVerificationService.VerifyChannelReadinessAsync(deal.ChannelId, ct);
+        if (verificationResult.IsError)
         {
             logger.LogWarning(
-                "Bot is no longer admin in channel for deal {DealId}, skipping post",
-                deal.Id);
+                "Channel verification failed for deal {DealId}: {Error}. Skipping auto-post.",
+                deal.Id, verificationResult.FirstError.Description);
             return;
         }
 

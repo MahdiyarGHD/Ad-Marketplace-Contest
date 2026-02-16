@@ -1,19 +1,16 @@
 using AdMarketplace.Bot.Extensions;
 using AdMarketplace.Bot.Handlers;
-using AdMarketplace.Database.Models;
 using AdMarketplace.Domain.Contracts.Common;
 using AdMarketplace.Infra.Interfaces;
-using Microsoft.EntityFrameworkCore;
-using Telegram.Bot;
 using Telegram.Bot.Types;
-using Telegram.Bot.Types.Enums;
 
 namespace AdMarketplace.Bot;
 
 public sealed class UpdateHandler(
     IUserService userService,
     UserChannelConnectionHandler userChannelConnectionHandler,
-    DraftSubmissionHandler draftSubmissionHandler)
+    DraftSubmissionHandler draftSubmissionHandler,
+    StartCommandHandler startCommandHandler)
 {
     public async Task HandleUpdate(Update update, CancellationToken ct)
     {
@@ -31,6 +28,7 @@ public sealed class UpdateHandler(
             
         
         // Update Handlers
+        await startCommandHandler.HandleUpdateAsync(update, ct);
         await userChannelConnectionHandler.HandleUpdateAsync(update, ct);
         await draftSubmissionHandler.HandleUpdateAsync(update, ct);
         await draftSubmissionHandler.HandleCallbackAsync(update, ct);

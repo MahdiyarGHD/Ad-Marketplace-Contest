@@ -35,6 +35,7 @@ public static class ServiceCollectionExtensions
             services.AddScoped<ICategoryService, CategoryService>();
             services.AddScoped<IUserChannelConnectionService, UserChannelConnectionService>();
             services.AddScoped<IChannelPricingService, ChannelPricingService>();
+            services.AddScoped<IChannelVerificationService, ChannelVerificationService>();
             services.AddScoped<IAgentService, AgentService>();
             services.AddScoped<IClientFactory, ClientFactory>();
             services.AddScoped<IAnalyticsUpdateService, AnalyticsUpdateService>();

@@ -58,52 +58,72 @@ public class TonPaymentService
     public async Task<string?> RefundAsync(string targetAddress, decimal amountTon, string memo)
     {
         var mnemonic = new Mnemonic(_tonSetting.Mnemonic.Split(' '));
-        var wallet = new WalletV4(new WalletV4Options 
-        { 
-            PublicKey = mnemonic.Keys.PublicKey, 
-            Workchain = 0 
+    
+        var v4SubDefault = new WalletV4(new WalletV4Options
+        {
+            PublicKey = mnemonic.Keys.PublicKey,
+            Workchain = 0,
+            SubwalletId = 698983191
         });
+        var wallet = v4SubDefault; 
 
         var addressInfo = await _client.GetAddressInformation(wallet.Address);
         if (addressInfo is null)
             return null;
-        
-        var seqno = addressInfo.Value.Data == null ? 0 : wallet.ParseStorage(addressInfo.Value.Data.Parse()).Seqno;
+
+        // Debug: Log the actual state
+        Console.WriteLine($"Wallet state: {addressInfo.Value.State}");
+        Console.WriteLine($"Balance: {addressInfo.Value.Balance}");
+        Console.WriteLine($"Has Data: {addressInfo.Value.Data != null}");
+
+        if (addressInfo.Value.State != AccountState.Active)
+            throw new Exception($"Wallet is not deployed or not active. State: {addressInfo.Value.State}");
+
+
+        var requiredNano = new Coins(amountTon + 0.05m).ToNano();
+        var balanceNano = addressInfo.Value.Balance.ToNano();
+        if (long.Parse(balanceNano) < long.Parse(requiredNano))
+            throw new Exception("Insufficient balance");
+
+        var seqno = wallet.ParseStorage(addressInfo.Value.Data!.Parse()).Seqno;
 
         Cell body = new CellBuilder().StoreUInt(0, 32).StoreString(memo).Build();
-        
+
         var info = new IntMsgInfo(new IntMsgInfoOptions
         {
             Dest = new Address(targetAddress),
             Value = new Coins(amountTon),
             Bounce = false
         });
-        
+
         var messageOptions = new MessageXOptions
         {
             Info = info,
             Body = body
         };
-        
+
         var message = new MessageX(messageOptions);
 
         var transfer = new WalletTransfer
         {
             Message = message,
-            Mode = 3 
+            Mode = 3
         };
-        
-        ExternalInMessage externalMessage = wallet.CreateTransferMessage(new[] { transfer }, seqno);
+
+        ExternalInMessage externalMessage = wallet.CreateTransferMessage([transfer], seqno);
 
         var signedMessage = externalMessage.Sign(mnemonic.Keys.PrivateKey);
 
-        Cell cellToSend = signedMessage.Cell; 
+        Cell cellToSend = signedMessage.Cell;
 
         var sendResult = await _client.SendBoc(cellToSend);
 
         if (sendResult is null)
             return null;
-        
-        return sendResult.Value.Type != "ok" ? throw new Exception($"Transaction rejected: {sendResult.Value.Type}") : cellToSend.Hash.ToString("hex");
+
+        return sendResult.Value.Type != "ok" 
+            ? throw new Exception($"Transaction rejected: {sendResult.Value.Type}") 
+            : cellToSend.Hash.ToString("hex");
     }
+
 }
