@@ -81,7 +81,8 @@ function ApplicationReview({
 
 		setApplication({
 			id: application.id,
-			channel_id: application.channel_id,
+			channel_id: application.channel_id ?? application.channel?.id,
+			channel: application.channel,
 			campaign_id: application.campaign_id,
 			proposed_price_ton: application.proposed_price_ton,
 			proposed_ad_format: application.proposed_ad_format,
@@ -103,6 +104,7 @@ function ApplicationReview({
 				<Avatar
 					id={
 						application?.advertiser_id ??
+						application?.channel?.id ??
 						application?.channel_id ??
 						application.campaign_id ??
 						""
@@ -110,16 +112,18 @@ function ApplicationReview({
 					size={80}
 					title={
 						application?.advertiser_name ??
+						application?.channel?.title ??
 						application?.channel_title ??
 						application?.campaign_title ??
 						""
 					}
+					isCampaign={!!application?.campaign_title}
 					isUuid
-					// isUuid={!!application?.advertiser_id || !!application.campaign_id}
 				/>
 				<div className="info">
 					<Shimmer className="title">
 						{application.advertiser_name ??
+							application.channel?.title ??
 							application.channel_title ??
 							application.campaign_title}
 					</Shimmer>
