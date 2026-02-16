@@ -16,8 +16,6 @@ public class Endpoint(IUserService userService, TonPaymentService tonPaymentServ
 
     public override async Task<ErrorOr<Response>> ExecuteAsync(CancellationToken ct)
     {
-        var result = await tonPaymentService.RefundAsync("0QBgbSx49lwLITzlB_Hla3OaTwSonMLaDaBmyyqsvHMPih83", 0.35M, "Ehskh");
-        
         var userResult = await User.GetCurrentUserAsync(userService);
         if (userResult.IsError)
             return userResult.Errors;
