@@ -27,8 +27,11 @@ function SelectCategory({ title }: { title?: string }) {
 			})),
 		);
 
-	const setFilterCategory = useUIStore(
-		useShallow((state) => state.search?.setFilter),
+	const setChannelFilterCategory = useUIStore(
+		useShallow((state) => state.search.channels.setFilter),
+	);
+	const setCampaignFilterCategory = useUIStore(
+		useShallow((state) => state.search.campaigns.setFilter),
 	);
 
 	const preferredCategoryIds =
@@ -59,8 +62,12 @@ function SelectCategory({ title }: { title?: string }) {
 			case "campaign-preferred":
 				setDraftCampaignPreferredCategory(category);
 				break;
-			case "filter":
-				setFilterCategory?.("categoryId", category.id);
+			case "filter-channels":
+				setChannelFilterCategory("categoryId", category.id);
+				navigate("/");
+				break;
+			case "filter-campaigns":
+				setCampaignFilterCategory("categoryId", category.id);
 				navigate("/");
 				break;
 			default:
