@@ -20,6 +20,7 @@ function Tabs({
 	const containerRef = useRef<HTMLDivElement>(null);
 	const prevIndex = useRef<number>(0);
 	const scrollDiv = useRef<HTMLDivElement>(null);
+	const backgroundRef = useRef<HTMLDivElement>(null);
 
 	const tabCount = isValidElement(tabs)
 		? Children.count((tabs as any).props.children)
@@ -51,6 +52,18 @@ function Tabs({
 		const widthPerTab = scrollDiv.current?.scrollWidth / tabCount;
 		const currentIndex = Math.round(scrollDiv.current.scrollLeft / widthPerTab);
 
+		if (backgroundRef.current) {
+			const tabElement =
+				containerRef.current?.querySelectorAll(".Tab")[currentIndex];
+
+			const gap = 8;
+
+			backgroundRef.current.style.transform = `translateX(${(scrollDiv.current.scrollLeft / scrollDiv.current.scrollWidth) * 2 * (tabElement?.clientWidth || 0) + gap * currentIndex}px)`;
+
+			backgroundRef.current.style.width =
+				tabElement?.clientWidth + "px" || `${100 / tabCount}%`;
+		}
+
 		if (currentIndex !== index) {
 			prevIndex.current = currentIndex;
 			setIndex(currentIndex);
@@ -59,7 +72,10 @@ function Tabs({
 
 	const TabsButtons = ((showOneTab && tabCount > 0) || tabCount > 1) && (
 		<Transition state={true}>
-			<div className="Tabs">{tabs}</div>
+			<div className="Tabs">
+				{tabs}
+				<span className="background" ref={backgroundRef}></span>
+			</div>
 		</Transition>
 	);
 

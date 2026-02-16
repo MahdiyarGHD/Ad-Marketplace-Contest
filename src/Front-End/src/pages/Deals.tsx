@@ -60,6 +60,18 @@ function Deals({ type = "my" }: { type?: "campaign" | "channel" | "my" }) {
 	// 	navigate("/set-channel-data");
 	// };
 
+	const handleDealById = async (id: string) => {
+		if (!id) return;
+
+		const deal = deals?.find((deal) => deal.id === id);
+
+		if (!deal) return;
+
+		clearDeal();
+		setDeal(deal);
+		setShowDeal(true);
+	};
+
 	useEffect(() => {
 		backButton.show();
 
@@ -89,6 +101,12 @@ function Deals({ type = "my" }: { type?: "campaign" | "channel" | "my" }) {
 			backButton.offClick(onBackButton);
 		};
 	}, []);
+
+	useEffect(() => {
+		if (id && deals) {
+			handleDealById(id);
+		}
+	}, [id, deals]);
 
 	const renderStatus = (status: number) => {
 		switch (status) {
@@ -222,7 +240,7 @@ function Deals({ type = "my" }: { type?: "campaign" | "channel" | "my" }) {
 			{deals && deals.length === 0 && (
 				<div className="Placeholder">
 					<div className="Emoji">
-						<RLottie sticker="pepe" autoplay width={120} height={120} />
+						<RLottie sticker="notfound" autoplay width={120} height={120} />
 					</div>
 					<h2 className="Title">No Deals</h2>
 					<p className="Subtitle">There are no deals yet.</p>

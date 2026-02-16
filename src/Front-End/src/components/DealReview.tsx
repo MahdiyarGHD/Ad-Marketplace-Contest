@@ -147,7 +147,7 @@ function DealReview({ onClose }: { onClose: () => void }) {
 				return (
 					<div className="Actions">
 						<div className="Button" onClick={onPayment}>
-							Payment
+							Pay
 						</div>
 					</div>
 				);
@@ -295,12 +295,16 @@ function DealReview({ onClose }: { onClose: () => void }) {
 						})}
 					</td>
 				</tr>
-				{deal.draft_message_id && (
+				{(deal.draft_message_id || deal.posted_message_id) && (
 					<tr>
-						<td className="label">Drafted Message</td>
+						<td className="label">
+							{deal.posted_message_id ? "Posted" : "Drafted"} Message
+						</td>
 						<td className="value primary pointer" onClick={showDraftMessage}>
 							<div className="flex">
-								<div className="title">View Draft Message</div>
+								<div className="title">
+									View {deal.posted_message_id ? "Posted" : "Drafted"} Message
+								</div>
 								<div className="icon">
 									<ChevronRight />
 								</div>

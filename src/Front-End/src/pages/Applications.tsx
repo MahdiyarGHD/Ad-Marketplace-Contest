@@ -217,7 +217,7 @@ function Applications({
 			{applications && applications.length === 0 && (
 				<div className="Placeholder">
 					<div className="Emoji">
-						<RLottie sticker="pepe" autoplay width={120} height={120} />
+						<RLottie sticker="notfound" autoplay width={120} height={120} />
 					</div>
 					<h2 className="Title">
 						No {invite ? "Invitations" : "Applications"}

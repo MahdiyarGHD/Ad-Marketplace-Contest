@@ -10,9 +10,15 @@ import { useShallow } from "zustand/shallow";
 import { useNavigate } from "react-router-dom";
 import useCategoryStore from "../stores/useCategoryStore";
 
-function Filters({ onApply }: { onApply: (filters?: FilterValues) => void }) {
+function Filters({
+	type,
+	onApply,
+}: {
+	type: "channels" | "campaigns";
+	onApply: (filters?: FilterValues) => void;
+}) {
 	const appliedFilters = useUIStore(
-		useShallow((state) => state.search?.filters),
+		useShallow((state) => state.search[type].filters),
 	);
 
 	const [values, setValues] = useState<FilterValues>(appliedFilters || {});
@@ -21,7 +27,7 @@ function Filters({ onApply }: { onApply: (filters?: FilterValues) => void }) {
 
 	const navigate = useNavigate();
 
-	const filters: Filter[] = [
+	const channelFilters: Filter[] = [
 		{
 			key: "categoryId",
 			title: "Category",
@@ -49,6 +55,35 @@ function Filters({ onApply }: { onApply: (filters?: FilterValues) => void }) {
 			type: "number",
 			unit: "TON",
 			range: [0, 100_000],
+		},
+		{
+			key: "adFormat",
+			title: "Ad Format",
+			type: "options",
+			options: AdFormats,
+		},
+		{
+			key: "priceType",
+			title: "Price Type",
+			type: "options",
+			options: PriceTypes,
+		},
+	];
+
+	const campaignFilters: Filter[] = [
+		{
+			key: "categoryId",
+			title: "Category",
+			type: "text",
+			onClick: () => navigate("/select-category/filter"),
+		},
+		{
+			key: "budget",
+			title: "Budget",
+			type: "range",
+			range: [0, 1_000_000],
+			minKey: "minBudget",
+			maxKey: "maxBudget",
 		},
 		{
 			key: "adFormat",
@@ -186,11 +221,13 @@ function Filters({ onApply }: { onApply: (filters?: FilterValues) => void }) {
 
 	return (
 		<div className="Filters">
-			{filters.map((filter) => (
-				<div className="Items" key={filter.key}>
-					{renderFilters(filter)}
-				</div>
-			))}
+			{(type === "channels" ? channelFilters : campaignFilters).map(
+				(filter) => (
+					<div className="Items" key={filter.key}>
+						{renderFilters(filter)}
+					</div>
+				),
+			)}
 			<div className="TextButton primary" onClick={() => setValues({})}>
 				Clear
 			</div>

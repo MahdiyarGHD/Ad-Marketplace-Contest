@@ -47,6 +47,8 @@ function ChannelProfile() {
 		category_id,
 		subscriber_count,
 		average_views,
+		premium_count,
+		language_distribution_json,
 		pricings,
 	} = useChannelStore(useShallow((state) => state.activeChannel)) || {};
 	const { setActiveChannel, setDraftChannel } = useChannelStore(
@@ -248,6 +250,23 @@ function ChannelProfile() {
 						</Shimmer>
 						<div className="subtitle">Average Views</div>
 					</div>
+					{!!language_distribution_json?.length && (
+						<div className="Item">
+							<Shimmer
+								className="title"
+								state={language_distribution_json !== undefined}
+							>
+								<span>{language_distribution_json?.[0]?.language}</span>
+							</Shimmer>
+							<div className="subtitle">Top Language</div>
+						</div>
+					)}
+					<div className="Item">
+						<Shimmer className="title" state={premium_count !== undefined}>
+							<span>{premium_count}</span>
+						</Shimmer>
+						<div className="subtitle">Premium Subscribers</div>
+					</div>
 				</div>
 
 				{isOwn && (
@@ -325,7 +344,9 @@ function ChannelProfile() {
 				<Modal
 					open={showApplication}
 					onClose={onApplicationClose}
-					title={applicationType === "apply" ? "Application" : "Invite"}
+					title={
+						applicationType === "apply" ? "Application" : "Invite Proposal"
+					}
 				>
 					<Application
 						type={applicationType === "invite" ? "invite" : "channel"}
