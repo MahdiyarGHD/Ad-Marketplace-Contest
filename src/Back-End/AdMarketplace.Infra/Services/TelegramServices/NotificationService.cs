@@ -32,10 +32,17 @@ public class NotificationService(
         );
     }
 
-    private InlineKeyboardMarkup CreateApplicationButton(Guid applicationId)
+    private InlineKeyboardMarkup CreateCampaignApplicationButton(Guid applicationId)
     {
         return new InlineKeyboardMarkup(
-            InlineKeyboardButton.WithUrl("📝 View Application", CreateDeepLink("application", applicationId))
+            InlineKeyboardButton.WithUrl("📝 View Campaign Application", CreateDeepLink("campaign_application", applicationId))
+        );
+    }
+
+    private InlineKeyboardMarkup CreateChannelApplicationButton(Guid applicationId)
+    {
+        return new InlineKeyboardMarkup(
+            InlineKeyboardButton.WithUrl("📝 View Channel Application", CreateDeepLink("channel_application", applicationId))
         );
     }
 
@@ -349,7 +356,7 @@ public class NotificationService(
             messageInfo +
             $"\n✅ Review and respond to this application.";
 
-        await SendSafeAsync(ownerChatId, text, ct, CreateApplicationButton(app.Id), parseMode: ParseMode.Html);
+        await SendSafeAsync(ownerChatId, text, ct, CreateChannelApplicationButton(app.Id), parseMode: ParseMode.Html);
     }
 
     public async Task NotifyChannelApplicationAcceptedAsync(Guid applicationId, CancellationToken ct = default)
@@ -366,7 +373,7 @@ public class NotificationService(
             $"💰 Price: <b>{app.ProposedPriceTon} TON</b>\n\n" +
             $"💳 <b>Next Step:</b> Please fund the escrow to proceed.";
 
-        await SendSafeAsync(advertiserChatId, text, ct, CreateApplicationButton(app.Id), parseMode: ParseMode.Html);
+        await SendSafeAsync(advertiserChatId, text, ct, CreateChannelApplicationButton(app.Id), parseMode: ParseMode.Html);
     }
 
     public async Task NotifyChannelApplicationRejectedAsync(Guid applicationId, string? reason, CancellationToken ct = default)
@@ -387,7 +394,7 @@ public class NotificationService(
             reasonInfo +
             $"\n<i>You can try applying to other channels.</i>";
 
-        await SendSafeAsync(advertiserChatId, text, ct, CreateApplicationButton(app.Id), parseMode: ParseMode.Html);
+        await SendSafeAsync(advertiserChatId, text, ct, CreateChannelApplicationButton(app.Id), parseMode: ParseMode.Html);
     }
 
     public async Task NotifyChannelApplicationCounterOfferAsync(Guid applicationId, CancellationToken ct = default)
@@ -412,7 +419,7 @@ public class NotificationService(
             messageInfo +
             $"\n✅ You can <b>accept</b>, <b>reject</b>, or send a <b>counter-offer</b>.";
 
-        await SendSafeAsync(recipientChatId, text, ct, CreateApplicationButton(app.Id), parseMode: ParseMode.Html);
+        await SendSafeAsync(recipientChatId, text, ct, CreateChannelApplicationButton(app.Id), parseMode: ParseMode.Html);
     }
 
     public async Task NotifyCampaignApplicationReceivedAsync(Guid applicationId, CancellationToken ct = default)
@@ -436,7 +443,7 @@ public class NotificationService(
             messageInfo +
             $"\n✅ Review this application.";
 
-        await SendSafeAsync(advertiserChatId, text, ct, CreateApplicationButton(app.Id), parseMode: ParseMode.Html);
+        await SendSafeAsync(advertiserChatId, text, ct, CreateCampaignApplicationButton(app.Id), parseMode: ParseMode.Html);
     }
 
     public async Task NotifyCampaignApplicationAcceptedAsync(Guid applicationId, CancellationToken ct = default)
@@ -453,7 +460,7 @@ public class NotificationService(
             $"💰 Price: <b>{app.ProposedPriceTon} TON</b>\n\n" +
             $"⏳ <i>A deal has been created. Awaiting advertiser payment.</i>";
 
-        await SendSafeAsync(ownerChatId, text, ct, CreateApplicationButton(app.Id), parseMode: ParseMode.Html);
+        await SendSafeAsync(ownerChatId, text, ct, CreateCampaignApplicationButton(app.Id), parseMode: ParseMode.Html);
     }
 
     public async Task NotifyCampaignApplicationRejectedAsync(Guid applicationId, string? reason, CancellationToken ct = default)
@@ -473,7 +480,7 @@ public class NotificationService(
             reasonInfo +
             $"\n<i>Keep exploring other campaigns!</i>";
 
-        await SendSafeAsync(ownerChatId, text, ct, CreateApplicationButton(app.Id), parseMode: ParseMode.Html);
+        await SendSafeAsync(ownerChatId, text, ct, CreateCampaignApplicationButton(app.Id), parseMode: ParseMode.Html);
     }
 
     public async Task NotifyCampaignApplicationCounterOfferAsync(Guid applicationId, CancellationToken ct = default)
@@ -499,7 +506,7 @@ public class NotificationService(
             messageInfo +
             $"\n✅ You can <b>accept</b>, <b>reject</b>, or send a <b>counter-offer</b>.";
 
-        await SendSafeAsync(recipientChatId, text, ct, CreateApplicationButton(app.Id), parseMode: ParseMode.Html);
+        await SendSafeAsync(recipientChatId, text, ct, CreateCampaignApplicationButton(app.Id), parseMode: ParseMode.Html);
     }
 
     public async Task NotifyCampaignInvitationReceivedAsync(Guid invitationId, CancellationToken ct = default)

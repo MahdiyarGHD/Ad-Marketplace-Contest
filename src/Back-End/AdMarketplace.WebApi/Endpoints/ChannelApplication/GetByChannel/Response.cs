@@ -19,5 +19,14 @@ public class ChannelApplicationItem
     public string? Message { get; set; }
     public ApplicationStatusType Status { get; set; }
     public string? RejectionReason { get; set; }
+    
+    // Counter offer properties
+    public AdFormatType? CounterAdFormat { get; set; }
+    public PriceType? CounterPriceType { get; set; }
+    public decimal? CounterPriceTon { get; set; }
+    public DateTimeOffset? CounterPostingTime { get; set; }
+    public string? CounterMessage { get; set; }
+    public Guid? LastCounterByUserId { get; set; }
+    
     public DateTimeOffset CreatedAt { get; set; }
 }

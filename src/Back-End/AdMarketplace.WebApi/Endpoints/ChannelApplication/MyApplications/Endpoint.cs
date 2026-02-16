@@ -40,6 +40,12 @@ public class Endpoint(
             Message = a.Message,
             Status = a.Status,
             RejectionReason = a.RejectionReason,
+            CounterAdFormat = a.CounterAdFormat,
+            CounterPriceType = a.CounterPriceType,
+            CounterPriceTon = a.CounterPriceTon,
+            CounterPostingTime = a.CounterPostingTime,
+            CounterMessage = a.CounterMessage,
+            LastCounterByUserId = a.LastCounterByUserId,
             CreatedAt = a.CreatedAt
         }).ToList();
 
