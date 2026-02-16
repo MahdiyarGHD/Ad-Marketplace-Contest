@@ -161,7 +161,7 @@ function ApplicationReview({
 					<td className="value">{application.message}</td>
 				</tr>
 			</table>
-			{(showActions() || application.status === 4) && (
+			{(showActions() || application.status === 4) && !invite && (
 				<div className="TextButton primary" onClick={onCounterOffer}>
 					<span>Counter Offer</span>
 				</div>

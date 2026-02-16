@@ -28,6 +28,7 @@ import Search from "../components/Search";
 import { requestAPI } from "../utils/api";
 import type { FilterValues } from "../stores/useUIStore";
 import useUIStore from "../stores/useUIStore";
+import { retrieveLaunchParams } from "@tma.js/sdk-react";
 
 const renderCategory = (
 	category: Category,
@@ -88,7 +89,7 @@ export const renderCampaign = (
 function Home() {
 	const [tabIndex, setTabIndex] = useState(0);
 
-	const { isAuth } = useAppStore();
+	const { isAuth, startParamHandled } = useAppStore();
 
 	const { getCategories } = useCategoryStore();
 	const {
@@ -102,14 +103,47 @@ function Home() {
 		useShallow((state) => state.setActiveCampaign),
 	);
 
-	const searchResults = useUIStore(
-		useShallow((state) => state.search?.results),
+	const channelSearchResults = useUIStore(
+		useShallow((state) => state.search.channels.results),
 	);
-	const setSearchResults = useUIStore(
-		useShallow((state) => state.search?.setResults),
+	const campaignSearchResults = useUIStore(
+		useShallow((state) => state.search.campaigns.results),
 	);
 
+	const setChannelSearchResults = useUIStore(
+		useShallow((state) => state.search.channels.setResults),
+	);
+	const setCampaignSearchResults = useUIStore(
+		useShallow((state) => state.search.campaigns.setResults),
+	);
+
+	const launchParams = retrieveLaunchParams();
+
 	const navigate = useNavigate();
+
+	const handleStartParam = async () => {
+		if (launchParams.tgWebAppStartParam) {
+			const [type, id] = launchParams.tgWebAppStartParam.split("_", 2);
+
+			launchParams.tgWebAppStartParam = "";
+
+			switch (type) {
+				case "deal":
+					navigate(`/deals/${id}`);
+					break;
+
+				case "application":
+					navigate(`/application/${id}`);
+					break;
+
+				case "invitation":
+					navigate(`/invitation/${id}`);
+					break;
+			}
+
+			useAppStore.setState({ startParamHandled: true });
+		}
+	};
 
 	const showChannelProfile = (channel: Channel) => {
 		setActiveChannel(channel);
@@ -140,7 +174,11 @@ function Home() {
 		type?: "channels" | "campaigns",
 	) => {
 		if (query === "" && (!filters || Object.keys(filters).length === 0)) {
-			setSearchResults?.(undefined);
+			if (type === "channels") {
+				setChannelSearchResults?.(undefined);
+			} else if (type === "campaigns") {
+				setCampaignSearchResults?.(undefined);
+			}
 			return;
 		}
 
@@ -153,12 +191,18 @@ function Home() {
 			"GET",
 		);
 
-		setSearchResults?.(response.value[type!] as Channel[] | Campaign[]);
+		if (type === "channels") {
+			setChannelSearchResults?.(response.value[type!] as Channel[]);
+		} else if (type === "campaigns") {
+			setCampaignSearchResults?.(response.value[type!] as Campaign[]);
+		}
 		console.log("Search", response);
 	};
 
 	useEffect(() => {
 		if (!isAuth) return;
+
+		if (!startParamHandled) handleStartParam();
 
 		getCategories();
 		getInfluencers();
@@ -273,14 +317,14 @@ function Home() {
 			>
 				<TabContent state={true} className="">
 					<Search type="channels" onSearch={onSearch} />
-					{searchResults && searchResults !== undefined ? (
-						searchResults.length > 0 ? (
+					{channelSearchResults && channelSearchResults !== undefined ? (
+						channelSearchResults.length > 0 ? (
 							renderSection(
 								{
 									$type: "channel",
 									icon: "",
 									label: "Search Results",
-									items: searchResults,
+									items: channelSearchResults,
 								},
 								"channel",
 							)
@@ -295,8 +339,25 @@ function Home() {
 					{influencers.elements.length === 0 && <LoadingSkeleton />}
 				</TabContent>
 				<TabContent state={true} className="">
-					{campaigns.elements.map((element) =>
-						renderSection(element, "campaign"),
+					<Search type="campaigns" onSearch={onSearch} />
+					{campaignSearchResults && campaignSearchResults !== undefined ? (
+						campaignSearchResults.length > 0 ? (
+							renderSection(
+								{
+									$type: "campaign",
+									icon: "",
+									label: "Search Results",
+									items: campaignSearchResults,
+								},
+								"campaign",
+							)
+						) : (
+							<NoResultsPlaceholder />
+						)
+					) : (
+						campaigns.elements.map((element) =>
+							renderSection(element, "campaign"),
+						)
 					)}
 					{campaigns.elements.length === 0 && <NoCampaignPlaceholder />}
 				</TabContent>
@@ -331,7 +392,7 @@ const LoadingSkeleton = memo(() => (
 const NoCampaignPlaceholder = memo(() => (
 	<div className="Placeholder">
 		<div className="Emoji">
-			<RLottie sticker="pepe" autoplay width={120} height={120} />
+			<RLottie sticker="notfound" autoplay width={120} height={120} />
 		</div>
 		<h2 className="Title">No Campaigns Yet</h2>
 		<p className="Subtitle">There is no campaign yet.</p>
@@ -341,7 +402,7 @@ const NoCampaignPlaceholder = memo(() => (
 const NoResultsPlaceholder = memo(() => (
 	<div className="Placeholder">
 		<div className="Emoji">
-			<RLottie sticker="pepe" autoplay width={120} height={120} />
+			<RLottie sticker="notfound" autoplay width={120} height={120} />
 		</div>
 		<h2 className="Title">No Results</h2>
 		<p className="Subtitle">There are no results for your search.</p>

@@ -282,7 +282,7 @@ function Application({
 							<div className="icon">
 								<ClockIcon />
 							</div>
-							<div className="body">Proposed Price type</div>
+							<div className="body">Price type</div>
 							<div className="meta">
 								<TextTransition text={priceType?.title || "None"} />
 								<ChevronDown />
@@ -308,7 +308,7 @@ function Application({
 							<div className="icon">
 								<SendHorizontalIcon />
 							</div>
-							<div className="body">Proposed Ad format</div>
+							<div className="body">Ad format</div>
 							<div className="meta">
 								<TextTransition
 									text={
@@ -360,14 +360,18 @@ function Application({
 					<div className="icon">
 						<CalendarIcon />
 					</div>
-					<div className="body">Proposed Posting time</div>
+					<div className="body">Posting time</div>
 					<div className="meta">
 						<TextTransition
 							text={
 								application?.proposed_posting_time
-									? new Date(
-											application?.proposed_posting_time,
-										).toLocaleDateString()
+									? new Date(application?.proposed_posting_time).toLocaleString(
+											"en-US",
+											{
+												dateStyle: "medium",
+												timeStyle: "short",
+											},
+										)
 									: "Select date"
 							}
 						/>
@@ -376,6 +380,7 @@ function Application({
 				<DatePicker
 					show={showDatePicker}
 					title="Select Date"
+					time
 					mode="single"
 					selected={new Date(application?.proposed_posting_time || "")}
 					onSelect={(date) =>

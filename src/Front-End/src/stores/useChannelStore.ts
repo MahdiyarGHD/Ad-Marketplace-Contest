@@ -29,6 +29,7 @@ export type Channel = {
 	description?: string;
 	subscriber_count: number;
 	average_views: number;
+	premium_count: number;
 	language_distribution_json: [
 		{
 			language: string;

@@ -617,6 +617,18 @@ body {
     box-shadow: 0px -20px 16px 8px var(--shadow-color);
     border: 1px solid var(--border-color);
     z-index: 1;
+
+    .background {
+        position: absolute;
+        left: 0px;
+        top: 0px;
+        background-color: var(--active-bg);
+        border-radius: 1rem;
+        margin: 0.25rem;
+        z-index: -1;
+        width: 170px;
+        height: calc(100% - .5rem);
+    }
 }
 
 .Tab {
@@ -632,15 +644,6 @@ body {
     // color: var(--secondary-text);
     // font-size: 1.5rem;
     // font-weight: bold;
-}
-
-.Tab:hover {
-    background-color: var(--hover-bg);
-}
-
-.Tab.active {
-    // color: var(--text-color);
-    background-color: var(--active-bg);
 }
 
 .Tab .icon {
@@ -1227,6 +1230,23 @@ body:not(.Mobile) {
 
 .DatePickerWrapper {
     background-color: var(--secondary-bg-color);
+
+    .Items {
+        align-self: normal;
+    }
+}
+
+input[type="time"] {
+    background-color: var(--secondary-bg-color);
+    border: 1px solid var(--border-color);
+    padding: .5rem;
+    border-radius: 1rem;
+    font-size: 20px;
+    cursor: pointer;
+
+    &::-webkit-calendar-picker-indicator {
+        display: none;
+    }
 }
 
 .Skeleton {

@@ -21,9 +21,9 @@ function Search({
 	const [query, setQuery] = useState("");
 	const [showFilters, setShowFilters] = useState(false);
 
-	const filters = useUIStore(useShallow((state) => state.search?.filters));
+	const filters = useUIStore(useShallow((state) => state.search[type].filters));
 	const setFilters = useUIStore(
-		useShallow((state) => state.search?.setFilters),
+		useShallow((state) => state.search[type].setFilters),
 	);
 
 	useEffect(() => {
@@ -35,7 +35,7 @@ function Search({
 
 			onSearch(query, filters, type);
 		}, 300);
-	}, [query, filters]);
+	}, [query, filters, type]);
 
 	return (
 		<div className="SearchBar">
@@ -62,6 +62,7 @@ function Search({
 				title="Filters"
 			>
 				<Filters
+					type={type}
 					onApply={(filters) => {
 						const activeFilters = Object.fromEntries(
 							Object.entries(filters || {}).filter(

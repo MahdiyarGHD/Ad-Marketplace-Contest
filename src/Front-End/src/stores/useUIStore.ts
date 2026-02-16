@@ -45,20 +45,79 @@ export type FilterValues = {
 	[key: string]: string | number | [number, number];
 };
 
+type SearchState<T> = {
+	query: string;
+	filters: FilterValues;
+	results?: T[];
+	setQuery: (value: string) => void;
+	setFilter: (key: string, value: string | number | [number, number]) => void;
+	setFilters: (filters: FilterValues) => void;
+	setResults: (results?: T[]) => void;
+};
+
+const createSearchState =
+	<T>() =>
+	(set: any, key: "channels" | "campaigns"): SearchState<T> => ({
+		query: "",
+		filters: {},
+		setQuery(value) {
+			set((state: UIState) => ({
+				search: {
+					...state.search,
+					[key]: {
+						...state.search[key],
+						query: value,
+					},
+				},
+			}));
+		},
+		setFilters(filters) {
+			set((state: UIState) => ({
+				search: {
+					...state.search,
+					[key]: {
+						...state.search[key],
+						filters,
+					},
+				},
+			}));
+		},
+		setFilter(keyName, value) {
+			set((state: UIState) => ({
+				search: {
+					...state.search,
+					[key]: {
+						...state.search[key],
+						filters: {
+							...state.search[key].filters,
+							[keyName]: value,
+						},
+					},
+				},
+			}));
+		},
+		setResults(results) {
+			set((state: UIState) => ({
+				search: {
+					...state.search,
+					[key]: {
+						...state.search[key],
+						results,
+					},
+				},
+			}));
+		},
+	});
+
 type UIState = {
 	topBarTitle?: string;
 	topBarButtons?: ReactNode;
 	mainButton?: { text: string; onClick?: () => void };
 	textButton?: { text: string; onClick?: () => void };
 	toasts: Toast[];
-	search?: {
-		query: string;
-		filters: FilterValues;
-		results?: Channel[] | Campaign[];
-		setQuery: (value: string) => void;
-		setFilter: (key: string, value: string | number | [number, number]) => void;
-		setFilters: (filters: FilterValues) => void;
-		setResults: (results?: Channel[] | Campaign[]) => void;
+	search: {
+		channels: SearchState<Channel>;
+		campaigns: SearchState<Campaign>;
 	};
 	setTopBarTitle: (value: string) => void;
 	setTopBarButtons: (value: ReactNode) => void;
@@ -70,48 +129,8 @@ type UIState = {
 const useUIStore = create<UIState>((set) => ({
 	toasts: [],
 	search: {
-		query: "",
-		filters: {},
-		setQuery(value) {
-			set((state) => ({
-				search: {
-					...state.search!,
-					query: value,
-					filters: state.search!.filters,
-					setQuery: state.search!.setQuery,
-					setFilter: state.search!.setFilter,
-					setFilters: state.search!.setFilters,
-					setResults: state.search!.setResults,
-				},
-			}));
-		},
-		setFilters(filters) {
-			set((state) => ({
-				search: {
-					...state.search!,
-					filters,
-				},
-			}));
-		},
-		setFilter(key, value) {
-			set((state) => ({
-				search: {
-					...state.search!,
-					filters: {
-						...state.search!.filters,
-						[key]: value,
-					},
-				},
-			}));
-		},
-		setResults(results) {
-			set((state) => ({
-				search: {
-					...state.search!,
-					results,
-				},
-			}));
-		},
+		channels: createSearchState<Channel>()(set, "channels"),
+		campaigns: createSearchState<Campaign>()(set, "campaigns"),
 	},
 	setTopBarTitle(value) {
 		set({ topBarTitle: value });

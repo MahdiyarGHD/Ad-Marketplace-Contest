@@ -4,6 +4,7 @@ import { requestAPI } from "../utils/api";
 type AppState = {
 	token?: string;
 	isAuth: boolean;
+	startParamHandled: boolean;
 	userId: string | undefined;
 	authenticate: (initData: string | undefined) => Promise<void>;
 	getMe: () => Promise<void>;
@@ -11,6 +12,7 @@ type AppState = {
 
 const useAppStore = create<AppState>((set) => ({
 	isAuth: false,
+	startParamHandled: false,
 	userId: undefined,
 	async authenticate(initData) {
 		const response = await requestAPI("/api/authentication/authenticate", {
