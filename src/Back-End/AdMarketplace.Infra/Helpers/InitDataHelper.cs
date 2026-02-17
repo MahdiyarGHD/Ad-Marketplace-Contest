@@ -50,6 +50,6 @@ public class InitDataHelper(IOptions<TelegramBotOptions> botOptions, JsonSeriali
             return true;
 
         var dateTime = DateTimeOffset.FromUnixTimeSeconds(dateUnix).UtcDateTime;
-        return (DateTimeOffset.UtcNow - dateTime).TotalSeconds > 14 * 24 * 3600; // ToDo: after implementing mini app, reduce this to something like 60s
+        return (DateTimeOffset.UtcNow - dateTime).TotalSeconds > 240; 
     } 
 }
